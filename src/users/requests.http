@@ -1,0 +1,25 @@
+POST http://localhost:3000/auth/signup
+content-type: application/json
+
+{
+    "email": "ada@awc.com",
+    "password": "adwwad"
+}
+
+
+### find user
+GET http://localhost:3000/auth/2
+
+### find user
+GET http://localhost:3000/auth?email=ada@awc
+
+### delete user
+DELETE http://localhost:3000/auth/12211
+
+### patch user
+PATCH http://localhost:3000/auth/222
+content-type: application/json
+
+{
+    "email": "11@awc.com"
+}
