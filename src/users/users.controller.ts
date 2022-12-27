@@ -30,18 +30,8 @@ export class UsersController {
     private authService: AuthService,
   ) {}
 
-  // @Get('/whoami')
-  // async whoAmI(@Session() session: any) {
-  //   if (!session.userId) {
-  //     throw new BadRequestException('not authenticated');
-  //   }
-  //   const user = await this.usersService.findOne(session.userId);
-  //   return user;
-  // }
-
   @Get('/whoami')
   whoAmI(@CurrentUser() user: User) {
-    console.log('user: ', user);
     return user;
   }
 
