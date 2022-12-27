@@ -1,11 +1,26 @@
+### signup
 POST http://localhost:3000/auth/signup
 content-type: application/json
 
 {
-    "email": "ada@awc.com",
-    "password": "adwwad"
+    "email": "111@awc.com",
+    "password": "111"
 }
 
+### signin
+POST http://localhost:3000/auth/signin
+content-type: application/json
+
+{
+    "email": "111@awc.com",
+    "password": "111"
+}
+
+### whoami
+GET http://localhost:3000/auth/whoami
+
+### sign out
+POST http://localhost:3000/auth/signout
 
 ### find user
 GET http://localhost:3000/auth/2
@@ -22,4 +37,13 @@ content-type: application/json
 
 {
     "email": "11@awc.com"
+}
+
+### singin user
+POST http://localhost:3000/auth/signin
+content-type: application/json
+
+{
+    "email": "ada@awc.com",
+    "password": "adwwad"
 }
