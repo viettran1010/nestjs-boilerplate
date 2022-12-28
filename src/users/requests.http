@@ -23,7 +23,7 @@ GET http://localhost:3000/auth/whoami
 POST http://localhost:3000/auth/signout
 
 ### find user
-GET http://localhost:3000/auth/2
+GET http://localhost:3000/auth/1
 
 ### find user
 GET http://localhost:3000/auth?email=ada@awc

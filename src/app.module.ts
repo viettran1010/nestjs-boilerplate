@@ -22,12 +22,25 @@ const cookieSession = require('cookie-session');
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        type: 'sqlite',
+        type: 'postgres',
+        host: configService.get('DB_HOST'),
+        port: configService.get('DB_PORT'),
+        username: configService.get('DB_USERNAME'),
+        password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_NAME'),
         entities: [User, Report],
         synchronize: true,
       }),
     }),
+    // TypeOrmModule.forRootAsync({
+    //   inject: [ConfigService],
+    //   useFactory: (configService: ConfigService) => ({
+    //     type: 'sqlite',
+    //     database: configService.get('DB_NAME'),
+    //     entities: [User, Report],
+    //     synchronize: true,
+    //   }),
+    // }),
   ],
   controllers: [AppController],
   providers: [
@@ -45,11 +58,13 @@ const cookieSession = require('cookie-session');
   ],
 })
 export class AppModule {
+  constructor(private configService: ConfigService) {}
+
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(
         cookieSession({
-          keys: ['asdf'], // for encryption
+          keys: [this.configService.get('COOKIE_KEY')], // for encryption
         }),
       )
       .forRoutes('*'); // for all routes
