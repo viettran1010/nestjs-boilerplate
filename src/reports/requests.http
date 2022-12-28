@@ -11,3 +11,14 @@ content-type: application/json
     "lng": 123.123,
     "lat": 17
 }
+
+### approve existing report
+PATCH  http://localhost:3000/reports/11
+content-type: application/json
+
+{
+    "approved": true
+}
+
+### get an estimate for a car
+GET http://localhost:3000/reports?maker=toyota&model=camry&year=2013&mileage=10000&year=1980&lng=120&lat=15

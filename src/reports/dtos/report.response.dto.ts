@@ -28,4 +28,7 @@ export class ReportResponseDto {
   @Transform(({ obj }) => obj.id)
   @Expose()
   userId: number;
+
+  @Expose()
+  approved: boolean;
 }
