@@ -17,14 +17,12 @@ import { AuthService } from './auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
-import { UserResponseDto } from './dtos/user-response.dto';
-import { CurrentUserInterceptor } from './interceptors/current-user.interceptor';
+import { UserResponseDto } from './dtos/user.response.dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
 
 @Controller('auth')
 @Serialize(UserResponseDto)
-@UseInterceptors(CurrentUserInterceptor)
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,

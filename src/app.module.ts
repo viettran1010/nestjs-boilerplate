@@ -6,8 +6,9 @@ import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/user.entity';
 import { Report } from './reports/report.entity';
-import { APP_PIPE } from '@nestjs/core';
+import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
 const cookieSession = require('cookie-session');
 
 @Module({
@@ -36,6 +37,10 @@ const cookieSession = require('cookie-session');
       useValue: new ValidationPipe({
         whitelist: true,
       }),
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: CurrentUserInterceptor,
     },
   ],
 })
