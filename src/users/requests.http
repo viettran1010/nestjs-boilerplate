@@ -7,12 +7,30 @@ content-type: application/json
     "password": "111"
 }
 
+### signup
+POST https://nestjs-boilerplate-viet.herokuapp.com/auth/signup
+content-type: application/json
+
+{
+    "email": "admin@awc.com",
+    "password": "111"
+}
+
 ### signin
 POST http://localhost:3000/auth/signin
 content-type: application/json
 
 {
     "email": "111@awc.com",
+    "password": "111"
+}
+
+### signin
+POST https://nestjs-boilerplate-viet.herokuapp.com/auth/signin
+content-type: application/json
+
+{
+    "email": "admin@awc.com",
     "password": "111"
 }
 

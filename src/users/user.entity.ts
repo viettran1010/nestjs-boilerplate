@@ -29,6 +29,9 @@ export class User {
   @Column({ nullable: true })
   resetPasswordToken?: string;
 
+  @Column({ nullable: true })
+  resetPasswordExpires?: Date;
+
   @AfterInsert()
   logInsert() {
     console.log('Inserted user with id: ', this.id);
