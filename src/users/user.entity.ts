@@ -26,6 +26,9 @@ export class User {
   @OneToMany(() => Report, (report) => report.user) // 1st arg to solve circular dependency
   reports: Report[];
 
+  @Column({ nullable: true })
+  age?: number;
+
   @AfterInsert()
   logInsert() {
     console.log('Inserted user with id: ', this.id);
