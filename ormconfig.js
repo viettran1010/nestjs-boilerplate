@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const dbConfig = {
   synchronize: false,
   migrations: ['migrations/*.js'],
@@ -9,21 +11,25 @@ const dbConfig = {
 switch (process.env.NODE_ENV) {
   case 'development':
     Object.assign(dbConfig, {
-      type: 'sqlite',
-      database: 'db.sqlite',
+      type: 'postgres',
       entities: ['**/*.entity.js'],
+      database: process.env.DB_NAME,
+      host: process.env.DB_HOST,
+      port: process.env.DB_PORT,
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
     });
 
     break;
-  case 'test':
-    Object.assign(dbConfig, {
-      type: 'sqlite',
-      database: 'test.sqlite',
-      entities: ['**/*.entity.ts'],
-      migrationsRun: true, // run migrations before tests
-    });
+  // case 'test':
+  //   Object.assign(dbConfig, {
+  //     type: 'sqlite',
+  //     database: 'test.sqlite',
+  //     entities: ['**/*.entity.ts'],
+  //     migrationsRun: true, // run migrations before tests
+  //   });
 
-    break;
+  //   break;
   case 'production':
     Object.assign(dbConfig, {
       type: 'postgres',

@@ -1,6 +1,5 @@
 import { DataSource } from 'typeorm';
 import { config } from 'dotenv';
-// import dbConfig from './ormconfig';
 
 const dbConfig = require('./ormconfig.js');
 
