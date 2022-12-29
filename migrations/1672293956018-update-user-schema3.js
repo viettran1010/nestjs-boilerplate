@@ -1,17 +1,16 @@
 const { MigrationInterface, QueryRunner } = require('typeorm');
 
-module.exports = class updateUserSchema31672293058474 {
-  name = 'updateUserSchema31672293058474';
+module.exports = class updateUserSchema31672293956018 {
+  name = 'updateUserSchema31672293956018';
 
   async up(queryRunner) {
     await queryRunner.query(
-      `ALTER TABLE "user" ADD "resetPasswordToken" TIMESTAMP`,
+      `ALTER TABLE "user" DROP COLUMN "resetPasswordExpires"`,
     );
-  }
-
-  async down(queryRunner) {
     await queryRunner.query(
       `ALTER TABLE "user" DROP COLUMN "resetPasswordToken"`,
     );
   }
+
+  async down(queryRunner) {}
 };
