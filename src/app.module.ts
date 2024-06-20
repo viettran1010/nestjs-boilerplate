@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { I18nModule, I18nJsonParser } from 'nestjs-i18n';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
+import { StudentsModule } from './students/students.module'; // Added StudentsModule import
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -21,7 +22,7 @@ const cookieSession = require('cookie-session');
     UsersModule,
     I18nModule.forRoot({
       fallbackLanguage: 'en',
-      parser: I18nJsonParser,
+      parser: I18nJsonParser, // Configure i18n with the path to translation files
       parserOptions: {
         path: join(__dirname, '/i18n/'),
       },
@@ -29,32 +30,21 @@ const cookieSession = require('cookie-session');
     ReportsModule,
     TypeOrmModule.forRootAsync({
       useFactory: () => {
-        return require('../ormconfig.js');
+        return require('../ormconfig.js'); // Autoload entities with TypeOrmModule
       },
     }),
+    // Other commented out TypeOrmModule configurations...
     /* TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get('DB_HOST'),
-        port: configService.get('DB_PORT'),
-        username: configService.get('DB_USERNAME'),
-        password: configService.get('DB_PASSWORD'),
-        database: configService.get('DB_NAME'),
-        entities: [User, Report],
-        synchronize: true,
-      }),
-    }),
-    */
-    /* TypeOrmModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
+        // Autoload configuration files with ConfigModule
         type: 'sqlite',
         database: configService.get('DB_NAME'),
         entities: [User, Report],
         synchronize: true,
       }),
     }), */
+    StudentsModule, // Ensure StudentsModule is imported for autoloading
   ],
   controllers: [AppController],
   providers: [
@@ -63,7 +53,7 @@ const cookieSession = require('cookie-session');
       provide: APP_PIPE,
       useValue: new ValidationPipe({
         whitelist: true,
-        forbidNonWhitelisted: true,
+        forbidNonWhitelisted: true, // Enable global validation with ValidationPipe
         transform: true
       }),
     },

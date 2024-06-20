@@ -7,12 +7,7 @@ export class StudentsController {
   constructor(private studentsService: StudentsService) {}
 
   @Post()
-  async create(@Body() createStudentDto: CreateStudentDto) {
-    const student = await this.studentsService.createStudent(
-      createStudentDto.user,
-      createStudentDto.enrollmentDate,
-      createStudentDto.status
-    );
-    return student;
+  async create(@Body() body: CreateStudentDto) {
+    return await this.studentsService.validateAndCreateStudent(body);
   }
 }
