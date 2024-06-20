@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  BadRequestException,
   Delete,
   Get,
   Param,
@@ -43,16 +42,8 @@ export class UsersController {
 
   @Post('/signup')
   async createUser(@Body() body: CreateUserDto, @Session() session: any) {
-    // Check if the email is already taken
-    const emailTaken = await this.usersService.isEmailTaken(body.email);
-    if (emailTaken) {
-      throw new BadRequestException('A student with this email already exists.');
-    }
-    // If email is not taken, proceed with creating the user
-    const user = await this.usersService.create(body.email, body.password);
-    // Set the user id in the session
+    const user = await this.authService.signup(body.email, body.password, body.age);
     session.userId = user.id;
-    // Return the created user
     return user;
   }
 

@@ -6,7 +6,7 @@ import { User } from './user.entity';
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User)
+    @InjectRepository(User) 
     private usersRepository: Repository<User>,
   ) {}
 
@@ -44,12 +44,5 @@ export class UsersService {
       throw new NotFoundException('user not found');
     }
     return await this.usersRepository.remove(user);
-  }
-
-  async isEmailTaken(email: string): Promise<boolean> {
-    const user = await this.usersRepository.findOne({
-      where: { email },
-    });
-    return user !== null;
   }
 }

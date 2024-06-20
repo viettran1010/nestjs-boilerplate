@@ -51,9 +51,10 @@ const cookieSession = require('cookie-session');
   providers: [
     AppService,
     {
-      provide: APP_PIPE, // ValidationPipe is already set up correctly
+      provide: APP_PIPE,
       useValue: new ValidationPipe({
         whitelist: true,
+        transform: true,
       }),
     },
     {
