@@ -45,4 +45,11 @@ export class UsersService {
     }
     return await this.usersRepository.remove(user);
   }
+
+  async isEmailTaken(email: string): Promise<boolean> {
+    const user = await this.usersRepository.findOne({
+      where: { email },
+    });
+    return user !== null;
+  }
 }
