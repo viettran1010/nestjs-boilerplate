@@ -9,6 +9,7 @@ import { Report } from './reports/report.entity';
 import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
+import { JanitorModule } from './janitor/janitor.module';
 const cookieSession = require('cookie-session');
 
 @Module({
@@ -24,6 +25,7 @@ const cookieSession = require('cookie-session');
         return require('../ormconfig.js');
       },
     }),
+    JanitorModule,
     // TypeOrmModule.forRootAsync({
     //   inject: [ConfigService],
     //   useFactory: (configService: ConfigService) => ({
