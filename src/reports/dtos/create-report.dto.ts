@@ -5,6 +5,8 @@ import {
   IsString,
   Max,
   Min,
+  IsEmail,
+  Matches,
 } from 'class-validator';
 
 export class CreateReportDto {
@@ -12,6 +14,19 @@ export class CreateReportDto {
   @Min(0)
   @Max(1000000)
   price: number;
+
+  @IsEmail()
+  email: string;
+
+  @IsString()
+  @Min(8)
+  @Matches(
+    new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$'),
+    {
+      message: 'Password is invalid',
+    },
+  )
+  password: string;
 
   @IsString()
   maker: string;

@@ -1,15 +1,19 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Reflector } from '@nestjs/core';
+import { Report } from '../reports/report.entity';
+import { User } from '../users/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
-    private reflector: Reflector,
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(Report) private readonly reportRepository: Repository<Report>,
   ) {}
 
-  canActivate(context: ExecutionContext): boolean {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const authHeader = request.headers.authorization;
     if (!authHeader) {
@@ -17,24 +21,26 @@ export class AuthGuard implements CanActivate {
     }
 
     const token = authHeader.split(' ')[1];
-    // Check if the token has been blacklisted
-    const isBlacklisted = this.checkTokenBlacklist(token);
-    if (isBlacklisted) {
-      throw new UnauthorizedException('Token has been blacklisted');
-    }
-
     try {
-      const decoded = this.jwtService.verify(token);
-      request.user = decoded;
+      const decodedToken = this.jwtService.verify(token);
+      if (decodedToken && decodedToken.resource_owner === 'users') {
+        const user = await this.userRepository.findOneBy({ id: decodedToken.id });
+        if (!user) {
+          throw new UnauthorizedException('User not found');
+        }
+        request.user = user;
+      } else if (decodedToken && decodedToken.resource_owner === 'reports') {
+        const report = await this.reportRepository.findOneBy({ id: decodedToken.id });
+        if (!report) {
+          throw new UnauthorizedException('Report not found');
+        }
+        request.report = report;
+      } else {
+        throw new UnauthorizedException('Invalid token payload');
+      }
       return true;
     } catch (error) {
       throw new UnauthorizedException('Invalid token');
     }
-  }
-
-  private checkTokenBlacklist(token: string): boolean {
-    // Placeholder for blacklist check logic
-    // This should be replaced with actual implementation, e.g., checking against a database or cache
-    return false;
   }
 }

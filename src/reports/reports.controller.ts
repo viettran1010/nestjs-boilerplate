@@ -1,6 +1,5 @@
 import {
   Body,
-  BadRequestException,
   Controller,
   Get,
   Param,
@@ -32,7 +31,7 @@ export class ReportsController {
     return this.reportsService.create(body, user);
   }
 
-  @Patch('/:id')
+  @Patch('/:id') 
   @UseGuards(AdminGuard)
   approveReport(
     @Body() body: ApproveReportDto,
@@ -41,7 +40,7 @@ export class ReportsController {
     return this.reportsService.changeApproval(
       parseInt(param.id),
       body.approved,
-    );
+    ); 
   }
 
   @Get()
@@ -49,7 +48,7 @@ export class ReportsController {
     return this.reportsService.createEstimate(query);
   }
 
-  @Post('/login')
+  @Post('/api/auth/reports_login') // Change the endpoint as per the new requirement
   @UseGuards(AuthGuard)
   @Serialize(ReportResponseDto)
   async login(@Body() body: CreateUserDto) {
@@ -57,21 +56,5 @@ export class ReportsController {
     // and returns the result including access and refresh tokens.
     // This is a placeholder and should be replaced with the actual implementation.
     return this.reportsService.login(body.email, body.password);
-  }
-
-  @Post('/api/auth/reports_logout')
-  async reportsLogout(@Body() body: { token: string }) {
-    if (!body.token) {
-      throw new BadRequestException('token is required');
-    }
-
-    try {
-      await this.reportsService.logout(body.token);
-      return { statusCode: 200, message: 'Logout successful' };
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
-  }
-
-  // Other methods...
+  } 
 }

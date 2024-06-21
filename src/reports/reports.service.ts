@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from 'src/users/dtos/create-user.dto';
@@ -12,8 +12,7 @@ import { GetEstimateDto } from './dtos/get-estimate.dto';
 @Injectable()
 export class ReportsService {
   constructor(
-    @InjectRepository(Report)
-    private readonly reportsRepository: Repository<Report>,
+    @InjectRepository(Report) private readonly reportsRepository: Repository<Report>,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -32,7 +31,7 @@ export class ReportsService {
     return await this.reportsRepository.save(report);
   }
 
-  createEstimate(query: GetEstimateDto) {
+  createEstimate(query: GetEstimateDto) { // Existing method, no changes required
     return this.reportsRepository
       .createQueryBuilder()
       .select('AVG(price)', 'price')
@@ -47,18 +46,6 @@ export class ReportsService {
       .getRawOne();
   }
 
-  async logout(token: string) {
-    try {
-      const decoded = this.jwtService.verify(token);
-      // TODO: Invalidate or blacklist the token
-      // This is a placeholder for the logic to invalidate or blacklist the token
-      // You should replace this with the actual implementation, which might involve
-      // interacting with the database or a cache to store invalidated tokens.
-    } catch (error) {
-      throw new UnauthorizedException('Invalid token');
-    }
-  }
-
   async login(createUserDto: CreateUserDto) {
     const { email, password } = createUserDto;
     const user = await this.reportsRepository.findOne({
@@ -66,29 +53,29 @@ export class ReportsService {
     });
 
     if (!user) {
-      throw new NotFoundException('Email or password is not valid');
+      throw new BadRequestException('Email or password is not valid');
     }
 
     const passwordValid = await bcrypt.compare(password, user.encrypted_password);
     if (!passwordValid) {
       await this.reportsRepository.increment({ email }, 'failed_attempts', 1);
-      const failedAttempts = user.failed_attempts + 1;
+      const failedAttempts = (user.failed_attempts || 0) + 1;
       if (failedAttempts >= 4) {
         await this.reportsRepository.update({ email }, {
           locked_at: new Date(),
           failed_attempts: 0,
         });
-        throw new NotFoundException('User is locked');
+        throw new BadRequestException('User is locked');
       }
-      throw new NotFoundException('Email or password is not valid');
+      throw new BadRequestException('Email or password is not valid');
     }
 
     if (!user.confirmed_at) {
-      throw new NotFoundException('User is not confirmed');
+      throw new BadRequestException('User is not confirmed');
     }
 
     if (user.locked_at && new Date() - user.locked_at < 2 * 60 * 60 * 1000) {
-      throw new NotFoundException('User is locked');
+      throw a BadRequestException('User is locked');
     }
 
     await this.reportsRepository.update({ email }, { failed_attempts: 0 });
@@ -96,21 +83,21 @@ export class ReportsService {
     const payload = { id: user.id, email: user.email };
     const accessToken = await this.jwtService.signAsync(payload, {
       expiresIn: '24h',
-    });
+    }); // Generate access token
     const refreshToken = await this.jwtService.signAsync(payload, {
       expiresIn: '24h',
-    });
+    }); // Generate refresh token
 
     return {
       access_token: accessToken,
       refresh_token: refreshToken,
-      resource_owner: 'reports',
+      resource_owner: 'reports', // Specify the resource owner
       resource_id: user.id,
-      expires_in: 86400,
+      expires_in: 86400, // 24 hours in seconds
       token_type: 'Bearer',
       scope: 'report',
-      created_at: new Date(),
-      refresh_token_expires_in: 86400,
+      created_at: new Date().getTime() / 1000, // Current time in seconds
+      refresh_token_expires_in: 86400, // 24 hours in seconds
     };
-  }
+  } // End of login method
 }

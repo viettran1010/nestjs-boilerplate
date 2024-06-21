@@ -1,6 +1,5 @@
-import { MiddlewareConsumer, Module, NestModule, RequestMethod, ValidationPipe } from '@nestjs/common';
-import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { I18nModule } from 'nestjs-i18n';
 import { JwtModule } from '@nestjs/jwt';
 import { AppController } from './app.controller';
@@ -8,9 +7,8 @@ import { AppService } from './app.service';
 import { GlobalExceptionFilter } from './filters/global-exception.filter';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
-import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { User } from './users/user.entity';
-import { Report } from './reports/report.entity';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
 const cookieSession = require('cookie-session');
 
@@ -23,36 +21,29 @@ const cookieSession = require('cookie-session');
     UsersModule,
     ReportsModule,
     TypeOrmModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get('DB_HOST'),
-        port: configService.get('DB_PORT'),
-        username: configService.get('DB_USERNAME'),
-        password: configService.get('DB_PASSWORD'),
-        database: configService.get('DB_NAME'),
-        entities: [User, Report],
-        synchronize: true,
-      }),
-    }),
-    JwtModule.registerAsync({
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get('JWT_SECRET'),
-        signOptions: { expiresIn: '24h' },
-      }),
+      useFactory: () => {
+        return require('../ormconfig.js');
+      },
     }),
     I18nModule.forRoot({
-      /* ... add your i18n configuration here ... */
+      // Assuming the translation files are located in the 'i18n' folder
+      fallbackLanguage: 'en',
+      folder: 'i18n',
+    }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        return {
+          secret: configService.get('JWT_SECRET'),
+          signOptions: { expiresIn: '24h' },
+        };
+      },
     }),
   ],
   controllers: [AppController],
   providers: [
     AppService,
-    {
-      provide: APP_FILTER,
-      useClass: GlobalExceptionFilter,
-    },
     {
       provide: APP_PIPE,
       useValue: new ValidationPipe({
@@ -62,21 +53,25 @@ const cookieSession = require('cookie-session');
       }),
     },
     {
+      provide: APP_FILTER,
+      useClass: GlobalExceptionFilter,
+    },
+    {
       provide: APP_INTERCEPTOR,
       useClass: CurrentUserInterceptor,
     },
   ],
 })
-export class AppModule implements NestModule {
-  constructor(private readonly configService: ConfigService) {}
+export class AppModule {
+  constructor(private configService: ConfigService) {}
 
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(
         cookieSession({
-          keys: [this.configService.get('COOKIE_KEY')],
+          keys: [this.configService.get('COOKIE_KEY')], // for encryption
         }),
       )
-      .forRoutes('*');
+      .forRoutes('*'); // for all routes
   }
 }
