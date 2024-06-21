@@ -11,6 +11,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
 import { join } from 'path';
 import { ValidationPipe } from '@nestjs/common';
+import { JanitorModule } from './janitor/janitor.module';
+
 const cookieSession = require('cookie-session');
 
 @Module({
@@ -33,18 +35,9 @@ const cookieSession = require('cookie-session');
         return require('../ormconfig.js'); // Autoload entities with TypeOrmModule
       },
     }),
-    // Other commented out TypeOrmModule configurations...
-    /* TypeOrmModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        // Autoload configuration files with ConfigModule
-        type: 'sqlite',
-        database: configService.get('DB_NAME'),
-        entities: [User, Report],
-        synchronize: true,
-      }),
-    }), */
+
     StudentsModule, // Ensure StudentsModule is imported for autoloading
+    JanitorModule,
   ],
   controllers: [AppController],
   providers: [
