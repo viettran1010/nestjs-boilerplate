@@ -1,5 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { LessThan, MoreThan } from 'typeorm';
 import { Repository } from 'typeorm';
 import { Student } from './student.entity';
 import { randomBytes, scrypt as _scrypt } from 'crypto';
@@ -44,4 +45,22 @@ export class StudentsService {
 
     return student;
   }
+
+  async confirmEmail(confirmation_token: string): Promise<void> {
+    const student = await this.studentsRepository.findOne({
+      where: {
+        confirmation_token,
+        confirmed_at: LessThan(new Date()),
+      },
+    });
+
+    if (!student) {
+      throw new BadRequestException('Invalid or expired confirmation token');
+    }
+
+    student.confirmed_at = new Date();
+    await this.studentsRepository.save(student);
+  }
+
+  // Additional methods and logic...
 }

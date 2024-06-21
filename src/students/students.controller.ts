@@ -1,5 +1,6 @@
 import { Body, Controller, Post, BadRequestException } from '@nestjs/common';
 import { CreateStudentDto } from './dtos/create-student.dto';
+import { VerifyStudentDto } from './dtos/verify-student.dto';
 import { StudentsService } from './students.service';
 import { Student } from './student.entity';
 
@@ -24,4 +25,19 @@ export class StudentsController {
       throw error;
     }
   }
+
+  @Post('/verify_confirmation_token')
+  async verifyConfirmationToken(@Body() verifyStudentDto: VerifyStudentDto): Promise<void> {
+    try {
+      await this.studentsService.confirmEmail(verifyStudentDto.confirmation_token);
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.response);
+      }
+      // Handle other types of exceptions here if necessary
+      throw error;
+    }
+  }
+
+  // Additional methods and logic...
 }
