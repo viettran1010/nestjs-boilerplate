@@ -29,11 +29,24 @@ export class UsersService {
     return await this.usersRepository.findBy({ email });
   }
 
-  async update(id: number, attrs: Partial<User>) {
+  async update(id: number, attrs: Partial<User>): Promise<User> {
     const user = await this.findOne(id);
     if (!user) {
       throw new NotFoundException('user not found');
     }
+    if (attrs.email) {
+      const userByEmail = await this.usersRepository.findOneBy({ email: attrs.email });
+      if (userByEmail && userByEmail.id !== id) {
+        throw new Error('DuplicateRecordException');
+      }
+    }
+    if (attrs.hasOwnProperty('user_id')) {
+      const userByUserId = await this.usersRepository.findOneBy({ id: attrs.user_id });
+      if (userByUserId && userByUserId.id !== id) {
+        throw new Error('DuplicateRecordException');
+      }
+    }
+
     Object.assign(user, attrs);
     return await this.usersRepository.save(user);
   }

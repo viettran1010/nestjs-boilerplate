@@ -10,6 +10,8 @@ import {
   Session,
   UseGuards,
   UseInterceptors,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
@@ -71,6 +73,16 @@ export class UsersController {
 
   @Patch('/:id')
   async updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
-    return await this.usersService.update(parseInt(id), body);
+    try {
+      return await this.usersService.update(parseInt(id), body);
+    } catch (error) {
+      if (error.message === 'DuplicateRecordException') {
+        throw new HttpException({
+          status: HttpStatus.BAD_REQUEST,
+          error: 'Cannot update record due to duplicate email or user_id',
+        }, HttpStatus.BAD_REQUEST);
+      }
+      throw error;
+    }
   }
 }
