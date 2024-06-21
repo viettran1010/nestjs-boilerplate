@@ -17,6 +17,7 @@ import { ApproveReportDto } from './dtos/approve-report.dto';
 import { CreateReportDto } from './dtos/create-report.dto';
 import { GetEstimateDto } from './dtos/get-estimate.dto';
 import { ReportResponseDto } from './dtos/report.response.dto';
+import { ResetPasswordConfirmDto } from './dtos/reset-password-confirm.dto'; // Added import for ResetPasswordConfirmDto
 import { ReportsService } from './reports.service';
 
 @Controller('reports')
@@ -45,5 +46,15 @@ export class ReportsController {
   @Get()
   getEstimate(@Query() query: GetEstimateDto) {
     return this.reportsService.createEstimate(query);
+  }
+
+  // Added new endpoint for password reset confirmation
+  @Post('/reset-password-confirm')
+  async confirmResetPassword(@Body() body: ResetPasswordConfirmDto) {
+    await this.reportsService.confirmResetPassword(body.token, body.password);
+    return {
+      statusCode: 200,
+      message: 'Password reset successfully',
+    };
   }
 }
