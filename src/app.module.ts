@@ -4,11 +4,12 @@ import { AppService } from './app.service';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './users/user.entity';
-import { Report } from './reports/report.entity';
 import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
+import { I18nModule, I18nJsonParser } from 'nestjs-i18n';
+import { JwtModule } from '@nestjs/jwt';
+import * as path from 'path';
 const cookieSession = require('cookie-session');
 
 @Module({
@@ -23,6 +24,21 @@ const cookieSession = require('cookie-session');
       useFactory: () => {
         return require('../ormconfig.js');
       },
+    }),
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      parser: I18nJsonParser,
+      parserOptions: {
+        path: path.join(__dirname, '/i18n/'),
+      },
+    }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get('JWT_SECRET'),
+        signOptions: { expiresIn: '24h' },
+      }),
+      inject: [ConfigService],
     }),
     // TypeOrmModule.forRootAsync({
     //   inject: [ConfigService],
@@ -51,13 +67,11 @@ const cookieSession = require('cookie-session');
   providers: [
     AppService,
     {
-      provide: 'EmailService', // Placeholder for the actual EmailService
-      useValue: {}, // The actual implementation will be provided later
-    },
-    {
-      provide: APP_PIPE,
+      provide: APP_PIPE, // Global validation pipe
       useValue: new ValidationPipe({
         whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
       }),
     },
     {

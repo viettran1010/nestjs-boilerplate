@@ -1,7 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { randomBytes } from 'crypto';
 import { promisify } from 'util';
+import { randomBytes, scrypt as _scrypt } from 'crypto';
 import { User } from 'src/users/user.entity';
 import { Repository } from 'typeorm';
 import { CreateReportDto } from './dtos/create-report.dto';
@@ -10,6 +10,8 @@ import { Report } from './report.entity';
 
 @Injectable()
 export class ReportsService {
+  private readonly scrypt = promisify(_scrypt);
+
   constructor(
     @InjectRepository(Report)
     private readonly reportsRepository: Repository<Report>,
@@ -45,29 +47,38 @@ export class ReportsService {
       .getRawOne();
   }
 
-  async resetPasswordRequest(email: string): Promise<void> {
+  async validateUser(email: string, password: string): Promise<Report | null> {
     const report = await this.reportsRepository.findOne({
       where: { email },
     });
 
-    if (!report) {
-      // If no report is found, return immediately to prevent email enumeration
-      return;
+    if (!report || !report.encrypted_password) {
+      return null;
     }
 
-    // Generate a secure random token
-    const randomBytesPromise = promisify(randomBytes);
-    const tokenBuffer = await randomBytesPromise(32);
-    const passwordResetToken = tokenBuffer.toString('hex');
+    const [salt, storedHash] = report.encrypted_password.split('.');
+    const hash = (await this.scrypt(password, salt, 32)) as Buffer;
 
-    // Set the token and timestamp in the report entity
-    report.reset_password_token = passwordResetToken;
-    report.reset_password_sent_at = new Date();
+    if (storedHash !== hash.toString('hex')) {
+      report.failed_attempts = (report.failed_attempts || 0) + 1;
+      if (report.failed_attempts >= 4) {
+        report.locked_at = new Date();
+        report.failed_attempts = 0;
+      }
+      await this.reportsRepository.save(report);
+      throw new BadRequestException('invalid credentials');
+    }
 
-    // Save the updated report entity
+    if (report.locked_at) {
+      const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
+      if (report.locked_at > twoHoursAgo) {
+        throw new BadRequestException('User is locked');
+      }
+    }
+
+    report.failed_attempts = 0;
     await this.reportsRepository.save(report);
 
-    // TODO: Implement EmailService.sendEmail method to send the reset password email
-    // EmailService.sendEmail(report.email, passwordResetToken, 'URL_FOR_RESET');
+    return report;
   }
 }
