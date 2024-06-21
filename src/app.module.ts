@@ -1,15 +1,16 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
-import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
-import { I18nModule } from '@nestjs/i18n';
+import { APP_FILTER, APP_PIPE } from '@nestjs/core';
+import { I18nModule } from 'nestjs-i18n';
 import { JwtModule } from '@nestjs/jwt';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { HttpExceptionFilter } from './filters/http-exception.filter';
+import { GlobalExceptionFilter } from './filters/global-exception.filter';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/user.entity';
 import { Report } from './reports/report.entity';
+import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
 const cookieSession = require('cookie-session');
@@ -22,19 +23,12 @@ const cookieSession = require('cookie-session');
     }),
     UsersModule,
     ReportsModule,
-    I18nModule.forRoot({
-      // TODO: Configure with the path to your translation files
-    }),
     TypeOrmModule.forRootAsync({
+    I18nModule.forRoot({ /* ... add your i18n configuration here ... */ }),
       useFactory: () => {
         return require('../ormconfig.js');
       },
     }),
-    JwtModule.register({
-      secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '60s' },
-    }),
-    // ... other imports
     // TypeOrmModule.forRootAsync({
     //   inject: [ConfigService],
     //   useFactory: (configService: ConfigService) => ({
@@ -62,15 +56,22 @@ const cookieSession = require('cookie-session');
   providers: [
     AppService,
     {
-      provide: APP_PIPE,
-      useClass: ValidationPipe,
-    },
-    {
       provide: APP_FILTER,
-      useClass: HttpExceptionFilter,
+      useClass: GlobalExceptionFilter,
     },
-    // ... other providers
     {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe({
+      useFactory: () => new ValidationPipe({
+      }),
+        forbidNonWhitelisted: true,
+        transform: true,
+    },
+    {
+    JwtModule.register({
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: '24h' },
+    }),
       provide: APP_INTERCEPTOR,
       useClass: CurrentUserInterceptor,
     },

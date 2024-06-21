@@ -1,16 +1,20 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { JwtService } from '@nestjs/jwt';
+import { CreateUserDto } from 'src/users/dtos/create-user.dto';
 import { User } from 'src/users/user.entity';
+import { Report } from './report.entity';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 import { CreateReportDto } from './dtos/create-report.dto';
 import { GetEstimateDto } from './dtos/get-estimate.dto';
-import { Report } from './report.entity';
 
 @Injectable()
 export class ReportsService {
   constructor(
     @InjectRepository(Report)
     private readonly reportsRepository: Repository<Report>,
+    private readonly jwtService: JwtService,
   ) {}
 
   create(body: CreateReportDto, user: User) {
@@ -41,5 +45,60 @@ export class ReportsService {
       .setParameters({ mileage: query.mileage })
       .limit(3)
       .getRawOne();
+  }
+
+  async login(createUserDto: CreateUserDto) {
+    const { email, password } = createUserDto;
+    const user = await this.reportsRepository.findOne({
+      where: { email },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Email or password is not valid');
+    }
+
+    const passwordValid = await bcrypt.compare(password, user.encrypted_password);
+    if (!passwordValid) {
+      await this.reportsRepository.increment({ email }, 'failed_attempts', 1);
+      const failedAttempts = user.failed_attempts + 1;
+      if (failedAttempts >= 4) {
+        await this.reportsRepository.update({ email }, {
+          locked_at: new Date(),
+          failed_attempts: 0,
+        });
+        throw new NotFoundException('User is locked');
+      }
+      throw new NotFoundException('Email or password is not valid');
+    }
+
+    if (!user.confirmed_at) {
+      throw new NotFoundException('User is not confirmed');
+    }
+
+    if (user.locked_at && new Date() - user.locked_at < 2 * 60 * 60 * 1000) {
+      throw new NotFoundException('User is locked');
+    }
+
+    await this.reportsRepository.update({ email }, { failed_attempts: 0 });
+
+    const payload = { id: user.id, email: user.email };
+    const accessToken = await this.jwtService.signAsync(payload, {
+      expiresIn: '24h',
+    });
+    const refreshToken = await this.jwtService.signAsync(payload, {
+      expiresIn: '24h',
+    });
+
+    return {
+      access_token: accessToken,
+      refresh_token: refreshToken,
+      resource_owner: 'reports',
+      resource_id: user.id,
+      expires_in: 86400,
+      token_type: 'Bearer',
+      scope: 'report',
+      created_at: new Date(),
+      refresh_token_expires_in: 86400,
+    };
   }
 }
