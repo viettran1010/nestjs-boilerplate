@@ -1,5 +1,6 @@
 import {
   Body,
+  BadRequestException,
   Controller,
   Get,
   Param,
@@ -8,14 +9,15 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { AdminGuard } from '../guards/admin.guard';
-import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { CurrentUser } from '../users/decorators/current-user.decorator';
 import { User } from '../users/user.entity';
 import { ApproveReportDto } from './dtos/approve-report.dto';
 import { CreateReportDto } from './dtos/create-report.dto';
 import { GetEstimateDto } from './dtos/get-estimate.dto';
+import { RefreshTokenDto } from './dtos/refresh-token.dto';
 import { ReportResponseDto } from './dtos/report.response.dto';
 import { ReportsService } from './reports.service';
 
@@ -45,5 +47,21 @@ export class ReportsController {
   @Get()
   getEstimate(@Query() query: GetEstimateDto) {
     return this.reportsService.createEstimate(query);
+  }
+
+  @Post('/refresh')
+  @UseGuards(AuthGuard('jwt'))
+  async refreshToken(
+    @Body() refreshTokenDto: RefreshTokenDto,
+    @CurrentUser() user: User
+  ) {
+    if (!refreshTokenDto || !refreshTokenDto.refresh_token) {
+      throw new BadRequestException('Refresh token is required');
+    }
+    const result = await this.reportsService.refreshToken(refreshTokenDto.refresh_token, 'reports');
+    if (!result) {
+      throw new BadRequestException('Refresh token is not valid');
+    }
+    return result;
   }
 }
