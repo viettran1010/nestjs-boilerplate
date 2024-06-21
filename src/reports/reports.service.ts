@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/users/user.entity';
 import { Repository } from 'typeorm';
+import { User } from 'src/users/user.entity';
 import { CreateReportDto } from './dtos/create-report.dto';
 import { GetEstimateDto } from './dtos/get-estimate.dto';
 import { Report } from './report.entity';
@@ -14,6 +14,21 @@ export class ReportsService {
   ) {}
 
   create(body: CreateReportDto, user: User) {
+  async confirmEmail(confirmation_token: string) {
+    const report = await this.reportsRepository.findOne({
+      where: { confirmation_token },
+    });
+
+    if (!report) {
+      throw new NotFoundException('Report with the given confirmation token not found');
+    }
+
+    report.confirmed_at = new Date();
+    await this.reportsRepository.save(report);
+
+    return report;
+  }
+
     const report = this.reportsRepository.create(body);
     report.user = user;
     return this.reportsRepository.save(report);

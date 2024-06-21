@@ -7,9 +7,9 @@ import {
   Post,
   Query,
   UseGuards,
+  NotFoundException,
 } from '@nestjs/common';
 import { AdminGuard } from '../guards/admin.guard';
-import { AuthService } from '../users/auth.service'; // Added import for AuthService
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { CurrentUser } from '../users/decorators/current-user.decorator';
@@ -17,30 +17,16 @@ import { User } from '../users/user.entity';
 import { ApproveReportDto } from './dtos/approve-report.dto';
 import { CreateReportDto } from './dtos/create-report.dto';
 import { GetEstimateDto } from './dtos/get-estimate.dto';
-import { ReportsRegistrationDto } from './dtos/create-report.dto'; // Added import for ReportsRegistrationDto
 import { ReportResponseDto } from './dtos/report.response.dto';
 import { ReportsService } from './reports.service';
 
 @Controller('reports')
+@Serialize(ReportResponseDto)
 export class ReportsController {
-  constructor(
-    private reportsService: ReportsService,
-    private authService: AuthService, // Added AuthService to the constructor
-  ) {}
-
-  @Post('/api/auth/reports_registrations')
-  async registerReport(@Body() body: ReportsRegistrationDto) {
-    const report = await this.authService.signup(body.email, body.password);
-    return {
-      reports: {
-        id: report.id,
-      },
-    };
-  }
+  constructor(private reportsService: ReportsService) {}
 
   @Post()
   @UseGuards(AuthGuard)
-  @Serialize(ReportResponseDto)
   createReport(@Body() body: CreateReportDto, @CurrentUser() user: User) {
     return this.reportsService.create(body, user);
   }
@@ -60,5 +46,15 @@ export class ReportsController {
   @Get()
   getEstimate(@Query() query: GetEstimateDto) {
     return this.reportsService.createEstimate(query);
+  }
+
+  @Post('/api/auth/reports_verify_confirmation_token')
+  verifyEmailConfirmation(@Body('confirmation_token') confirmation_token: string) {
+    return this.reportsService.confirmEmail(confirmation_token).then(report => {
+      if (!report) {
+        throw new NotFoundException('Confirmation token is invalid or has expired');
+      }
+      return report;
+    });
   }
 }

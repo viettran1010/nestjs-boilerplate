@@ -1,28 +1,19 @@
-import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
+import { MiddlewareConsumer, Module, ValidationPipe, ClassSerializerInterceptor } from '@nestjs/common';
 import { I18nModule, I18nJsonParser } from 'nestjs-i18n';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
-import { HttpExceptionFilter } from './filters/http-exception.filter';
+import { APP_PIPE, APP_INTERCEPTOR } from '@nestjs/core';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/user.entity';
 import { Report } from './reports/report.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
 import { join } from 'path';
 const cookieSession = require('cookie-session');
 
 @Module({
   imports: [
-    I18nModule.forRoot({
-      fallbackLanguage: 'en',
-      parser: I18nJsonParser,
-      parserOptions: {
-        path: join(__dirname, '/i18n/'),
-      },
-    }),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
@@ -33,6 +24,11 @@ const cookieSession = require('cookie-session');
       useFactory: () => {
         return require('../ormconfig.js');
       },
+    }),
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      parser: I18nJsonParser,
+      parserOptions: { path: join(__dirname, '/i18n/') },
     }),
     // TypeOrmModule.forRootAsync({
     //   inject: [ConfigService],
@@ -60,20 +56,10 @@ const cookieSession = require('cookie-session');
   controllers: [AppController],
   providers: [
     AppService,
-    {
-      provide: APP_PIPE,
-      useValue: new ValidationPipe({
-        transform: true,
-        forbidNonWhitelisted: true,
-      }),
-    },
-    {
-      provide: APP_FILTER,
-      useClass: HttpExceptionFilter,
-    },
+    { provide: APP_PIPE, useClass: ValidationPipe },
     {
       provide: APP_INTERCEPTOR,
-      useClass: CurrentUserInterceptor,
+      useClass: ClassSerializerInterceptor,
     },
   ],
 })

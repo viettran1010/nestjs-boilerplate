@@ -1,13 +1,23 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import { Report } from './report.entity';
-import { AuthService } from '../users/auth.service';
 import { ReportsController } from './reports.controller';
 import { ReportsService } from './reports.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Report])],
-  controllers: [ReportsController], // Keep existing controllers
-  providers: [ReportsService, AuthService], // Add AuthService to the providers array
+  imports: [
+    TypeOrmModule.forFeature([Report]),
+    JwtModule.registerAsync({
+      inject: [ConfigService],
+      useFactory: async (config: ConfigService) => ({
+        secret: config.get('JWT_SECRET'),
+        signOptions: { expiresIn: '60s' },
+      }),
+    }),
+  ],
+  controllers: [ReportsController],
+  providers: [ReportsService],
 })
 export class ReportsModule {}
