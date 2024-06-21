@@ -10,8 +10,11 @@ import {
   Session,
   UseGuards,
   UseInterceptors,
+  UsePipes,
   HttpException,
   HttpStatus,
+  Put,
+  ValidationPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
@@ -83,6 +86,22 @@ export class UsersController {
         }, HttpStatus.BAD_REQUEST);
       }
       throw error;
+    }
+  }
+
+  @Put('/students/:id')
+  @UseGuards(AuthGuard)
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async updateStudentRecord(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    try {
+      const updatedStudent = await this.usersService.updateStudentRecord(parseInt(id), updateUserDto);
+      return {
+        status: HttpStatus.OK,
+        message: 'Student record updated successfully.',
+        student: updatedStudent,
+      };
+    } catch (error) {
+      throw new HttpException({ status: error.status, error: error.message }, error.status);
     }
   }
 }

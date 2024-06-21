@@ -1,10 +1,42 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { DuplicateRecordException } from '../exceptions/duplicate-record.exception';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 
 @Injectable()
 export class UsersService {
+  constructor(
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
+  ) {}
+
+  // ... Other methods ...
+
+  async updateStudentRecord(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+    const student = await this.usersRepository.findOneBy({ id });
+    if (!student) {
+      throw new NotFoundException('Student record not found.');
+    }
+
+    const duplicateByEmail = await this.usersRepository.findOneBy({ email: updateUserDto.email });
+    if (duplicateByEmail && duplicateByEmail.id !== id) {
+      throw new DuplicateRecordException('Duplicate student record found with the same email.');
+    }
+
+    const duplicateByUserId = await this.usersRepository.findOneBy({ id: updateUserDto.userId });
+    if (duplicateByUserId && duplicateByUserId.id !== id) {
+      throw new DuplicateRecordException('Duplicate student record found with the same user_id.');
+    }
+
+    Object.assign(student, updateUserDto);
+    await this.usersRepository.save(student);
+
+    return student;
+  }
+
+  // ... Other methods ...
+
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,

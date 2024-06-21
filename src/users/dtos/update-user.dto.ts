@@ -1,5 +1,19 @@
-import { IsEmail, IsOptional } from 'class-validator';
-import { IsNumber, IsBoolean, Min } from 'class-validator';
+import {
+  IsEmail,
+  IsOptional,
+  IsNumber,
+  IsBoolean,
+  Min,
+  IsDateString,
+  IsEnum,
+} from 'class-validator';
+
+enum StudentStatus {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  SUSPENDED = 'suspended',
+  GRADUATED = 'graduated',
+}
 
 export class UpdateUserDto {
   @IsEmail()
@@ -14,4 +28,13 @@ export class UpdateUserDto {
   @IsBoolean()
   @IsOptional()
   admin?: boolean;
+
+  @IsNumber()
+  userId: number;
+
+  @IsDateString()
+  enrollmentDate: Date;
+
+  @IsEnum(StudentStatus)
+  status: StudentStatus;
 }
