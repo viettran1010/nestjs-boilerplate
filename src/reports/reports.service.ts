@@ -1,7 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { LessThan, MoreThan, Repository } from 'typeorm';
 import { User } from 'src/users/user.entity';
-import { Repository } from 'typeorm';
 import { CreateReportDto } from './dtos/create-report.dto';
 import { GetEstimateDto } from './dtos/get-estimate.dto';
 import { Report } from './report.entity';
@@ -17,6 +17,27 @@ export class ReportsService {
     const report = this.reportsRepository.create(body);
     report.user = user;
     return this.reportsRepository.save(report);
+  }
+
+  async confirmEmail(confirmation_token: string) {
+    const report = await this.reportsRepository.findOne({
+      where: {
+        confirmation_token: confirmation_token,
+        confirmed_at: LessThan(new Date()),
+      },
+    });
+
+    if (!report || report.confirmed_at) {
+      throw new BadRequestException('Confirmation token is not valid');
+    }
+
+    if (report.confirmation_sent_at && report.confirmation_sent_at > MoreThan(new Date())) {
+      throw new BadRequestException('Confirmation token is expired');
+    }
+
+    report.confirmed_at = new Date(); // Set confirmed_at to current time
+    await this.reportsRepository.save(report);
+    return report;
   }
 
   async changeApproval(id: number, approved: boolean) {

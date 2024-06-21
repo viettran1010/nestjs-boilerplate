@@ -2,12 +2,17 @@ import {
   IsLatitude,
   IsLongitude,
   IsNumber,
+  IsOptional,
   IsString,
   Max,
   Min,
 } from 'class-validator';
 
 export class CreateReportDto {
+  @IsString()
+  @IsOptional()
+  confirmation_token?: string;
+
   @IsNumber()
   @Min(0)
   @Max(1000000)
@@ -19,6 +24,7 @@ export class CreateReportDto {
   @IsString()
   model: string;
 
+  @IsNumber()
   @Min(1930)
   year: number;
 
