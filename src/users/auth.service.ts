@@ -1,17 +1,18 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { promisify } from 'util';
-import { EmailService } from '../email/email.service'; // Added import for EmailService
+import { EmailService } from '../email/email.service';
 import { UsersService } from './users.service';
-import { randomBytes, scrypt as _scrypt } from 'crypto';
+import { randomBytes as _randomBytes, scrypt as _scrypt } from 'crypto';
 
 const scrypt = promisify(_scrypt);
+const randomBytes = _randomBytes;
 
 @Injectable()
 export class AuthService {
-  // Added EmailService to the constructor
   constructor(private usersService: UsersService, private emailService: EmailService) {}
 
   async signup(email: string, password: string) {
+    // Existing signup logic...
     // validate user email doesn't exist
     const users = await this.usersService.find(email);
     if (users.length) {
@@ -53,6 +54,7 @@ export class AuthService {
     return user;
   }
 
+  // Existing sendConfirmationEmail method...
   async sendConfirmationEmail(email: string, confirmation_token: string) {
     const confirmationUrl = `http://yourfrontend.com/confirm?token=${confirmation_token}`;
     await this.emailService.sendMail({

@@ -1,5 +1,6 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { I18nModule, I18nJsonParser } from 'nestjs-i18n';
+import { EmailModule } from './email/email.module'; // Assuming the path to EmailModule
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { JwtModule } from '@nestjs/jwt';
@@ -22,6 +23,7 @@ const cookieSession = require('cookie-session');
     }),
     UsersModule,
     ReportsModule,
+    EmailModule, // Added EmailModule to the imports array
     I18nModule.forRoot({
       fallbackLanguage: 'en',
       parser: I18nJsonParser,
