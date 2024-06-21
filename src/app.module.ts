@@ -1,30 +1,25 @@
-import { MiddlewareConsumer, Module, ValidationPipe, ExceptionFilter, ArgumentsHost } from '@nestjs/common';
+import { MiddlewareConsumer, NestModule, ValidationPipe } from '@nestjs/common';
+import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE, Module } from '@nestjs/core';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { I18nModule } from '@nestjs/i18n';
+import { JwtModule } from '@nestjs/jwt';
+import { User } from './users/user.entity';
+import { Report } from './reports/report.entity';
+import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
+import { HttpExceptionFilter } from './filters/http-exception.filter';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './users/user.entity';
-import { Report } from './reports/report.entity';
-import { APP_INTERCEPTOR, APP_PIPE, APP_FILTER } from '@nestjs/core';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
+import * as path from 'path';
 const cookieSession = require('cookie-session');
-
-// Assuming the global exception filter class is defined somewhere in the project
-// If not, it should be created following the NestJS documentation on exception filters
-export class AllExceptionsFilter implements ExceptionFilter {
-  catch(exception: unknown, host: ArgumentsHost) {
-    // ... implementation details
-  }
-}
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
-      // ... other configurations remain unchanged
     }),
     UsersModule,
     ReportsModule,
@@ -33,38 +28,45 @@ export class AllExceptionsFilter implements ExceptionFilter {
         return require('../ormconfig.js');
       },
     }),
-    // ... other imports remain unchanged
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      loaderOptions: {
+        path: path.join(__dirname, '/i18n/'),
+        watch: true,
+      },
+    }),
+    JwtModule.register({
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: '24h' },
+    }),
   ],
   controllers: [AppController],
   providers: [
     AppService,
     {
       provide: APP_PIPE,
-      useValue: new ValidationPipe({
-        whitelist: true,
-      }),
+      useClass: ValidationPipe,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
     },
     {
       provide: APP_INTERCEPTOR,
       useClass: CurrentUserInterceptor,
     },
-    {
-      provide: APP_FILTER,
-      useClass: AllExceptionsFilter, // Assuming AllExceptionsFilter is the global exception filter class
-    },
-    // ... other providers remain unchanged
   ],
 })
-export class AppModule {
+export class AppModule implements NestModule {
   constructor(private configService: ConfigService) {}
 
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(
         cookieSession({
-          keys: [this.configService.get('COOKIE_KEY')], // for encryption
+          keys: [this.configService.get('COOKIE_KEY')],
         }),
       )
-      .forRoutes('*'); // for all routes
+      .forRoutes('*');
   }
 }
