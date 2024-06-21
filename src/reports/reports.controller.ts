@@ -1,5 +1,6 @@
 import {
   Body,
+  BadRequestException,
   Controller,
   Get,
   Param,
@@ -7,6 +8,7 @@ import {
   Post,
   Query,
   UseGuards,
+  UseFilters,
 } from '@nestjs/common';
 import { AdminGuard } from '../guards/admin.guard';
 import { AuthGuard } from '../guards/auth.guard';
@@ -29,6 +31,24 @@ export class ReportsController {
   createReport(@Body() body: CreateReportDto, @CurrentUser() user: User) {
     return this.reportsService.create(body, user);
   }
+
+  @Patch('/confirm')
+  @Serialize(ReportResponseDto)
+  async confirmEmail(@Body('token') token: string) {
+    try {
+      const report = await this.reportsService.confirmEmail(token);
+      if (!report) {
+        throw new BadRequestException('Confirmation token is not valid');
+      }
+      return report;
+    } catch (error) {
+      if (error instanceof TokenExpiredError) {
+        throw new BadRequestException('Confirmation token is expired');
+      }
+      throw error;
+    }
+  }
+
 
   @Patch('/:id')
   @UseGuards(AdminGuard)
