@@ -7,6 +7,7 @@ import {
   Min,
   IsEmail,
   Matches,
+  MinLength, // Added import for MinLength
 } from 'class-validator';
 
 export class CreateReportDto {
@@ -15,11 +16,11 @@ export class CreateReportDto {
   @Max(1000000)
   price: number;
 
-  @IsEmail()
+  @IsEmail({}, { message: 'Email is invalid' }) // Updated decorator with custom message
   email: string;
 
   @IsString()
-  @Min(8)
+  @MinLength(8, { message: 'Password must be longer than 8 characters' }) // Added MinLength decorator with custom message
   @Matches(
     new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$'),
     {
@@ -34,6 +35,7 @@ export class CreateReportDto {
   @IsString()
   model: string;
 
+  @IsNumber()
   @Min(1930)
   year: number;
 

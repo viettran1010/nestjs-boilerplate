@@ -40,5 +40,33 @@ export class LoginResponseDto {
   @Expose()
   refresh_token: string;
 
+  @Expose()
+  resource_owner: string;
+
+  @Expose()
+  resource_id: number;
+
+  @Expose()
+  expires_in: number;
+
+  @Expose()
+  token_type: string;
+
+  @Expose()
+  scope: string;
+
+  @Expose()
+  created_at: number;
+
+  @Expose()
+  refresh_token_expires_in: number | null;
+}
+export class LoginResponseDto {
+  @Expose()
+  access_token: string;
+
+  @Expose()
+  refresh_token: string;
+
   // ... other fields as specified in the business logic documents
 }

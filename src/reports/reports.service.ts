@@ -1,7 +1,7 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
-import { CreateUserDto } from 'src/users/dtos/create-user.dto';
+import { LoginDto } from './dtos/login.dto'; // Updated import
 import { User } from 'src/users/user.entity';
 import { Report } from './report.entity';
 import { Repository } from 'typeorm';
@@ -46,41 +46,41 @@ export class ReportsService {
       .getRawOne();
   }
 
-  async login(createUserDto: CreateUserDto) {
-    const { email, password } = createUserDto;
-    const user = await this.reportsRepository.findOne({
+  async login(loginDto: LoginDto) { // Updated parameter type
+    const { email, password } = loginDto;
+    const report = await this.reportsRepository.findOne({
       where: { email },
     });
 
-    if (!user) {
+    if (!report) {
       throw new BadRequestException('Email or password is not valid');
     }
 
-    const passwordValid = await bcrypt.compare(password, user.encrypted_password);
+    const passwordValid = await bcrypt.compare(password, report.encrypted_password); // Updated variable name
     if (!passwordValid) {
       await this.reportsRepository.increment({ email }, 'failed_attempts', 1);
-      const failedAttempts = (user.failed_attempts || 0) + 1;
+      const failedAttempts = (report.failed_attempts || 0) + 1;
       if (failedAttempts >= 4) {
         await this.reportsRepository.update({ email }, {
           locked_at: new Date(),
-          failed_attempts: 0,
+          failed_attempts: 0, // Reset failed attempts after locking the user
         });
         throw new BadRequestException('User is locked');
       }
       throw new BadRequestException('Email or password is not valid');
     }
 
-    if (!user.confirmed_at) {
+    if (!report.confirmed_at) {
       throw new BadRequestException('User is not confirmed');
     }
 
-    if (user.locked_at && new Date() - user.locked_at < 2 * 60 * 60 * 1000) {
+    if (report.locked_at && new Date().getTime() - report.locked_at.getTime() < 2 * 60 * 60 * 1000) { // Updated time comparison
       throw new BadRequestException('User is locked');
     }
 
     await this.reportsRepository.update({ email }, { failed_attempts: 0 });
 
-    const payload = { id: user.id, email: user.email };
+    const payload = { id: report.id, email: report.email };
     const accessToken = await this.jwtService.signAsync(payload, {
       expiresIn: '24h',
     }); // Generate access token
@@ -92,7 +92,7 @@ export class ReportsService {
       access_token: accessToken,
       refresh_token: refreshToken,
       resource_owner: 'reports', // Specify the resource owner
-      resource_id: user.id,
+      resource_id: report.id,
       expires_in: 86400, // 24 hours in seconds
       token_type: 'Bearer',
       scope: 'report',
@@ -100,19 +100,4 @@ export class ReportsService {
       refresh_token_expires_in: 86400, // 24 hours in seconds
     };
   } // End of login method
-
-  // New logout method
-  async logout(token: string) {
-    try {
-      const decoded = this.jwtService.verify(token);
-      // Implement logic to blacklist or delete the token
-      // For example, if using a blacklist:
-      // await this.tokenBlacklistRepository.save({ token });
-      // If deleting the token:
-      // await this.tokenRepository.delete({ token });
-      return;
-    } catch (error) {
-      throw new BadRequestException('Invalid token');
-    }
-  }
 }

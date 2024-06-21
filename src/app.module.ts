@@ -1,6 +1,6 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
-import { I18nModule, I18nJsonParser } from 'nestjs-i18n';
+import { I18nModule } from 'nestjs-i18n';
 import { JwtModule } from '@nestjs/jwt';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -24,17 +24,16 @@ const cookieSession = require('cookie-session');
       useFactory: () => {
         return require('../ormconfig.js');
       },
-    }),
+    }), // TypeOrmModule configuration remains unchanged
     I18nModule.forRoot({
       // Assuming the translation files are located in the 'i18n' folder
       fallbackLanguage: 'en',
       folder: 'i18n',
-      parser: I18nJsonParser,
     }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
+      useFactory: async (configService: ConfigService) => {
         return {
           secret: configService.get('JWT_SECRET'),
           signOptions: { expiresIn: '24h' },
@@ -43,27 +42,30 @@ const cookieSession = require('cookie-session');
     }),
   ],
   controllers: [AppController],
-  providers: [
+  providers: [ // Start of providers array
     AppService,
     {
       provide: APP_PIPE,
-      useValue: new ValidationPipe({
-        whitelist: true,
-        forbidNonWhitelisted: true,
-        transform: true,
-      }),
+      useClass: ValidationPipe, // Changed from useValue to useClass
+      useFactory: () => {
+        return new ValidationPipe({
+          whitelist: true,
+          forbidNonWhitelisted: true,
+          transform: true,
+        });
+      },
     },
     {
       provide: APP_FILTER,
-      useClass: GlobalExceptionFilter,
+      useClass: GlobalExceptionFilter, // GlobalExceptionFilter configuration remains unchanged
     },
     {
       provide: APP_INTERCEPTOR,
       useClass: CurrentUserInterceptor,
     },
-  ],
+  ], // End of providers array
 })
-export class AppModule {
+export class AppModule { // AppModule class definition remains unchanged
   constructor(private configService: ConfigService) {}
 
   configure(consumer: MiddlewareConsumer) {

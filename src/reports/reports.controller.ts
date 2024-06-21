@@ -18,7 +18,7 @@ import { ApproveReportDto } from './dtos/approve-report.dto';
 import { CreateReportDto } from './dtos/create-report.dto';
 import { GetEstimateDto } from './dtos/get-estimate.dto';
 import { ReportResponseDto } from './dtos/report.response.dto';
-import { LogoutReportDto } from './dtos/report.response.dto'; // Added from patch
+import { LoginResponseDto } from './dtos/login-response.dto'; // Added from patch
 import { ReportsService } from './reports.service';
 
 @Controller('reports')
@@ -49,23 +49,10 @@ export class ReportsController {
     return this.reportsService.createEstimate(query);
   }
 
-  @Post('/api/auth/reports_login') // Endpoint changed as per the new requirement
+  @Post('/api/auth/reports_login')
   @UseGuards(AuthGuard)
-  @Serialize(ReportResponseDto)
-  async login(@Body() body: CreateUserDto) {
-    // Assuming there is a login method in the ReportsService that handles the login logic
-    // and returns the result including access and refresh tokens.
-    // This is a placeholder and should be replaced with the actual implementation.
-    return this.reportsService.login(body.email, body.password);
-  }
-
-  @Post('/api/auth/reports_logout') // Added from patch
-  @UseGuards(AuthGuard)
-  async logout(@Body() body: LogoutReportDto) {
-    await this.reportsService.logout(body.token);
-    return {
-      statusCode: 200,
-      message: 'Logout successful',
-    };
-  }
+  @Serialize(LoginResponseDto) // Changed from ReportResponseDto to LoginResponseDto
+  async login(@Body() body: CreateReportDto) { // Changed parameter type from CreateUserDto to CreateReportDto
+    return this.reportsService.login(body); // Changed to pass the whole body to the login method
+  } 
 }
