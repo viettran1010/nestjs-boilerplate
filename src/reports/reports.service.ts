@@ -75,7 +75,7 @@ export class ReportsService {
     }
 
     if (user.locked_at && new Date() - user.locked_at < 2 * 60 * 60 * 1000) {
-      throw a BadRequestException('User is locked');
+      throw new BadRequestException('User is locked');
     }
 
     await this.reportsRepository.update({ email }, { failed_attempts: 0 });
@@ -100,4 +100,19 @@ export class ReportsService {
       refresh_token_expires_in: 86400, // 24 hours in seconds
     };
   } // End of login method
+
+  // New logout method
+  async logout(token: string) {
+    try {
+      const decoded = this.jwtService.verify(token);
+      // Implement logic to blacklist or delete the token
+      // For example, if using a blacklist:
+      // await this.tokenBlacklistRepository.save({ token });
+      // If deleting the token:
+      // await this.tokenRepository.delete({ token });
+      return;
+    } catch (error) {
+      throw new BadRequestException('Invalid token');
+    }
+  }
 }

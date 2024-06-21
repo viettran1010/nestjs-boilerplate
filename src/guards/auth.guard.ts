@@ -1,5 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { BlacklistedToken } from '../auth/blacklisted-token.entity';
 import { Report } from '../reports/report.entity';
 import { User } from '../users/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -11,6 +12,7 @@ export class AuthGuard implements CanActivate {
     private readonly jwtService: JwtService,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     @InjectRepository(Report) private readonly reportRepository: Repository<Report>,
+    @InjectRepository(BlacklistedToken) private readonly blacklistedTokenRepository: Repository<BlacklistedToken>,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -21,6 +23,11 @@ export class AuthGuard implements CanActivate {
     }
 
     const token = authHeader.split(' ')[1];
+    const isBlacklisted = await this.blacklistedTokenRepository.findOneBy({ token });
+    if (isBlacklisted) {
+      throw new UnauthorizedException('Token is blacklisted');
+    }
+
     try {
       const decodedToken = this.jwtService.verify(token);
       if (decodedToken && decodedToken.resource_owner === 'users') {

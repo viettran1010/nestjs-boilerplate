@@ -1,6 +1,6 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
-import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
-import { I18nModule } from 'nestjs-i18n';
+import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { I18nModule, I18nJsonParser } from 'nestjs-i18n';
 import { JwtModule } from '@nestjs/jwt';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -29,6 +29,7 @@ const cookieSession = require('cookie-session');
       // Assuming the translation files are located in the 'i18n' folder
       fallbackLanguage: 'en',
       folder: 'i18n',
+      parser: I18nJsonParser,
     }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
