@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { promisify } from 'util';
+import { JwtService } from '@nestjs/jwt';
 import { UsersService } from './users.service';
 import { randomBytes, scrypt as _scrypt } from 'crypto';
 
@@ -7,7 +8,10 @@ const scrypt = promisify(_scrypt);
 
 @Injectable()
 export class AuthService {
-  constructor(private usersService: UsersService) {}
+  constructor(
+    private usersService: UsersService,
+    private jwtService: JwtService
+  ) {}
 
   async signup(email: string, password: string) {
     // validate user email doesn't exist
@@ -43,5 +47,10 @@ export class AuthService {
     }
 
     return user;
+  }
+
+  async login(user: any) { // Replace 'any' with the actual User type, if available
+    const payload = { id: user.id, email: user.email };
+    return this.jwtService.signAsync(payload);
   }
 }

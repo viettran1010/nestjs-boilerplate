@@ -7,10 +7,13 @@ import {
   Patch,
   Post,
   Query,
+  Res,
   Session,
   UseGuards,
+  HttpStatus,
   UseInterceptors,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { AuthService } from './auth.service';
@@ -35,6 +38,12 @@ export class UsersController {
     return user;
   }
 
+  @Post('/logout')
+  async logout(@Session() session: any, @Res() response: Response) {
+    session.userId = null;
+    return response.status(HttpStatus.OK).send();
+  }
+
   @Post('/signout')
   async signout(@Session() session: any) {
     session.userId = null;
@@ -48,10 +57,11 @@ export class UsersController {
   }
 
   @Post('/signin')
-  async signin(@Body() body: CreateUserDto, @Session() session: any) {
+  async signin(@Body() body: CreateUserDto, @Session() session: any, @Res() response: Response) {
     const user = await this.authService.signin(body.email, body.password);
-    session.userId = user.id;
-    return user;
+    const jwt = await this.authService.login(user);
+    session.userId = jwt;
+    return response.status(HttpStatus.OK).json({ access_token: jwt });
   }
 
   @Get('/:id')
