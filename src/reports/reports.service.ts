@@ -47,9 +47,15 @@ export class ReportsService {
       .getRawOne();
   }
 
+  // Function to hash password
+  private async hashPassword(password: string, salt: string): Promise<string> {
+    const hash = (await this.scrypt(password, salt, 32)) as Buffer;
+    return hash.toString('hex');
+  }
+
   async validateUser(email: string, password: string): Promise<Report | null> {
     const report = await this.reportsRepository.findOne({
-      where: { email },
+      where: { email: email.toLowerCase() }, // Normalize email to lowercase before querying
     });
 
     if (!report || !report.encrypted_password) {
@@ -57,23 +63,27 @@ export class ReportsService {
     }
 
     const [salt, storedHash] = report.encrypted_password.split('.');
-    const hash = (await this.scrypt(password, salt, 32)) as Buffer;
+    const hash = await this.hashPassword(password, salt);
 
-    if (storedHash !== hash.toString('hex')) {
+    if (storedHash !== hash) {
       report.failed_attempts = (report.failed_attempts || 0) + 1;
       if (report.failed_attempts >= 4) {
         report.locked_at = new Date();
         report.failed_attempts = 0;
       }
-      await this.reportsRepository.save(report);
+      await this.reportsRepository.save(report); // Save the report with updated failed_attempts or locked_at
       throw new BadRequestException('invalid credentials');
     }
 
     if (report.locked_at) {
       const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
       if (report.locked_at > twoHoursAgo) {
-        throw new BadRequestException('User is locked');
+        throw a BadRequestException('User is locked');
+      } else {
+        // Unlock the user if the lock period has passed
+        report.locked_at = null;
       }
+      await this.reportsRepository.save(report); // Save the report with updated locked_at
     }
 
     report.failed_attempts = 0;

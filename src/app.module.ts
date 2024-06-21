@@ -20,16 +20,16 @@ const cookieSession = require('cookie-session');
     }),
     UsersModule,
     ReportsModule,
-    TypeOrmModule.forRootAsync({
-      useFactory: () => {
-        return require('../ormconfig.js');
-      },
-    }),
     I18nModule.forRoot({
       fallbackLanguage: 'en',
       parser: I18nJsonParser,
       parserOptions: {
         path: path.join(__dirname, '/i18n/'),
+      },
+    }),
+    TypeOrmModule.forRootAsync({
+      useFactory: () => {
+        return require('../ormconfig.js');
       },
     }),
     JwtModule.registerAsync({
@@ -68,7 +68,7 @@ const cookieSession = require('cookie-session');
     AppService,
     {
       provide: APP_PIPE, // Global validation pipe
-      useValue: new ValidationPipe({
+      useFactory: () => new ValidationPipe({
         whitelist: true,
         forbidNonWhitelisted: true,
         transform: true,
