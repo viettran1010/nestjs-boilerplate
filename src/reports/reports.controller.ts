@@ -17,6 +17,7 @@ import { ApproveReportDto } from './dtos/approve-report.dto';
 import { CreateReportDto } from './dtos/create-report.dto';
 import { GetEstimateDto } from './dtos/get-estimate.dto';
 import { ReportResponseDto } from './dtos/report.response.dto';
+import { ResetPasswordRequestDto } from './dtos/reset-password-request.dto'; // Added from patch
 import { ReportsService } from './reports.service';
 
 @Controller('reports')
@@ -28,6 +29,16 @@ export class ReportsController {
   @Serialize(ReportResponseDto)
   createReport(@Body() body: CreateReportDto, @CurrentUser() user: User) {
     return this.reportsService.create(body, user);
+  }
+
+  // Added from patch
+  @Post('/reset-password-request')
+  async resetPasswordRequest(@Body() body: ResetPasswordRequestDto) {
+    await this.reportsService.resetPasswordRequest(body.email);
+    // Always return a success response to prevent email enumeration
+    return {
+      message: 'If an account with that email exists, we have sent a password reset link to it.',
+    };
   }
 
   @Patch('/:id')
@@ -46,16 +57,4 @@ export class ReportsController {
   getEstimate(@Query() query: GetEstimateDto) {
     return this.reportsService.createEstimate(query);
   }
-
-  @Post('/logout')
-  @UseGuards(AuthGuard)
-  async logout(
-    @Body('token') token: string,
-    @Body('token_type_hint') tokenTypeHint: string,
-  ) {
-    await this.reportsService.logout(token, tokenTypeHint);
-    return { statusCode: 200 };
-  }
-
-  // Other methods...
 }

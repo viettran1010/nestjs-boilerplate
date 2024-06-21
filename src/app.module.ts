@@ -1,6 +1,5 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { JwtModule } from '@nestjs/jwt'; // Added import for JwtModule
 import { AppService } from './app.service';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
@@ -17,10 +16,6 @@ const cookieSession = require('cookie-session');
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
-    }),
-    JwtModule.register({ // Added JwtModule configuration
-      secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '60s' },
     }),
     UsersModule,
     ReportsModule,
@@ -52,9 +47,13 @@ const cookieSession = require('cookie-session');
     //   }),
     // }),
   ],
-  controllers: [AppController], // Moved controllers array to the correct position
+  controllers: [AppController],
   providers: [
     AppService,
+    {
+      provide: 'EmailService', // Placeholder for the actual EmailService
+      useValue: {}, // The actual implementation will be provided later
+    },
     {
       provide: APP_PIPE,
       useValue: new ValidationPipe({

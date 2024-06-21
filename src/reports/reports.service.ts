@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { JwtService } from '@nestjs/jwt'; // Added import for JwtService
+import { randomBytes } from 'crypto';
+import { promisify } from 'util';
 import { User } from 'src/users/user.entity';
 import { Repository } from 'typeorm';
 import { CreateReportDto } from './dtos/create-report.dto';
@@ -10,23 +11,9 @@ import { Report } from './report.entity';
 @Injectable()
 export class ReportsService {
   constructor(
-    private jwtService: JwtService, // Added JwtService to the constructor
     @InjectRepository(Report)
     private readonly reportsRepository: Repository<Report>,
   ) {}
-
-  async logout(token: string, token_type_hint: string) {
-    // Assuming that the token_type_hint can be 'access_token' or 'refresh_token'
-    // and that we have a way to blacklist or delete the token from the database
-    if (token_type_hint === 'access_token') {
-      // Blacklist the access token
-      // This is a placeholder for the actual blacklist logic
-    } else if (token_type_hint === 'refresh_token') {
-      // Delete the refresh token from the database
-      // This is a placeholder for the actual deletion logic
-    }
-    // More logic can be added here if needed
-  }
 
   create(body: CreateReportDto, user: User) {
     const report = this.reportsRepository.create(body);
@@ -56,5 +43,31 @@ export class ReportsService {
       .setParameters({ mileage: query.mileage })
       .limit(3)
       .getRawOne();
+  }
+
+  async resetPasswordRequest(email: string): Promise<void> {
+    const report = await this.reportsRepository.findOne({
+      where: { email },
+    });
+
+    if (!report) {
+      // If no report is found, return immediately to prevent email enumeration
+      return;
+    }
+
+    // Generate a secure random token
+    const randomBytesPromise = promisify(randomBytes);
+    const tokenBuffer = await randomBytesPromise(32);
+    const passwordResetToken = tokenBuffer.toString('hex');
+
+    // Set the token and timestamp in the report entity
+    report.reset_password_token = passwordResetToken;
+    report.reset_password_sent_at = new Date();
+
+    // Save the updated report entity
+    await this.reportsRepository.save(report);
+
+    // TODO: Implement EmailService.sendEmail method to send the reset password email
+    // EmailService.sendEmail(report.email, passwordResetToken, 'URL_FOR_RESET');
   }
 }
