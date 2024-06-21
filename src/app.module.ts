@@ -1,7 +1,7 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { I18nModule, I18nJsonParser } from 'nestjs-i18n';
-import { EmailModule } from './email/email.module'; // Assuming the path to EmailModule
 import { AppController } from './app.controller';
+import { ConfigModule } from '@nestjs/config';
 import { AppService } from './app.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -18,16 +18,13 @@ const cookieSession = require('cookie-session');
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
     UsersModule,
     ReportsModule,
-    EmailModule, // Added EmailModule to the imports array
     I18nModule.forRoot({
       fallbackLanguage: 'en',
       parser: I18nJsonParser,
-      parserOptions: {
         path: join(__dirname, '/i18n'),
       },
     }),
@@ -35,7 +32,6 @@ const cookieSession = require('cookie-session');
       useFactory: () => {
         return require('../ormconfig.js');
       },
-    }),
     // ... other commented out TypeOrmModule configurations
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -43,7 +39,6 @@ const cookieSession = require('cookie-session');
         secret: configService.get('JWT_SECRET'),
         signOptions: { expiresIn: '60s' },
       }),
-      inject: [ConfigService],
     }),
   ],
   controllers: [AppController],
