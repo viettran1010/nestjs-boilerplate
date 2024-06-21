@@ -1,4 +1,5 @@
 import { Report } from '../reports/report.entity';
+import { Student } from '../students/student.entity';
 import {
   Entity,
   Column,
@@ -24,6 +25,9 @@ export class User {
   password: string;
 
   @OneToMany(() => Report, (report) => report.user) // 1st arg to solve circular dependency
+  @OneToMany(() => Student, (student) => student.user)
+  students: Student[];
+
   reports: Report[];
 
   @Column({ nullable: true })
