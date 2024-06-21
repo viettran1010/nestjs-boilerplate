@@ -6,9 +6,10 @@ import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/user.entity';
 import { Report } from './reports/report.entity';
-import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { APP_INTERCEPTOR, APP_PIPE, APP_FILTER } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter'; // Added import for AllExceptionsFilter
 import { JanitorModule } from './janitor/janitor.module';
 const cookieSession = require('cookie-session');
 
@@ -52,6 +53,10 @@ const cookieSession = require('cookie-session');
   controllers: [AppController],
   providers: [
     AppService,
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter, // Added provider for AllExceptionsFilter
+    },
     {
       provide: APP_PIPE,
       useValue: new ValidationPipe({

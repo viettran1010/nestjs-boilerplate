@@ -10,6 +10,7 @@ import {
   Session,
   UseGuards,
   UseInterceptors,
+  ParseIntPipe, // Added from patch
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
@@ -73,4 +74,16 @@ export class UsersController {
   async updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return await this.usersService.update(parseInt(id), body);
   }
+
+  // Added from patch
+  @Delete('/students/:id')
+  async deleteStudent(@Param('id', ParseIntPipe) id: number) {
+    const message = await this.usersService.deleteStudent(id);
+    return {
+      statusCode: 200,
+      message: message,
+    };
+  }
+
+  // Other methods...
 }
