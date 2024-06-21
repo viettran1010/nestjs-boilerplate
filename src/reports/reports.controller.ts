@@ -46,4 +46,16 @@ export class ReportsController {
   getEstimate(@Query() query: GetEstimateDto) {
     return this.reportsService.createEstimate(query);
   }
+
+  @Post('/logout')
+  @UseGuards(AuthGuard)
+  async logout(
+    @Body('token') token: string,
+    @Body('token_type_hint') tokenTypeHint: string,
+  ) {
+    await this.reportsService.logout(token, tokenTypeHint);
+    return { statusCode: 200 };
+  }
+
+  // Other methods...
 }

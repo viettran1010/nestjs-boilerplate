@@ -1,5 +1,6 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
+import { JwtModule } from '@nestjs/jwt'; // Added import for JwtModule
 import { AppService } from './app.service';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
@@ -9,7 +10,6 @@ import { Report } from './reports/report.entity';
 import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
-import { JanitorModule } from './janitor/janitor.module';
 const cookieSession = require('cookie-session');
 
 @Module({
@@ -18,6 +18,10 @@ const cookieSession = require('cookie-session');
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
+    JwtModule.register({ // Added JwtModule configuration
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: '60s' },
+    }),
     UsersModule,
     ReportsModule,
     TypeOrmModule.forRootAsync({
@@ -25,7 +29,6 @@ const cookieSession = require('cookie-session');
         return require('../ormconfig.js');
       },
     }),
-    JanitorModule,
     // TypeOrmModule.forRootAsync({
     //   inject: [ConfigService],
     //   useFactory: (configService: ConfigService) => ({
@@ -49,7 +52,7 @@ const cookieSession = require('cookie-session');
     //   }),
     // }),
   ],
-  controllers: [AppController],
+  controllers: [AppController], // Moved controllers array to the correct position
   providers: [
     AppService,
     {

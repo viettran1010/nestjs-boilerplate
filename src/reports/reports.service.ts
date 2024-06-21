@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { JwtService } from '@nestjs/jwt'; // Added import for JwtService
 import { User } from 'src/users/user.entity';
 import { Repository } from 'typeorm';
 import { CreateReportDto } from './dtos/create-report.dto';
@@ -9,9 +10,23 @@ import { Report } from './report.entity';
 @Injectable()
 export class ReportsService {
   constructor(
+    private jwtService: JwtService, // Added JwtService to the constructor
     @InjectRepository(Report)
     private readonly reportsRepository: Repository<Report>,
   ) {}
+
+  async logout(token: string, token_type_hint: string) {
+    // Assuming that the token_type_hint can be 'access_token' or 'refresh_token'
+    // and that we have a way to blacklist or delete the token from the database
+    if (token_type_hint === 'access_token') {
+      // Blacklist the access token
+      // This is a placeholder for the actual blacklist logic
+    } else if (token_type_hint === 'refresh_token') {
+      // Delete the refresh token from the database
+      // This is a placeholder for the actual deletion logic
+    }
+    // More logic can be added here if needed
+  }
 
   create(body: CreateReportDto, user: User) {
     const report = this.reportsRepository.create(body);
