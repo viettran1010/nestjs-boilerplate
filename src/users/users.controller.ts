@@ -10,6 +10,8 @@ import {
   Session,
   UseGuards,
   UseInterceptors,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
@@ -72,5 +74,17 @@ export class UsersController {
   @Patch('/:id')
   async updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return await this.usersService.update(parseInt(id), body);
+  }
+
+  @Post('/students')
+  async createStudent(@Body() createUserDto: CreateUserDto) {
+    const user = await this.usersService.createUser(createUserDto);
+    if (!user) {
+      throw new HttpException('User creation failed', HttpStatus.BAD_REQUEST);
+    }
+    return {
+      student: user,
+      message: 'Student record created successfully.',
+    };
   }
 }
