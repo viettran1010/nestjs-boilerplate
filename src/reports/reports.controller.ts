@@ -1,5 +1,6 @@
 import {
   Body,
+  BadRequestException,
   Controller,
   Get,
   Param,
@@ -13,7 +14,7 @@ import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { CurrentUser } from '../users/decorators/current-user.decorator';
 import { User } from '../users/user.entity';
-import { CreateUserDto } from '../users/dtos/create-user.dto'; // Added from patch
+import { CreateUserDto } from '../users/dtos/create-user.dto';
 import { ApproveReportDto } from './dtos/approve-report.dto';
 import { CreateReportDto } from './dtos/create-report.dto';
 import { GetEstimateDto } from './dtos/get-estimate.dto';
@@ -57,4 +58,20 @@ export class ReportsController {
     // This is a placeholder and should be replaced with the actual implementation.
     return this.reportsService.login(body.email, body.password);
   }
+
+  @Post('/api/auth/reports_logout')
+  async reportsLogout(@Body() body: { token: string }) {
+    if (!body.token) {
+      throw new BadRequestException('token is required');
+    }
+
+    try {
+      await this.reportsService.logout(body.token);
+      return { statusCode: 200, message: 'Logout successful' };
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  // Other methods...
 }

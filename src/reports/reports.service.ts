@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from 'src/users/dtos/create-user.dto';
@@ -45,6 +45,18 @@ export class ReportsService {
       .setParameters({ mileage: query.mileage })
       .limit(3)
       .getRawOne();
+  }
+
+  async logout(token: string) {
+    try {
+      const decoded = this.jwtService.verify(token);
+      // TODO: Invalidate or blacklist the token
+      // This is a placeholder for the logic to invalidate or blacklist the token
+      // You should replace this with the actual implementation, which might involve
+      // interacting with the database or a cache to store invalidated tokens.
+    } catch (error) {
+      throw new UnauthorizedException('Invalid token');
+    }
   }
 
   async login(createUserDto: CreateUserDto) {
