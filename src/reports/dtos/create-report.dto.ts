@@ -5,6 +5,7 @@ import {
   IsString,
   Max,
   Min,
+  IsEmail,
 } from 'class-validator';
 
 export class CreateReportDto {
@@ -18,6 +19,12 @@ export class CreateReportDto {
 
   @IsString()
   model: string;
+
+  @IsEmail()
+  email: string;
+
+  @IsString()
+  password: string;
 
   @Min(1930)
   year: number;

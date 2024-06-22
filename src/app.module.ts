@@ -12,27 +12,21 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
 import { JanitorModule } from './janitor/janitor.module';
 const cookieSession = require('cookie-session');
-import { ConfigModule, ConfigService } from '@nestjs/config';
-
-const jwtConfigAsync = {
-  imports: [ConfigModule],
-  useFactory: async (configService: ConfigService) => ({
-    secret: configService.get('JWT_SECRET'),
-    signOptions: { expiresIn: '60s' },
-  }),
-  inject: [ConfigService],
-};
+import { EmailService } from './users/email.service';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
-      JwtModule.registerAsync(jwtConfigAsync),
     }),
     UsersModule,
     ReportsModule,
     TypeOrmModule.forRootAsync({
+    JwtModule.register({
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: '60m' },
+    }),
       useFactory: () => {
         return require('../ormconfig.js');
       },
@@ -66,6 +60,7 @@ const jwtConfigAsync = {
     AppService,
     {
       provide: APP_PIPE,
+      provide: EmailService,
       useValue: new ValidationPipe({
         whitelist: true,
       }),
@@ -74,6 +69,7 @@ const jwtConfigAsync = {
       provide: APP_INTERCEPTOR,
       useClass: CurrentUserInterceptor,
     },
+      useClass: EmailService,
   ],
 })
 export class AppModule {
