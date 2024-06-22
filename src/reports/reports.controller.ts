@@ -55,14 +55,13 @@ export class ReportsController {
     return await this.reportsService.signup(body.email, body.password);
   }
 
-  @Get('/confirm')
-  async confirmEmail(@Query('confirmation_token') token: string) {
-    const confirmed = await this.reportsService.confirmEmail(token);
-    if (confirmed) {
-      return { message: 'Email confirmed successfully.' };
-    } else {
-      throw new BadRequestException('Confirmation token is invalid or has expired.');
+  @Post('/api/auth/reports_verify_confirmation_token')
+  async confirmEmail(@Body('confirmation_token') confirmation_token: string) {
+    const report = await this.reportsService.confirmEmail(confirmation_token);
+    if (!report) {
+      throw new BadRequestException('Confirmation token is not valid or has expired');
     }
+    return report;
   }
 
   // Placeholder for the confirmEmail method in ReportsService

@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { randomBytes, scrypt as _scrypt } from 'crypto';
 import { promisify } from 'util';
 import { User } from 'src/users/user.entity';
-import { Repository } from 'typeorm';
+import { Repository, LessThan, MoreThan, IsNull } from 'typeorm';
 import { CreateReportDto } from './dtos/create-report.dto';
 import { GetEstimateDto } from './dtos/get-estimate.dto';
 import { Report } from './report.entity';
@@ -84,5 +84,27 @@ export class ReportsService {
   private async sendConfirmationEmail(email: string, confirmationToken: string) {
     // TODO: Implement the email sending logic using EmailService
     // This is a placeholder for the actual email service implementation
+  }
+
+  async confirmEmail(confirmation_token: string) {
+    const report = await this.reportsRepository.findOne({
+      where: {
+        confirmation_token,
+        confirmed_at: IsNull(),
+      },
+    });
+
+    if (!report) {
+      throw new BadRequestException('Confirmation token is not valid');
+    }
+
+    if (report.confirmation_sent_at && report.confirmation_sent_at < new Date()) {
+      throw a BadRequestException('Confirmation token is expired');
+    }
+
+    report.confirmed_at = new Date();
+    await this.reportsRepository.save(report);
+
+    return report;
   }
 }

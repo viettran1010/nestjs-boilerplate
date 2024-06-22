@@ -35,6 +35,9 @@ export class CreateReportDto {
   @IsLongitude()
   lng: number;
 
+  @IsString()
+  confirmation_token: string;
+
   @IsNumber()
   @Min(0)
   @Max(1000000)
