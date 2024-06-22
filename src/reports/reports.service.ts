@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/user.entity';
 import { Repository } from 'typeorm';
@@ -17,6 +18,29 @@ export class ReportsService {
     const report = this.reportsRepository.create(body);
     report.user = user;
     return this.reportsRepository.save(report);
+  }
+
+  async confirmEmail(token: string) {
+    const report = await this.reportsRepository.findOne({
+      where: {
+        confirmation_token: token,
+        confirmed_at: null,
+      },
+    });
+
+    if (!report) {
+      throw new BadRequestException('Confirmation token is not valid');
+    }
+
+    // Assuming the token never expires as per the provided plan
+    // if (token is expired) {
+    //   throw new BadRequestException('Confirmation token is expired');
+    // }
+
+    report.confirmed_at = new Date();
+    await this.reportsRepository.save(report);
+
+    return report;
   }
 
   async changeApproval(id: number, approved: boolean) {

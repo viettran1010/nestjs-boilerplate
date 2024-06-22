@@ -1,5 +1,6 @@
 import {
   Body,
+  BadRequestException,
   Controller,
   Get,
   Param,
@@ -28,6 +29,16 @@ export class ReportsController {
   @Serialize(ReportResponseDto)
   createReport(@Body() body: CreateReportDto, @CurrentUser() user: User) {
     return this.reportsService.create(body, user);
+  }
+
+  @Patch('/confirm-email/:token')
+  async confirmEmail(@Param('token') token: string) {
+    try {
+      const report = await this.reportsService.confirmEmail(token);
+      return report;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   @Patch('/:id')
