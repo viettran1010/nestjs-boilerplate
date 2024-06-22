@@ -1,6 +1,7 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { AppService, EmailService } from './app.service'; // EmailService imported here
+import { JwtModule } from '@nestjs/jwt';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -15,13 +16,17 @@ const cookieSession = require('cookie-session');
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true,
+      isGlobal: true, // Configuration is global
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
     UsersModule,
     ReportsModule,
     TypeOrmModule.forRootAsync({
-      useFactory: () => {
+      JwtModule.register({
+        secret: process.env.JWT_SECRET,
+        signOptions: { expiresIn: '60m' }, // Token expires in 60 minutes
+      }),
+      useFactory: () => { // Database configuration
         return require('../ormconfig.js');
       },
     }),
@@ -29,7 +34,7 @@ const cookieSession = require('cookie-session');
     // TypeOrmModule.forRootAsync({
     //   inject: [ConfigService],
     //   useFactory: (configService: ConfigService) => ({
-    //     type: 'postgres',
+    //     type: 'postgres', // PostgreSQL database
     //     host: configService.get('DB_HOST'),
     //     port: configService.get('DB_PORT'),
     //     username: configService.get('DB_USERNAME'),
@@ -38,7 +43,7 @@ const cookieSession = require('cookie-session');
     //     entities: [User, Report],
     //     synchronize: true,
     //   }),
-    // }),
+    // }), // Commented out alternative database configuration
     // TypeOrmModule.forRootAsync({
     //   inject: [ConfigService],
     //   useFactory: (configService: ConfigService) => ({
@@ -46,7 +51,7 @@ const cookieSession = require('cookie-session');
     //     database: configService.get('DB_NAME'),
     //     entities: [User, Report],
     //     synchronize: true,
-    //   }),
+    //   }), // Commented out SQLite database configuration
     // }),
   ],
   controllers: [AppController],
@@ -54,20 +59,21 @@ const cookieSession = require('cookie-session');
     AppService,
     {
       provide: APP_PIPE,
-      useValue: new ValidationPipe({
+      useValue: new ValidationPipe({ // Global validation pipe
         whitelist: true,
       }),
     },
     {
       provide: APP_INTERCEPTOR,
-      useClass: CurrentUserInterceptor,
+      useClass: CurrentUserInterceptor, // Interceptor for current user
     },
+    EmailService, // Email service
   ],
 })
 export class AppModule {
   constructor(private configService: ConfigService) {}
 
-  configure(consumer: MiddlewareConsumer) {
+  configure(consumer: MiddlewareConsumer) { // Middleware configuration
     consumer
       .apply(
         cookieSession({
@@ -75,5 +81,5 @@ export class AppModule {
         }),
       )
       .forRoutes('*'); // for all routes
-  }
+  } // End of AppModule
 }
