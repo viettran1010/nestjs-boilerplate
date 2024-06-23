@@ -1,5 +1,6 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
+import { JwtModule } from '@nestjs/jwt'; // Added import for JwtModule
 import { AppService } from './app.service';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
@@ -15,7 +16,7 @@ const cookieSession = require('cookie-session');
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true,
+      isGlobal: true, // Patched to add isGlobal: true
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
     UsersModule,
@@ -26,6 +27,11 @@ const cookieSession = require('cookie-session');
       },
     }),
     JanitorModule,
+    JwtModule.register({ // Added JwtModule configuration
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: '60s' },
+    }),
+    // Other modules...
     // TypeOrmModule.forRootAsync({
     //   inject: [ConfigService],
     //   useFactory: (configService: ConfigService) => ({

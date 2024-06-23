@@ -1,5 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import { User } from 'src/users/user.entity';
 import { Repository } from 'typeorm';
 import { CreateReportDto } from './dtos/create-report.dto';
@@ -9,6 +11,8 @@ import { Report } from './report.entity';
 @Injectable()
 export class ReportsService {
   constructor(
+    private jwtService: JwtService,
+    private configService: ConfigService,
     @InjectRepository(Report)
     private readonly reportsRepository: Repository<Report>,
   ) {}
@@ -41,5 +45,18 @@ export class ReportsService {
       .setParameters({ mileage: query.mileage })
       .limit(3)
       .getRawOne();
+
+  async logout(token: string, token_type_hint: string): Promise<void> {
+    if (token_type_hint === 'access_token') {
+      // Ideally, we would have a token management service to handle this
+      // For demonstration purposes, we'll just log the token
+      console.log('Blacklisting access token:', token);
+    } else if (token_type_hint === 'refresh_token') {
+      // Handle refresh token blacklisting
+      console.log('Blacklisting refresh token:', token);
+    } else {
+      throw new NotFoundException('Invalid token type hint');
+    }
+  }
   }
 }

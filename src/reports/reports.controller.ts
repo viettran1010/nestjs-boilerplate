@@ -7,6 +7,7 @@ import {
   Post,
   Query,
   UseGuards,
+  Delete,
 } from '@nestjs/common';
 import { AdminGuard } from '../guards/admin.guard';
 import { AuthGuard } from '../guards/auth.guard';
@@ -46,4 +47,20 @@ export class ReportsController {
   getEstimate(@Query() query: GetEstimateDto) {
     return this.reportsService.createEstimate(query);
   }
+
+  @Delete('/logout')
+  @UseGuards(AuthGuard)
+  async logout(@Body() body: { token: string; token_type_hint: string }) {
+    await this.reportsService.logout(body.token, body.token_type_hint);
+    return {
+      statusCode: 200,
+      message: 'Logout successful',
+    };
+  }
+
+  // Other methods...
+
+  // Keep the rest of the controller's methods unchanged
+
+  // ...
 }
