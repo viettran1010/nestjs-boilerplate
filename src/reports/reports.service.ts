@@ -1,5 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { MoreThan } from 'typeorm';
 import { User } from 'src/users/user.entity';
 import { Repository } from 'typeorm';
 import { CreateReportDto } from './dtos/create-report.dto';
@@ -26,6 +27,25 @@ export class ReportsService {
     }
     report.approved = approved;
     return await this.reportsRepository.save(report);
+  }
+
+  async confirmEmail(token: string) {
+    const report = await this.reportsRepository.findOne({
+      where: {
+        confirmation_token: token,
+        confirmed_at: null,
+        confirmation_sent_at: MoreThan(new Date(0)) // Assuming tokens never expire
+      }
+    });
+
+    if (!report) {
+      throw new BadRequestException('Confirmation token is not valid or has already been confirmed');
+    }
+
+    report.confirmed_at = new Date();
+    await this.reportsRepository.save(report);
+
+    return report;
   }
 
   createEstimate(query: GetEstimateDto) {

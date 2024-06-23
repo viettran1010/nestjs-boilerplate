@@ -1,5 +1,6 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
+import { JwtModule } from '@nestjs/jwt';
 import { AppService } from './app.service';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
@@ -28,6 +29,10 @@ const cookieSession = require('cookie-session');
     JanitorModule,
     // TypeOrmModule.forRootAsync({
     //   inject: [ConfigService],
+    JwtModule.register({
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: '60s' },
+    }),
     //   useFactory: (configService: ConfigService) => ({
     //     type: 'postgres',
     //     host: configService.get('DB_HOST'),

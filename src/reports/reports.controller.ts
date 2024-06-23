@@ -1,5 +1,6 @@
 import {
   Body,
+  BadRequestException,
   Controller,
   Get,
   Param,
@@ -22,6 +23,24 @@ import { ReportsService } from './reports.service';
 @Controller('reports')
 export class ReportsController {
   constructor(private reportsService: ReportsService) {}
+
+  @Post('/confirm')
+  @Serialize(ReportResponseDto)
+  async confirmEmail(@Body('token') token: string) {
+    try {
+      const report = await this.reportsService.confirmEmail(token);
+      if (!report) {
+        throw new BadRequestException('Confirmation token is not valid');
+      }
+      return report;
+    } catch (error) {
+      if (error.status === 400) {
+        throw new BadRequestException(error.response);
+      }
+      // Re-throw the error if it's not a BadRequestException
+      throw error;
+    }
+  }
 
   @Post()
   @UseGuards(AuthGuard)
