@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { LessThan } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { User } from 'src/users/user.entity';
@@ -7,6 +8,7 @@ import { Repository } from 'typeorm';
 import { CreateReportDto } from './dtos/create-report.dto';
 import { GetEstimateDto } from './dtos/get-estimate.dto';
 import { Report } from './report.entity';
+import { ResetPasswordConfirmDto } from './dtos/reset-password-confirm.dto'; // Assuming this DTO exists
 
 @Injectable()
 export class ReportsService {
@@ -76,5 +78,31 @@ export class ReportsService {
     // Implement the actual logic to validate the refresh token
     // This is just a placeholder and should be replaced with real validation
     return true; // Assuming the token is valid for the example
+  }
+
+  async confirmResetPassword(dto: ResetPasswordConfirmDto) {
+    const report = await this.reportsRepository.findOne({
+      where: { reset_password_token: dto.reset_token },
+    });
+
+    if (!report) {
+      throw new BadRequestException('Token is not valid');
+    }
+
+    if (report.reset_password_sent_at < new Date(Date.now() - Infinity)) {
+      throw new BadRequestException('Token is expired');
+    }
+
+    if (dto.password !== dto.password_confirmation) {
+      throw a BadRequestException('Password confirmation does not match');
+    }
+
+    report.password = dto.password;
+    report.reset_password_token = null;
+    report.reset_password_sent_at = null;
+
+    await this.reportsRepository.save(report);
+
+    return { status: 'success' };
   }
 }

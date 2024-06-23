@@ -8,6 +8,7 @@ import {
   Post,
   Query,
   UseGuards,
+  HttpException, // Added from patch
 } from '@nestjs/common';
 import { AdminGuard } from '../guards/admin.guard';
 import { AuthGuard } from '../guards/auth.guard';
@@ -18,6 +19,7 @@ import { ApproveReportDto } from './dtos/approve-report.dto';
 import { CreateReportDto } from './dtos/create-report.dto';
 import { GetEstimateDto } from './dtos/get-estimate.dto';
 import { ReportResponseDto } from './dtos/report.response.dto';
+import { ResetPasswordConfirmDto } from './dtos/create-report.dto'; // Added from patch
 import { ReportsService } from './reports.service';
 
 @Controller('reports')
@@ -63,5 +65,19 @@ export class ReportsController {
   @Get()
   getEstimate(@Query() query: GetEstimateDto) {
     return this.reportsService.createEstimate(query);
+  }
+
+  // Added from patch
+  @Post('/api/auth/reports_verify_reset_password_requests')
+  async confirmResetPassword(@Body() dto: ResetPasswordConfirmDto) {
+    try {
+      await this.reportsService.confirmResetPassword(dto);
+      return { message: 'Password reset successfully' };
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new BadRequestException('An unexpected error occurred');
+    }
   }
 }
