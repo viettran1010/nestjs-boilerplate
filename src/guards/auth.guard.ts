@@ -1,35 +1,45 @@
 import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Report } from '../reports/report.entity';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    @InjectRepository(Report)
+    private reportRepository: Repository<Report>
+  ) {}
 
-  canActivate(context: ExecutionContext): boolean {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const token = this.extractToken(request);
+    const token = request.headers.authorization ? request.headers.authorization.split(' ')[1] : null;
+    return token ? this.validateToken(token) : this.validateConfirmationToken(request.body.confirmation_token);
+  }
 
+  private async validateToken(token: string): Promise<boolean> {
+    if (!token) {
+      throw new UnauthorizedException('No token provided');
+    }
     try {
-      return this.validateToken(token);
+      const decoded = await this.jwtService.verifyAsync(token);
+      return Boolean(decoded);
     } catch (error) {
       throw new UnauthorizedException('Invalid token');
     }
   }
 
-  private async validateToken(token: string): Promise<boolean> {
-    const decoded = await this.jwtService.verifyAsync(token);
-    return Boolean(decoded);
-  }
-
-  private extractToken(request: any): string {
-    const authHeader = request.headers.authorization;
-    if (!authHeader) {
-      throw new UnauthorizedException('No authentication token provided');
+  private async validateConfirmationToken(confirmation_token: string): Promise<boolean> {
+    if (!confirmation_token) {
+      throw new UnauthorizedException('No confirmation token provided');
     }
-    const parts = authHeader.split(' ');
-    if (parts.length !== 2 || parts[0] !== 'Bearer') {
-      throw new UnauthorizedException('Invalid authentication token format');
+    const report = await this.reportRepository.findOne({
+      where: { confirmation_token, confirmed_at: null }
+    });
+    if (!report) {
+      throw new UnauthorizedException('Invalid or expired confirmation token');
     }
-    return parts[1];
+    return true;
   }
 }
