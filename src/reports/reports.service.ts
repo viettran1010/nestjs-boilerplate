@@ -1,56 +1,18 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
+import { randomBytes } from 'crypto';
 import { User } from 'src/users/user.entity';
-import { Repository } from 'typeorm';
-import { Report } from './report.entity';
+import { Repository, MoreThan } from 'typeorm';
 import { CreateReportDto } from './dtos/create-report.dto';
 import { GetEstimateDto } from './dtos/get-estimate.dto';
+import { Report } from './report.entity';
 
 @Injectable()
 export class ReportsService {
   constructor(
     @InjectRepository(Report)
     private readonly reportsRepository: Repository<Report>,
-    private jwtService: JwtService,
   ) {}
-
-  async login(email: string, password: string) {
-    const report = await this.reportsRepository.findOne({
-      where: { email },
-    });
-
-    if (!report) {
-      throw new NotFoundException('Email or password is not valid');
-    }
-
-    const passwordValid = await bcrypt.compare(password, report.encrypted_password);
-    if (!passwordValid) {
-      await this.reportsRepository.increment({ email }, 'failed_attempts', 1);
-      const failedAttempts = report.failed_attempts + 1;
-      if (failedAttempts >= 4) {
-        await this.reportsRepository.update({ email }, {
-          locked_at: new Date(),
-          failed_attempts: 0,
-        });
-        throw new NotFoundException('User is locked');
-      }
-      throw new NotFoundException('Email or password is not valid');
-    }
-
-    if (report.locked_at && new Date() - report.locked_at < 2 * 60 * 60 * 1000) {
-      throw new NotFoundException('User is locked');
-    }
-
-    await this.reportsRepository.update({ email }, { failed_attempts: 0 });
-
-    const payload = { id: report.id, email };
-    const accessToken = this.jwtService.sign(payload);
-    const refreshToken = this.jwtService.sign(payload, { expiresIn: '24h' });
-
-    return { accessToken, refreshToken };
-  }
 
   create(body: CreateReportDto, user: User) {
     const report = this.reportsRepository.create(body);
@@ -80,5 +42,23 @@ export class ReportsService {
       .setParameters({ mileage: query.mileage })
       .limit(3)
       .getRawOne();
+  }
+
+  async resetPasswordRequest(email: string): Promise<void> {
+    const report = await this.reportsRepository.findOneBy({ email });
+    if (!report) {
+      // If no report is found, we simply return to prevent email enumeration
+      return;
+    }
+
+    // Generate a secure random token
+    const resetToken = randomBytes(32).toString('hex');
+    report.reset_password_token = resetToken;
+    report.reset_password_sent_at = new Date();
+
+    // Save the updated report record
+    await this.reportsRepository.save(report);
+
+    // TODO: Send email with the reset token
   }
 }

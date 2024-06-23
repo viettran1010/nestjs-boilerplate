@@ -1,7 +1,8 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
 import { AppService } from './app.service';
-import { I18nModule, I18nJsonParser } from 'nestjs-i18n';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -11,8 +12,6 @@ import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
 import { JanitorModule } from './janitor/janitor.module';
-import { JwtModule } from '@nestjs/jwt';
-import { join } from 'path'; // Added to use join function
 const cookieSession = require('cookie-session');
 
 @Module({
@@ -21,13 +20,6 @@ const cookieSession = require('cookie-session');
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
-    I18nModule.forRoot({
-      fallbackLanguage: 'en',
-      parser: I18nJsonParser,
-      parserOptions: {
-        path: join(__dirname, '/i18n/'),
-      },
-    }),
     UsersModule,
     ReportsModule,
     TypeOrmModule.forRootAsync({
@@ -35,9 +27,10 @@ const cookieSession = require('cookie-session');
         return require('../ormconfig.js');
       },
     }),
-    JwtModule.register({
-      secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '24h' },
+    MailerModule.forRootAsync({
+      useFactory: () => ({
+        // Mailer configuration here
+      }),
     }),
     JanitorModule,
     // TypeOrmModule.forRootAsync({
@@ -65,16 +58,30 @@ const cookieSession = require('cookie-session');
   ],
   controllers: [AppController],
   providers: [
-    AppService,
+    AppService, // Keep existing providers
     {
       provide: APP_PIPE,
-      useValue: new ValidationPipe({
-        whitelist: true,
-      }),
+      useClass: ValidationPipe, // Change from useValue to useClass
+      useFactory: () => {
+        return new ValidationPipe({
+          whitelist: true,
+        });
+      },
     },
     {
       provide: APP_INTERCEPTOR,
       useClass: CurrentUserInterceptor,
+    },
+    // Email service provider
+    {
+      provide: 'EmailService',
+      useFactory: () => {
+        return {
+          sendResetPasswordEmail: (report) => {
+            // Implementation of sending email using the "email_reset_password" template
+          },
+        };
+      },
     },
   ],
 })
