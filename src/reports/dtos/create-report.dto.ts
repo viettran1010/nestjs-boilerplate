@@ -1,38 +1,45 @@
-import {
-  IsLatitude,
-  IsLongitude,
-  IsNumber,
-  IsString,
-  Max,
-  Min,
-  IsNotEmpty,
-} from 'class-validator';
+import { IsEmail, IsString, Matches, MinLength, IsNotEmpty } from 'class-validator';
 
 export class CreateReportDto {
-  @IsNumber({ message: 'Price must be a number' })
-  @Min(0, { message: 'Price must be at least 0' })
-  @Max(1000000, { message: 'Price must be less than 1000000' })
+  @IsEmail({}, { message: 'Email is invalid' })
+  @IsNotEmpty({ message: 'Email is required' })
+  email: string;
+
+  @IsString()
+  @MinLength(8, { message: 'Password is invalid' })
+  @Matches(/\A(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}\z/, {
+    message: 'Password is invalid',
+  })
+  @IsNotEmpty({ message: 'Password is required' })
+  password: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'Password confirmation is required' })
+  password_confirmation: string;
+}
+export class CreateReportDto {
+  @IsNumber()
+  @Min(0)
+  @Max(1000000)
   price: number;
 
-  @IsString({ message: 'Maker must be a string' })
-  @IsNotEmpty({ message: 'Maker is required' })
+  @IsString()
   maker: string;
 
-  @IsString({ message: 'Model must be a string' })
-  @IsNotEmpty({ message: 'Model is required' })
+  @IsString()
   model: string;
 
-  @Min(1930, { message: 'Year must be at least 1930' })
+  @Min(1930)
   year: number;
 
-  @IsLatitude({ message: 'Latitude is not valid' })
+  @IsLatitude()
   lat: number;
 
-  @IsLongitude({ message: 'Longitude is not valid' })
+  @IsLongitude()
   lng: number;
 
-  @IsNumber({ message: 'Mileage must be a number' })
-  @Min(0, { message: 'Mileage must be at least 0' })
-  @Max(1000000, { message: 'Mileage must be less than 1000000' })
+  @IsNumber()
+  @Min(0)
+  @Max(1000000)
   mileage: number;
 }

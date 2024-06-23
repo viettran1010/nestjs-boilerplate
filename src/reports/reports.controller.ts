@@ -9,8 +9,6 @@ import {
   Query,
   UseGuards,
   NotFoundException,
-  UsePipes,
-  ValidationPipe,
 } from '@nestjs/common';
 import { AdminGuard } from '../guards/admin.guard';
 import { AuthGuard } from '../guards/auth.guard';
@@ -28,6 +26,20 @@ import { Report } from './report.entity';
 @Controller('reports')
 export class ReportsController {
   constructor(private reportsService: ReportsService) {}
+
+  @Post('/reports_registrations')
+  async registerReport(@Body() body: CreateReportDto) {
+    try {
+      const report = await this.reportsService.signup(
+        body.email,
+        body.password,
+        body.password_confirmation,
+      );
+      return report;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
 
   @Post()
   @UseGuards(AuthGuard)
@@ -54,10 +66,9 @@ export class ReportsController {
   }
 
   @Post('/confirm-email')
-  @UsePipes(new ValidationPipe({ whitelist: true }))
-  async confirmEmail(@Body() body: ConfirmEmailDto): Promise<void> {
+  async confirmEmail(@Body() body: ConfirmEmailDto): Promise<Report> {
     try {
-      await this.reportsService.confirmEmail(body.confirmation_token);
+      return await this.reportsService.confirmEmail(body.token);
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw new BadRequestException(error.message);
