@@ -1,8 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule, RequestMethod, ValidationPipe } from '@nestjs/common';
-import { AppController } from './app.controller';
 import { I18nModule, I18nJsonParser } from 'nestjs-i18n';
-import * as path from 'path';
-import { JwtModule } from '@nestjs/jwt';
+import { AppController } from './app.controller';
+import { join } from 'path';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
 import { AppService } from './app.service';
@@ -16,7 +15,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
 import { JanitorModule } from './janitor/janitor.module';
 const cookieSession = require('cookie-session');
-const i18nLangs = ['en', 'es', 'fr', 'de']; // Add supported languages here
+
+const i18nPath = join(__dirname, '/i18n');
 
 @Module({
   imports: [
@@ -24,24 +24,12 @@ const i18nLangs = ['en', 'es', 'fr', 'de']; // Add supported languages here
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
-    UsersModule,
     I18nModule.forRoot({
       fallbackLanguage: 'en',
       parser: I18nJsonParser,
-      parserOptions: {
-        path: path.join(__dirname, '/i18n/'),
-        watch: true,
-      },
-      languages: i18nLangs,
+      parserOptions: { path: i18nPath },
     }),
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get('JWT_SECRET'),
-        signOptions: { expiresIn: '60m' },
-      }),
-      inject: [ConfigService],
-    }),
+    UsersModule,
     ReportsModule,
     TypeOrmModule.forRootAsync({
       useFactory: () => {
@@ -85,7 +73,7 @@ const i18nLangs = ['en', 'es', 'fr', 'de']; // Add supported languages here
       useClass: ValidationPipe, // Change from useValue to useClass
       useFactory: () => {
         return new ValidationPipe({
-          whitelist: true, // Keep existing options and add any additional options if needed
+          whitelist: true, forbidNonWhitelisted: true, transform: true,
         });
       },
     },
