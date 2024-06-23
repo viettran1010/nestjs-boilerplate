@@ -1,5 +1,6 @@
 import {
   Body,
+  BadRequestException,
   Controller,
   Get,
   Param,
@@ -9,10 +10,12 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AdminGuard } from '../guards/admin.guard';
+import { AuthService } from '../users/auth.service';
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { CurrentUser } from '../users/decorators/current-user.decorator';
 import { User } from '../users/user.entity';
+import { CreateUserDto } from '../users/dtos/create-user.dto';
 import { ApproveReportDto } from './dtos/approve-report.dto';
 import { CreateReportDto } from './dtos/create-report.dto';
 import { GetEstimateDto } from './dtos/get-estimate.dto';
@@ -21,7 +24,24 @@ import { ReportsService } from './reports.service';
 
 @Controller('reports')
 export class ReportsController {
-  constructor(private reportsService: ReportsService) {}
+  constructor(
+    private reportsService: ReportsService,
+    private authService: AuthService,
+  ) {}
+
+  @Post('/signup')
+  @Serialize(ReportResponseDto)
+  async signup(@Body() body: CreateUserDto) {
+    try {
+      const report = await this.authService.signup(body.email, body.password);
+      return report;
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.response);
+      }
+      throw error;
+    }
+  }
 
   @Post()
   @UseGuards(AuthGuard)
