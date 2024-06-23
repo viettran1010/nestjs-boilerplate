@@ -1,7 +1,7 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { JwtModule } from '@nestjs/jwt'; // Added import for JwtModule
 import { AppService } from './app.service';
+import { I18nModule, I18nJsonParser } from 'nestjs-i18n';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -11,13 +11,22 @@ import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
 import { JanitorModule } from './janitor/janitor.module';
+import { JwtModule } from '@nestjs/jwt';
+import { join } from 'path'; // Added to use join function
 const cookieSession = require('cookie-session');
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true, // Patched to add isGlobal: true
+      isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
+    }),
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      parser: I18nJsonParser,
+      parserOptions: {
+        path: join(__dirname, '/i18n/'),
+      },
     }),
     UsersModule,
     ReportsModule,
@@ -26,12 +35,11 @@ const cookieSession = require('cookie-session');
         return require('../ormconfig.js');
       },
     }),
-    JanitorModule,
-    JwtModule.register({ // Added JwtModule configuration
+    JwtModule.register({
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '60s' },
+      signOptions: { expiresIn: '24h' },
     }),
-    // Other modules...
+    JanitorModule,
     // TypeOrmModule.forRootAsync({
     //   inject: [ConfigService],
     //   useFactory: (configService: ConfigService) => ({
