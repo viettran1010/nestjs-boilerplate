@@ -1,5 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { hash } from 'bcrypt';
 import { User } from 'src/users/user.entity';
 import { Repository } from 'typeorm';
 import { CreateReportDto } from './dtos/create-report.dto';
@@ -26,6 +27,29 @@ export class ReportsService {
     }
     report.approved = approved;
     return await this.reportsRepository.save(report);
+  }
+
+  async resetPasswordConfirm(token: string, password: string) {
+    const report = await this.reportsRepository.findOneBy({ reset_password_token: token });
+    if (!report) {
+      throw new BadRequestException('Token is not valid');
+    }
+
+    const tokenExpirationTime = new Date(report.reset_password_sent_at);
+    tokenExpirationTime.setHours(tokenExpirationTime.getHours() + 1); // Assuming token is valid for 1 hour
+
+    if (new Date() > tokenExpirationTime) {
+      throw new BadRequestException('Token is expired');
+    }
+
+    report.reset_password_token = null;
+    report.reset_password_sent_at = null;
+
+    const hashedPassword = await hash(password, 10);
+    report.password = hashedPassword;
+
+    await this.reportsRepository.save(report);
+    return { status: 'success' };
   }
 
   createEstimate(query: GetEstimateDto) {
