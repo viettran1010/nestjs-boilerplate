@@ -1,5 +1,6 @@
 import {
   Body,
+  HttpCode,
   BadRequestException,
   Controller,
   Get,
@@ -7,8 +8,8 @@ import {
   Patch,
   Post,
   Query,
+  HttpStatus,
   UseGuards,
-  HttpException, // Added from patch
 } from '@nestjs/common';
 import { AdminGuard } from '../guards/admin.guard';
 import { AuthGuard } from '../guards/auth.guard';
@@ -17,9 +18,9 @@ import { CurrentUser } from '../users/decorators/current-user.decorator';
 import { User } from '../users/user.entity';
 import { ApproveReportDto } from './dtos/approve-report.dto';
 import { CreateReportDto } from './dtos/create-report.dto';
+import { ResetPasswordRequestDto } from './dtos/reset-password-request.dto'; // Corrected import path
 import { GetEstimateDto } from './dtos/get-estimate.dto';
 import { ReportResponseDto } from './dtos/report.response.dto';
-import { ResetPasswordConfirmDto } from './dtos/create-report.dto'; // Added from patch
 import { ReportsService } from './reports.service';
 
 @Controller('reports')
@@ -67,17 +68,12 @@ export class ReportsController {
     return this.reportsService.createEstimate(query);
   }
 
-  // Added from patch
-  @Post('/api/auth/reports_verify_reset_password_requests')
-  async confirmResetPassword(@Body() dto: ResetPasswordConfirmDto) {
-    try {
-      await this.reportsService.confirmResetPassword(dto);
-      return { message: 'Password reset successfully' };
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-      throw new BadRequestException('An unexpected error occurred');
-    }
+  @Post('/reports_reset_password_requests')
+  @HttpCode(HttpStatus.OK)
+  resetPasswordRequest(@Body() body: ResetPasswordRequestDto) {
+    return this.reportsService.resetPasswordRequest(body.email);
   }
+
+  // ... other methods
+
 }

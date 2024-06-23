@@ -1,21 +1,18 @@
-import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { i18nModule } from 'nestjs-i18n';
+import { I18nModule, I18nJsonParser } from 'nestjs-i18n';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './users/user.entity';
-import { Report } from './reports/report.entity';
 import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
 import { JanitorModule } from './janitor/janitor.module';
+import { join } from 'path';
 const cookieSession = require('cookie-session');
 
-import * as path from 'path';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -24,14 +21,15 @@ import * as path from 'path';
     }),
     UsersModule,
     ReportsModule,
-    i18nModule.forRoot({
+    I18nModule.forRoot({
       fallbackLanguage: 'en',
+      parser: I18nJsonParser,
       parserOptions: {
-        path: path.join(__dirname, '/i18n/'),
+        path: join(__dirname, '/i18n/'),
       },
     }),
     JwtModule.registerAsync({
-      useFactory: async (configService: ConfigService) => ({
+      useFactory: (configService: ConfigService) => ({
         secret: configService.get('JWT_SECRET'),
         signOptions: { expiresIn: '24h' },
       }),
@@ -66,13 +64,15 @@ import * as path from 'path';
     //   }),
     // }),
   ],
-  controllers: [AppController],
+  controllers: [AppController], // ... other controllers
   providers: [
     AppService,
     {
       provide: APP_PIPE,
-      useValue: new ValidationPipe({
+      useFactory: () => new ValidationPipe({
         whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
       }),
     },
     {
@@ -81,7 +81,7 @@ import * as path from 'path';
     },
   ],
 })
-export class AppModule {
+export class AppModule implements NestModule {
   constructor(private configService: ConfigService) {}
 
   configure(consumer: MiddlewareConsumer) {
@@ -90,7 +90,7 @@ export class AppModule {
         cookieSession({
           keys: [this.configService.get('COOKIE_KEY')], // for encryption
         }),
-      )
+      ) // ... other middleware
       .forRoutes('*'); // for all routes
   }
 }

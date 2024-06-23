@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { LessThan } from 'typeorm';
+import { randomBytes } from 'crypto';
+import { EmailService } from '../email/email.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { User } from 'src/users/user.entity';
@@ -8,7 +9,7 @@ import { Repository } from 'typeorm';
 import { CreateReportDto } from './dtos/create-report.dto';
 import { GetEstimateDto } from './dtos/get-estimate.dto';
 import { Report } from './report.entity';
-import { ResetPasswordConfirmDto } from './dtos/reset-password-confirm.dto'; // Assuming this DTO exists
+import { ReportsRepository } from './reports.repository'; // Assuming this exists and is correctly implemented
 
 @Injectable()
 export class ReportsService {
@@ -16,7 +17,8 @@ export class ReportsService {
     @InjectRepository(Report)
     private readonly reportsRepository: Repository<Report>,
     private jwtService: JwtService,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private emailService: EmailService,
   ) {}
 
   create(body: CreateReportDto, user: User) {
@@ -80,29 +82,24 @@ export class ReportsService {
     return true; // Assuming the token is valid for the example
   }
 
-  async confirmResetPassword(dto: ResetPasswordConfirmDto) {
-    const report = await this.reportsRepository.findOne({
-      where: { reset_password_token: dto.reset_token },
-    });
-
+  async resetPasswordRequest(email: string) {
+    const report = await this.reportsRepository.findOne({ where: { email } });
     if (!report) {
-      throw new BadRequestException('Token is not valid');
+      return;
     }
 
-    if (report.reset_password_sent_at < new Date(Date.now() - Infinity)) {
-      throw new BadRequestException('Token is expired');
-    }
-
-    if (dto.password !== dto.password_confirmation) {
-      throw a BadRequestException('Password confirmation does not match');
-    }
-
-    report.password = dto.password;
-    report.reset_password_token = null;
-    report.reset_password_sent_at = null;
+    const token = randomBytes(20).toString('hex');
+    report.reset_password_token = token;
+    report.reset_password_sent_at = new Date();
 
     await this.reportsRepository.save(report);
 
-    return { status: 'success' };
+    const resetPasswordUrl = `http://yourfrontend.com/reset-password?token=${token}`;
+    await this.emailService.sendMail({
+      to: email,
+      subject: 'Reset your password',
+      template: 'email_reset_password',
+      context: { token, url: resetPasswordUrl },
+    });
   }
 }
