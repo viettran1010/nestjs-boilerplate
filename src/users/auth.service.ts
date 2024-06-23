@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { promisify } from 'util';
 import { UsersService } from './users.service';
 import { randomBytes, scrypt as _scrypt } from 'crypto';
@@ -7,7 +8,10 @@ const scrypt = promisify(_scrypt);
 
 @Injectable()
 export class AuthService {
-  constructor(private usersService: UsersService) {}
+  constructor(
+    private jwtService: JwtService,
+    private usersService: UsersService
+  ) {}
 
   async signup(email: string, password: string) {
     // validate user email doesn't exist
@@ -43,5 +47,24 @@ export class AuthService {
     }
 
     return user;
+  }
+
+  async refreshToken(refreshToken: string) {
+    try {
+      const payload = this.jwtService.verify(refreshToken);
+      const user = await this.usersService.findOne(payload.sub);
+
+      if (!user) {
+        throw new BadRequestException('Refresh token invalid');
+      }
+
+      const accessToken = this.jwtService.sign({ sub: user.id });
+      return {
+        access_token: accessToken,
+        refresh_token: refreshToken, // Ideally, you should also generate a new refresh token
+      };
+    } catch (e) {
+      throw new BadRequestException('Refresh token expired');
+    }
   }
 }

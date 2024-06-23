@@ -1,5 +1,6 @@
 import {
   Body,
+  BadRequestException,
   Controller,
   Get,
   Param,
@@ -8,6 +9,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { AuthService } from '../users/auth.service';
 import { AdminGuard } from '../guards/admin.guard';
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
@@ -15,13 +17,56 @@ import { CurrentUser } from '../users/decorators/current-user.decorator';
 import { User } from '../users/user.entity';
 import { ApproveReportDto } from './dtos/approve-report.dto';
 import { CreateReportDto } from './dtos/create-report.dto';
+import { ReportsLoginDto } from './dtos/reports-login.dto';
 import { GetEstimateDto } from './dtos/get-estimate.dto';
 import { ReportResponseDto } from './dtos/report.response.dto';
 import { ReportsService } from './reports.service';
 
 @Controller('reports')
 export class ReportsController {
-  constructor(private reportsService: ReportsService) {}
+  constructor(
+    private reportsService: ReportsService,
+    private authService: AuthService
+  ) {}
+
+  @Post('/api/auth/reports_login')
+  async reportsLogin(@Body() body: ReportsLoginDto) {
+    if (body.grant_type === 'password') {
+      const user = await this.authService.signin(body.email, body.password);
+      // TODO: Generate JWT token and return the appropriate response body
+      // This is a placeholder response and should be replaced with actual token generation logic
+      return {
+        access_token: 'generated_access_token',
+        refresh_token: 'generated_refresh_token',
+        resource_owner: user.email,
+        resource_id: user.id,
+        expires_in: 3600,
+        token_type: 'bearer',
+        scope: 'reports',
+        created_at: Date.now(),
+        refresh_token_expires_in: null,
+      };
+    } else if (body.grant_type === 'refresh_token') {
+      if (!body.refresh_token) {
+        throw new BadRequestException('refresh_token is required');
+      }
+      // TODO: Implement refresh token logic
+      // This is a placeholder response and should be replaced with actual refresh token logic
+      return {
+        access_token: 'new_generated_access_token',
+        refresh_token: 'new_generated_refresh_token',
+        resource_owner: 'user@example.com',
+        resource_id: 1,
+        expires_in: 3600,
+        token_type: 'bearer',
+        scope: 'reports',
+        created_at: Date.now(),
+        refresh_token_expires_in: null,
+      };
+    } else {
+      throw new BadRequestException('Invalid grant_type');
+    }
+  }
 
   @Post()
   @UseGuards(AuthGuard)
