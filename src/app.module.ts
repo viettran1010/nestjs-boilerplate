@@ -1,6 +1,5 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { JwtModule } from '@nestjs/jwt';
 import { AppService } from './app.service';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
@@ -11,6 +10,9 @@ import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
 import { JanitorModule } from './janitor/janitor.module';
+import { I18nModule, I18nJsonParser } from 'nestjs-i18n';
+import { MailerModule } from '@nestjs-modules/mailer';
+import * as path from 'path';
 const cookieSession = require('cookie-session');
 
 @Module({
@@ -18,6 +20,7 @@ const cookieSession = require('cookie-session');
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
+      load: [configuration], // Assuming 'configuration' is defined elsewhere in the project
     }),
     UsersModule,
     ReportsModule,
@@ -26,13 +29,21 @@ const cookieSession = require('cookie-session');
         return require('../ormconfig.js');
       },
     }),
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      parser: I18nJsonParser,
+      parserOptions: {
+        path: path.join(__dirname, '/i18n/'),
+        watch: true,
+      },
+    }),
+    MailerModule.forRootAsync({
+      useFactory: (config: ConfigService) => config.get('mail'),
+      inject: [ConfigService],
+    }),
     JanitorModule,
     // TypeOrmModule.forRootAsync({
     //   inject: [ConfigService],
-    JwtModule.register({
-      secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '60s' },
-    }),
     //   useFactory: (configService: ConfigService) => ({
     //     type: 'postgres',
     //     host: configService.get('DB_HOST'),
