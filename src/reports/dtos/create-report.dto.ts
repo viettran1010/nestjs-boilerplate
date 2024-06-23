@@ -5,6 +5,8 @@ import {
   IsString,
   Max,
   Min,
+  IsEmail,
+  MinLength,
 } from 'class-validator';
 
 export class CreateReportDto {
@@ -19,6 +21,7 @@ export class CreateReportDto {
   @IsString()
   model: string;
 
+  @IsNumber()
   @Min(1930)
   year: number;
 
@@ -27,6 +30,15 @@ export class CreateReportDto {
 
   @IsLongitude()
   lng: number;
+
+  @IsEmail()
+  email: string;
+
+  @IsString()
+  @MinLength(8, {
+    message: 'Password must be longer than or equal to 8 characters',
+  })
+  password: string;
 
   @IsNumber()
   @Min(0)

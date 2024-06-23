@@ -8,6 +8,7 @@ import {
   Post,
   Query,
   UseGuards,
+  Inject,
 } from '@nestjs/common';
 import { AdminGuard } from '../guards/admin.guard';
 import { AuthGuard } from '../guards/auth.guard';
@@ -19,10 +20,14 @@ import { CreateReportDto } from './dtos/create-report.dto';
 import { GetEstimateDto } from './dtos/get-estimate.dto';
 import { ReportResponseDto } from './dtos/report.response.dto';
 import { ReportsService } from './reports.service';
+import { AuthService } from '../users/auth.service';
 
 @Controller('reports')
 export class ReportsController {
-  constructor(private reportsService: ReportsService) {}
+  constructor(
+    private reportsService: ReportsService,
+    @Inject(AuthService) private authService: AuthService
+  ) {}
 
   @Post('/confirm')
   @Serialize(ReportResponseDto)
@@ -64,5 +69,20 @@ export class ReportsController {
   @Get()
   getEstimate(@Query() query: GetEstimateDto) {
     return this.reportsService.createEstimate(query);
+  }
+
+  @Post('/api/auth/reports_registrations')
+  @Serialize(ReportResponseDto)
+  async registerReport(@Body() body: CreateReportDto) {
+    try {
+      const report = await this.authService.signup(body.email, body.password);
+      return report;
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.response);
+      }
+      // Re-throw the error if it's not a BadRequestException
+      throw error;
+    }
   }
 }

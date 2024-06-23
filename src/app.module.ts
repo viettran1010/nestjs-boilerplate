@@ -1,4 +1,5 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
+import { HttpExceptionFilter } from './filters/http-exception.filter'; // Added import for HttpExceptionFilter
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ReportsModule } from './reports/reports.module';
@@ -6,7 +7,7 @@ import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/user.entity';
 import { Report } from './reports/report.entity';
-import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { APP_INTERCEPTOR, APP_PIPE, APP_FILTER } from '@nestjs/core'; // Added APP_FILTER to the imports
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
 import { JanitorModule } from './janitor/janitor.module';
@@ -16,7 +17,7 @@ import * as path from 'path';
 const cookieSession = require('cookie-session');
 
 @Module({
-  imports: [
+  imports: [ 
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
@@ -69,10 +70,16 @@ const cookieSession = require('cookie-session');
   providers: [
     AppService,
     {
-      provide: APP_PIPE,
+      provide: APP_PIPE, // Global validation pipe
       useValue: new ValidationPipe({
         whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
       }),
+    },
+    {
+      provide: APP_FILTER, // Global exception filter
+      useClass: HttpExceptionFilter,
     },
     {
       provide: APP_INTERCEPTOR,
