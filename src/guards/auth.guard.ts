@@ -1,10 +1,14 @@
 import { Injectable, UnauthorizedException, ExecutionContext, CanActivate } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Observable } from 'rxjs';
+import { Reflector } from '@nestjs/core';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    private reflector: Reflector,
+  ) {}
 
   canActivate(
     context: ExecutionContext,
@@ -21,7 +25,13 @@ export class AuthGuard implements CanActivate {
     }
 
     try {
-      const decoded = this.jwtService.verifyAsync(token);
+      const decoded = this.jwtService.verify(token);
+      // Check if the token is blacklisted
+      // TODO: Implement the actual check using a service or cache
+      const isBlacklisted = false; // Replace with actual check
+      if (isBlacklisted) {
+        throw new UnauthorizedException('Token is blacklisted');
+      }
       return Boolean(decoded);
     } catch (error) {
       throw new UnauthorizedException('Invalid token');

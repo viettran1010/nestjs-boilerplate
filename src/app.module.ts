@@ -1,5 +1,8 @@
-import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
+import { I18nModule, I18nJsonParser } from 'nestjs-i18n';
+import * as path from 'path';
+import { JwtModule } from '@nestjs/jwt';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
 import { AppService } from './app.service';
@@ -13,6 +16,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
 import { JanitorModule } from './janitor/janitor.module';
 const cookieSession = require('cookie-session');
+const i18nLangs = ['en', 'es', 'fr', 'de']; // Add supported languages here
 
 @Module({
   imports: [
@@ -21,6 +25,23 @@ const cookieSession = require('cookie-session');
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
     UsersModule,
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      parser: I18nJsonParser,
+      parserOptions: {
+        path: path.join(__dirname, '/i18n/'),
+        watch: true,
+      },
+      languages: i18nLangs,
+    }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get('JWT_SECRET'),
+        signOptions: { expiresIn: '60m' },
+      }),
+      inject: [ConfigService],
+    }),
     ReportsModule,
     TypeOrmModule.forRootAsync({
       useFactory: () => {
@@ -64,7 +85,7 @@ const cookieSession = require('cookie-session');
       useClass: ValidationPipe, // Change from useValue to useClass
       useFactory: () => {
         return new ValidationPipe({
-          whitelist: true,
+          whitelist: true, // Keep existing options and add any additional options if needed
         });
       },
     },

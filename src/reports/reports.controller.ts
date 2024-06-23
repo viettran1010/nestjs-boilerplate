@@ -16,7 +16,7 @@ import { CurrentUser } from '../users/decorators/current-user.decorator';
 import { User } from '../users/user.entity';
 import { ApproveReportDto } from './dtos/approve-report.dto';
 import { CreateReportDto } from './dtos/create-report.dto';
-import { ResetPasswordRequestDto } from './dtos/reset-password-request.dto'; // Added import for ResetPasswordRequestDto
+import { ResetPasswordRequestDto } from './dtos/reset-password-request.dto';
 import { GetEstimateDto } from './dtos/get-estimate.dto';
 import { ReportResponseDto } from './dtos/report.response.dto';
 import { ReportsService } from './reports.service';
@@ -47,6 +47,20 @@ export class ReportsController {
   @Get()
   getEstimate(@Query() query: GetEstimateDto) {
     return this.reportsService.createEstimate(query);
+  }
+
+  @Post('/api/auth/reports_logout')
+  async logout(@Body() body: CreateReportDto) {
+    try {
+      await this.reportsService.invalidateToken(body.token);
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Logout successful',
+      };
+    } catch (error) {
+      // Handle exceptions and return an appropriate error response if needed
+      throw error;
+    }
   }
 
   @Post('/reset-password')

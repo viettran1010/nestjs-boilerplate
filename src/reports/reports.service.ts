@@ -1,8 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { JwtService } from '@nestjs/jwt';
 import { randomBytes } from 'crypto';
 import { User } from 'src/users/user.entity';
-import { Repository, MoreThan } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateReportDto } from './dtos/create-report.dto';
 import { GetEstimateDto } from './dtos/get-estimate.dto';
 import { Report } from './report.entity';
@@ -10,6 +11,7 @@ import { Report } from './report.entity';
 @Injectable()
 export class ReportsService {
   constructor(
+    private jwtService: JwtService,
     @InjectRepository(Report)
     private readonly reportsRepository: Repository<Report>,
   ) {}
@@ -60,5 +62,19 @@ export class ReportsService {
     await this.reportsRepository.save(report);
 
     // TODO: Send email with the reset token
+  }
+
+  async invalidateToken(token: string): Promise<void> {
+    try {
+      const decoded = this.jwtService.verify(token);
+      // TODO: Implement logic to blacklist the token or delete it from the database
+      // For example, save the token identifier or user id with an expiration date in a blacklist
+    } catch (error) {
+      if (error.name === 'TokenExpiredError') {
+        throw new UnauthorizedException('Token expired');
+      } else {
+        throw new UnauthorizedException('Invalid token');
+      }
+    }
   }
 }
