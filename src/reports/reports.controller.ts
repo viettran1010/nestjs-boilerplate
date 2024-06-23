@@ -1,5 +1,6 @@
 import {
   Body,
+  BadRequestException,
   Controller,
   Get,
   Param,
@@ -7,10 +8,7 @@ import {
   Post,
   Query,
   UseGuards,
-  HttpStatus,
-  Res,
 } from '@nestjs/common';
-import { Response } from 'express';
 import { AdminGuard } from '../guards/admin.guard';
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
@@ -18,7 +16,6 @@ import { CurrentUser } from '../users/decorators/current-user.decorator';
 import { User } from '../users/user.entity';
 import { ApproveReportDto } from './dtos/approve-report.dto';
 import { CreateReportDto } from './dtos/create-report.dto';
-import { ResetPasswordConfirmDto } from './dtos/reset-password-confirm.dto';
 import { GetEstimateDto } from './dtos/get-estimate.dto';
 import { ReportResponseDto } from './dtos/report.response.dto';
 import { ReportsService } from './reports.service';
@@ -34,17 +31,25 @@ export class ReportsController {
     return this.reportsService.create(body, user);
   }
 
-  @Patch('/:id')
-  @UseGuards(AdminGuard)
-  @Post('/reset-password-confirm')
-  async resetPasswordConfirm(
-    @Body() body: ResetPasswordConfirmDto,
-    @Res() res: Response,
+  @Post('/refresh-token')
+  async refreshToken(
+    @Body('refresh_token') refreshToken: string,
+    @Body('scope') scope: string,
   ) {
-    await this.reportsService.resetPasswordConfirm(body.token, body.password);
-    return res.status(HttpStatus.OK).send();
+    if (!refreshToken || scope !== 'reports') {
+      throw new BadRequestException('Refresh token is not valid');
+    }
+
+    try {
+      const newTokens = await this.reportsService.refreshToken(refreshToken, scope);
+      return newTokens;
+    } catch (error) {
+      throw new BadRequestException('Refresh token is not valid');
+    }
   }
 
+  @Patch('/:id')
+  @UseGuards(AdminGuard)
   approveReport(
     @Body() body: ApproveReportDto,
     @Param() param: { id: string },

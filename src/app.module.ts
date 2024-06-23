@@ -1,6 +1,9 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { i18nModule } from 'nestjs-i18n';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -12,6 +15,7 @@ import { CurrentUserInterceptor } from './users/interceptors/current-user.interc
 import { JanitorModule } from './janitor/janitor.module';
 const cookieSession = require('cookie-session');
 
+import * as path from 'path';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -20,6 +24,19 @@ const cookieSession = require('cookie-session');
     }),
     UsersModule,
     ReportsModule,
+    i18nModule.forRoot({
+      fallbackLanguage: 'en',
+      parserOptions: {
+        path: path.join(__dirname, '/i18n/'),
+      },
+    }),
+    JwtModule.registerAsync({
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get('JWT_SECRET'),
+        signOptions: { expiresIn: '24h' },
+      }),
+      inject: [ConfigService],
+    }),
     TypeOrmModule.forRootAsync({
       useFactory: () => {
         return require('../ormconfig.js');

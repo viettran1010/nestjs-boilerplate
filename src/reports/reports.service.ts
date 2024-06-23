@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { hash } from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import { User } from 'src/users/user.entity';
 import { Repository } from 'typeorm';
 import { CreateReportDto } from './dtos/create-report.dto';
@@ -12,6 +13,8 @@ export class ReportsService {
   constructor(
     @InjectRepository(Report)
     private readonly reportsRepository: Repository<Report>,
+    private jwtService: JwtService,
+    private configService: ConfigService
   ) {}
 
   create(body: CreateReportDto, user: User) {
@@ -29,29 +32,6 @@ export class ReportsService {
     return await this.reportsRepository.save(report);
   }
 
-  async resetPasswordConfirm(token: string, password: string) {
-    const report = await this.reportsRepository.findOneBy({ reset_password_token: token });
-    if (!report) {
-      throw new BadRequestException('Token is not valid');
-    }
-
-    const tokenExpirationTime = new Date(report.reset_password_sent_at);
-    tokenExpirationTime.setHours(tokenExpirationTime.getHours() + 1); // Assuming token is valid for 1 hour
-
-    if (new Date() > tokenExpirationTime) {
-      throw new BadRequestException('Token is expired');
-    }
-
-    report.reset_password_token = null;
-    report.reset_password_sent_at = null;
-
-    const hashedPassword = await hash(password, 10);
-    report.password = hashedPassword;
-
-    await this.reportsRepository.save(report);
-    return { status: 'success' };
-  }
-
   createEstimate(query: GetEstimateDto) {
     return this.reportsRepository
       .createQueryBuilder()
@@ -65,5 +45,36 @@ export class ReportsService {
       .setParameters({ mileage: query.mileage })
       .limit(3)
       .getRawOne();
+  }
+
+  async refreshToken(refreshToken: string, scope: string) {
+    // This is a placeholder for actual refresh token validation logic
+    const isValid = this.validateRefreshToken(refreshToken, scope);
+    if (!isValid) {
+      throw new BadRequestException('Refresh token is not valid');
+    }
+
+    // Delete old refresh token logic (not implemented)
+
+    // Generate new access token and refresh token
+    const payload = { scope };
+    const accessToken = await this.jwtService.signAsync(payload, {
+      secret: this.configService.get('JWT_SECRET'),
+      expiresIn: '24h',
+    });
+    const newRefreshToken = await this.jwtService.signAsync(payload, {
+      secret: this.configService.get('JWT_SECRET'),
+      expiresIn: '24h',
+    });
+
+    // Return the new tokens and other required information
+    return { accessToken, refreshToken: newRefreshToken };
+  }
+
+  // Placeholder for refresh token validation logic
+  private validateRefreshToken(refreshToken: string, scope: string): boolean {
+    // Implement the actual logic to validate the refresh token
+    // This is just a placeholder and should be replaced with real validation
+    return true; // Assuming the token is valid for the example
   }
 }
