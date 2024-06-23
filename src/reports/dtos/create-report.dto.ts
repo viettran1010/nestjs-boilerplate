@@ -5,31 +5,34 @@ import {
   IsString,
   Max,
   Min,
+  IsNotEmpty,
 } from 'class-validator';
 
 export class CreateReportDto {
-  @IsNumber()
-  @Min(0)
-  @Max(1000000)
+  @IsNumber({ message: 'Price must be a number' })
+  @Min(0, { message: 'Price must be at least 0' })
+  @Max(1000000, { message: 'Price must be less than 1000000' })
   price: number;
 
-  @IsString()
+  @IsString({ message: 'Maker must be a string' })
+  @IsNotEmpty({ message: 'Maker is required' })
   maker: string;
 
-  @IsString()
+  @IsString({ message: 'Model must be a string' })
+  @IsNotEmpty({ message: 'Model is required' })
   model: string;
 
-  @Min(1930)
+  @Min(1930, { message: 'Year must be at least 1930' })
   year: number;
 
-  @IsLatitude()
+  @IsLatitude({ message: 'Latitude is not valid' })
   lat: number;
 
-  @IsLongitude()
+  @IsLongitude({ message: 'Longitude is not valid' })
   lng: number;
 
-  @IsNumber()
-  @Min(0)
-  @Max(1000000)
+  @IsNumber({ message: 'Mileage must be a number' })
+  @Min(0, { message: 'Mileage must be at least 0' })
+  @Max(1000000, { message: 'Mileage must be less than 1000000' })
   mileage: number;
 }

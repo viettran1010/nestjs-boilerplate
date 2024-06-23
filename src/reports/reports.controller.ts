@@ -9,6 +9,8 @@ import {
   Query,
   UseGuards,
   NotFoundException,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { AdminGuard } from '../guards/admin.guard';
 import { AuthGuard } from '../guards/auth.guard';
@@ -16,12 +18,12 @@ import { Serialize } from '../interceptors/serialize.interceptor';
 import { CurrentUser } from '../users/decorators/current-user.decorator';
 import { User } from '../users/user.entity';
 import { ApproveReportDto } from './dtos/approve-report.dto';
-import { ConfirmEmailDto } from './dtos/confirm-email.dto'; // Added import for ConfirmEmailDto
+import { ConfirmEmailDto } from './dtos/confirm-email.dto';
 import { CreateReportDto } from './dtos/create-report.dto';
 import { GetEstimateDto } from './dtos/get-estimate.dto';
 import { ReportResponseDto } from './dtos/report.response.dto';
 import { ReportsService } from './reports.service';
-import { Report } from './report.entity'; // Added import for Report entity
+import { Report } from './report.entity';
 
 @Controller('reports')
 export class ReportsController {
@@ -52,9 +54,10 @@ export class ReportsController {
   }
 
   @Post('/confirm-email')
-  async confirmEmail(@Body() body: ConfirmEmailDto): Promise<Report> {
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  async confirmEmail(@Body() body: ConfirmEmailDto): Promise<void> {
     try {
-      return await this.reportsService.confirmEmail(body.token);
+      await this.reportsService.confirmEmail(body.confirmation_token);
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw new BadRequestException(error.message);
