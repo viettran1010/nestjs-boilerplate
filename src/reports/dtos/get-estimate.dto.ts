@@ -6,6 +6,7 @@ import {
   IsString,
   Max,
   Min,
+  IsNotEmpty,
 } from 'class-validator';
 
 export class GetEstimateDto {
@@ -13,6 +14,7 @@ export class GetEstimateDto {
   maker: string;
 
   @IsString()
+  @IsNotEmpty()
   model: string;
 
   @Transform(({ value }) => parseInt(value))

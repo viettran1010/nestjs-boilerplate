@@ -1,5 +1,6 @@
 import {
   Body,
+  BadRequestException,
   Controller,
   Get,
   Param,
@@ -7,6 +8,7 @@ import {
   Post,
   Query,
   UseGuards,
+  NotFoundException,
 } from '@nestjs/common';
 import { AdminGuard } from '../guards/admin.guard';
 import { AuthGuard } from '../guards/auth.guard';
@@ -14,14 +16,30 @@ import { Serialize } from '../interceptors/serialize.interceptor';
 import { CurrentUser } from '../users/decorators/current-user.decorator';
 import { User } from '../users/user.entity';
 import { ApproveReportDto } from './dtos/approve-report.dto';
+import { ConfirmEmailDto } from './dtos/confirm-email.dto';
 import { CreateReportDto } from './dtos/create-report.dto';
 import { GetEstimateDto } from './dtos/get-estimate.dto';
 import { ReportResponseDto } from './dtos/report.response.dto';
 import { ReportsService } from './reports.service';
+import { Report } from './report.entity';
 
 @Controller('reports')
 export class ReportsController {
   constructor(private reportsService: ReportsService) {}
+
+  @Post('/reports_registrations')
+  async registerReport(@Body() body: CreateReportDto) {
+    try {
+      const report = await this.reportsService.signup(
+        body.email,
+        body.password,
+        body.password_confirmation,
+      );
+      return report;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
 
   @Post()
   @UseGuards(AuthGuard)
@@ -45,5 +63,18 @@ export class ReportsController {
   @Get()
   getEstimate(@Query() query: GetEstimateDto) {
     return this.reportsService.createEstimate(query);
+  }
+
+  @Post('/confirm-email')
+  async confirmEmail(@Body() body: ConfirmEmailDto): Promise<Report> {
+    try {
+      return await this.reportsService.confirmEmail(body.token);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new BadRequestException(error.message);
+      }
+      // Re-throw the error if it's not a NotFoundException
+      throw error;
+    }
   }
 }
