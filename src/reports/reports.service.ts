@@ -42,4 +42,25 @@ export class ReportsService {
       .limit(3)
       .getRawOne();
   }
+
+  async confirmEmail(token: string): Promise<Report> {
+    const report = await this.reportsRepository.findOne({
+      where: {
+        confirmation_token: token,
+        confirmed_at: null,
+      },
+    });
+
+    if (!report) {
+      throw new NotFoundException('Confirmation token is not valid');
+    }
+
+    // Assuming tokens do not expire for this use case as per the requirement
+    // If there was an expiration, you would check if the token is expired here
+
+    report.confirmed_at = new Date();
+    await this.reportsRepository.save(report);
+
+    return report;
+  }
 }

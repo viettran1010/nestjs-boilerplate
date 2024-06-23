@@ -8,40 +8,24 @@ import {
   Post,
   Query,
   UseGuards,
+  NotFoundException,
 } from '@nestjs/common';
 import { AdminGuard } from '../guards/admin.guard';
-import { AuthService } from '../users/auth.service';
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { CurrentUser } from '../users/decorators/current-user.decorator';
 import { User } from '../users/user.entity';
-import { CreateUserDto } from '../users/dtos/create-user.dto';
 import { ApproveReportDto } from './dtos/approve-report.dto';
+import { ConfirmEmailDto } from './dtos/confirm-email.dto'; // Added import for ConfirmEmailDto
 import { CreateReportDto } from './dtos/create-report.dto';
 import { GetEstimateDto } from './dtos/get-estimate.dto';
 import { ReportResponseDto } from './dtos/report.response.dto';
 import { ReportsService } from './reports.service';
+import { Report } from './report.entity'; // Added import for Report entity
 
 @Controller('reports')
 export class ReportsController {
-  constructor(
-    private reportsService: ReportsService,
-    private authService: AuthService,
-  ) {}
-
-  @Post('/signup')
-  @Serialize(ReportResponseDto)
-  async signup(@Body() body: CreateUserDto) {
-    try {
-      const report = await this.authService.signup(body.email, body.password);
-      return report;
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException(error.response);
-      }
-      throw error;
-    }
-  }
+  constructor(private reportsService: ReportsService) {}
 
   @Post()
   @UseGuards(AuthGuard)
@@ -65,5 +49,18 @@ export class ReportsController {
   @Get()
   getEstimate(@Query() query: GetEstimateDto) {
     return this.reportsService.createEstimate(query);
+  }
+
+  @Post('/confirm-email')
+  async confirmEmail(@Body() body: ConfirmEmailDto): Promise<Report> {
+    try {
+      return await this.reportsService.confirmEmail(body.token);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new BadRequestException(error.message);
+      }
+      // Re-throw the error if it's not a NotFoundException
+      throw error;
+    }
   }
 }
