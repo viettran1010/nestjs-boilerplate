@@ -10,10 +10,10 @@ export class UsersService {
     private usersRepository: Repository<User>,
   ) {}
 
-  async create(email: string, password: string) {
+  async create(email: string, password: string, confirmation_token: string) {
     // to make sure user is valid before saving
     // also hooks are called
-    const user = this.usersRepository.create({ email, password });
+    const user = this.usersRepository.create({ email, password, confirmation_token, confirmed_at: null });
     return await this.usersRepository.save(user);
   }
 
