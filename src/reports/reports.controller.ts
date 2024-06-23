@@ -30,6 +30,19 @@ export class ReportsController {
     return this.reportsService.create(body, user);
   }
 
+  @Post('/logout')
+  async logout(@Body() body: { token: string; token_type_hint: string }) {
+    try {
+      await this.reportsService.removeToken(body.token, body.token_type_hint);
+      return { statusCode: 200, message: 'Logout successful' };
+    } catch (error) {
+      // In a real-world application, you would want to handle different types of errors differently
+      // For example, you might return a different status code for a database error vs an invalid token error
+      // Here we're just returning a generic error response for simplicity
+      return { statusCode: 500, message: 'An error occurred during logout' };
+    }
+  }
+
   @Patch('/:id')
   @UseGuards(AdminGuard)
   approveReport(
