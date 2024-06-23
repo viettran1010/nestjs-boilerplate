@@ -1,5 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { promisify } from 'util';
+import { ConfigService } from '@nestjs/config';
 import { UsersService } from './users.service';
 import { randomBytes, scrypt as _scrypt } from 'crypto';
 
@@ -7,7 +9,11 @@ const scrypt = promisify(_scrypt);
 
 @Injectable()
 export class AuthService {
-  constructor(private usersService: UsersService) {}
+  constructor(
+    private jwtService: JwtService,
+    private configService: ConfigService,
+    private usersService: UsersService
+  ) {}
 
   async signup(email: string, password: string) {
     // validate user email doesn't exist
@@ -43,5 +49,29 @@ export class AuthService {
     }
 
     return user;
+  }
+
+  async generateJwtToken(userId: number): Promise<string> {
+    const payload = { id: userId };
+    return this.jwtService.signAsync(payload, {
+      secret: this.configService.get('JWT_SECRET'),
+      expiresIn: '24h',
+    });
+  }
+
+  async generateRefreshToken(userId: number): Promise<string> {
+    const payload = { id: userId };
+    return this.jwtService.signAsync(payload, {
+      secret: this.configService.get('JWT_SECRET'),
+      expiresIn: '24h',
+    });
+  }
+
+  async validateToken(token: string): Promise<any> {
+    try {
+      return this.jwtService.verifyAsync(token, { secret: this.configService.get('JWT_SECRET') });
+    } catch (error) {
+      throw new BadRequestException('Invalid token');
+    }
   }
 }
