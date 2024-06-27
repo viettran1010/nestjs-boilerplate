@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
+import { Customer } from '../entities/customers.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 
@@ -9,6 +10,36 @@ export class UsersService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
   ) {}
+
+  async searchCustomers(searchCriteria: { name?: string; katakana?: string; email_address?: string; }) {
+    const queryBuilder = this.usersRepository.createQueryBuilder('customer');
+
+    if (searchCriteria.name) {
+      queryBuilder.andWhere('customer.name = :name', { name: searchCriteria.name });
+    }
+
+    if (searchCriteria.katakana) {
+      queryBuilder.andWhere('customer.katakana = :katakana', { katakana: searchCriteria.katakana });
+    }
+
+    if (searchCriteria.email_address) {
+      queryBuilder.andWhere('customer.email_address = :email_address', { email_address: searchCriteria.email_address });
+    }
+
+    const customers = await queryBuilder.getMany();
+
+    if (customers.length === 0) {
+      throw new NotFoundException('No customers found with the provided criteria.');
+    }
+
+    return customers.map(customer => ({
+      id: customer.id,
+      name: customer.name,
+      katakana: customer.katakana,
+      phone_number: customer.phone_number,
+      email_address: customer.email_address,
+    }));
+  }
 
   async create(email: string, password: string) {
     // to make sure user is valid before saving
