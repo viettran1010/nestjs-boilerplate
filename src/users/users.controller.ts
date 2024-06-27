@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
   Patch,
@@ -9,8 +8,7 @@ import {
   Query,
   Session,
   UseGuards,
-  UseInterceptors,
-  NotFoundException,
+  Serialize,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
@@ -65,26 +63,8 @@ export class UsersController {
     return await this.usersService.find(email);
   }
 
-  @Delete('/:id')
-  async removeUser(@Param('id') id: string) {
-    return await this.usersService.remove(parseInt(id));
-  }
-
   @Patch('/:id')
   async updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return await this.usersService.update(parseInt(id), body);
-  }
-
-  @Get('/error-message/:userId')
-  async getErrorMessage(@Param('userId') userId: string) {
-    const errorMessage = await this.usersService.findMostRecentErrorMessage(parseInt(userId));
-    if (!errorMessage) {
-      throw new NotFoundException('Error message not found for the user.');
-    }
-    return {
-      error_icon: errorMessage.error_icon,
-      error_message: errorMessage.error_message,
-      error_detail: errorMessage.error_detail,
-    };
   }
 }

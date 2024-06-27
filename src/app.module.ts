@@ -1,20 +1,18 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
+import * as path from 'path';
 import { AppService } from './app.service';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
 import { ErrorMessagesModule } from './error_messages/error_messages.module';
 import { AuditLogsModule } from './audit_logs/audit_logs.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './users/user.entity';
-import { Report } from './reports/report.entity';
 import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
 import { JanitorModule } from './janitor/janitor.module';
 const cookieSession = require('cookie-session');
-import * as path from 'path';
 
 @Module({
   imports: [
@@ -22,14 +20,15 @@ import * as path from 'path';
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
-    UsersModule,
     I18nModule.forRoot({
       fallbackLanguage: 'en',
       parser: I18nJsonParser,
       parserOptions: {
         path: path.join(__dirname, '/i18n/'),
+        watch: true,
       },
     }),
+    UsersModule,
     ReportsModule,
     TypeOrmModule.forRootAsync({
       useFactory: () => {
@@ -69,8 +68,11 @@ import * as path from 'path';
     {
       provide: APP_PIPE,
       useClass: ValidationPipe,
-        whitelist: true,
-      }),
+      useFactory: () => {
+        return new ValidationPipe({
+          whitelist: true,
+        });
+      },
     },
     {
       provide: APP_INTERCEPTOR,

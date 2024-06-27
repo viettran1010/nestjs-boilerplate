@@ -1,8 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../users/user.entity';
-import { AuditLog } from '../audit_logs/audit_log.entity';
-import { Repository } from 'typeorm';
+import { InjectRepository, Repository } from '@nestjs/typeorm';
 import { ErrorMessage } from './error_message.entity';
 
 @Injectable()
@@ -10,10 +7,6 @@ export class ErrorMessagesService {
   constructor(
     @InjectRepository(ErrorMessage)
     private errorMessageRepository: Repository<ErrorMessage>,
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
-    @InjectRepository(AuditLog)
-    private auditLogRepository: Repository<AuditLog>,
   ) {}
 
   async logErrorMessage(
@@ -26,11 +19,6 @@ export class ErrorMessagesService {
     contract_id?: number
   ) {
     try {
-      const user = await this.userRepository.findOne(user_id);
-      if (!user) {
-        throw new NotFoundException('Invalid user ID.');
-      }
-
       const errorMessage = this.errorMessageRepository.create({
         user_id,
         error_icon,
@@ -41,17 +29,6 @@ export class ErrorMessagesService {
         contract_id,
       });
       await this.errorMessageRepository.save(errorMessage);
-
-      if (action_taken === 'retry') {
-        const auditLog = this.auditLogRepository.create({
-          action: 'error_retry',
-          timestamp: new Date(),
-          user_id: user_id,
-          contract_id: contract_id,
-        });
-        await this.auditLogRepository.save(auditLog);
-      }
-
       return { success: true, message: 'Error logged successfully' };
     } catch (error) {
       // Handle the error appropriately in your project context
@@ -59,4 +36,19 @@ export class ErrorMessagesService {
       throw new NotFoundException('Error logging message');
     }
   }
+
+  async findMostRecentErrorMessage(userId: number): Promise<ErrorMessage> {
+    const errorMessage = await this.errorMessageRepository.findOne({
+      where: { user_id: userId },
+      order: { created_at: 'DESC' },
+    });
+
+    if (!errorMessage) {
+      throw new NotFoundException('No error message found for the given user.');
+    }
+
+    return errorMessage;
+  }
+
+  // Other methods...
 }
