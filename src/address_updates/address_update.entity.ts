@@ -7,7 +7,6 @@ import {
 } from 'typeorm';
 import { User } from '../users/user.entity';
 import { Customer } from '../customers/customer.entity';
-import { AuditLog } from '../audit_logs/audit_log.entity';
 
 @Entity()
 export class AddressUpdate {
@@ -35,10 +34,6 @@ export class AddressUpdate {
   @ManyToOne(() => User)
   @JoinColumn({ name: 'user_id' })
   user: User;
-
-  @ManyToOne(() => AuditLog)
-  @JoinColumn({ name: 'audit_log_id' })
-  auditLog: AuditLog;
 
   @ManyToOne(() => Customer)
   @JoinColumn({ name: 'customer_id' })

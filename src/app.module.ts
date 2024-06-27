@@ -1,23 +1,20 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
-import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
 import { AppController } from './app.controller';
+import { AuditLog } from './audit_logs/audit_log.entity';
+import { AddressUpdate } from './address_updates/address_update.entity';
+import { AuditLogService } from './audit_logs/audit_logs.service';
+import { AddressUpdateService } from './address_updates/address_updates.service';
 import { AppService } from './app.service';
-import * as path from 'path';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from './users/user.entity';
+import { Report } from './reports/report.entity';
 import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
 import { JanitorModule } from './janitor/janitor.module';
 const cookieSession = require('cookie-session');
-
-const i18nOptions = {
-  fallbackLanguage: 'en',
-  parserOptions: {
-    path: path.join(__dirname, '/i18n/'),
-  },
-};
 
 @Module({
   imports: [
@@ -27,17 +24,13 @@ const i18nOptions = {
     }),
     UsersModule,
     ReportsModule,
-    I18nModule.forRoot({
-      fallbackLanguage: 'en',
-      parser: I18nJsonParser,
-      parserOptions: i18nOptions.parserOptions,
-    }),
     TypeOrmModule.forRootAsync({
       useFactory: () => {
         return require('../ormconfig.js');
       },
     }),
     JanitorModule,
+    TypeOrmModule.forFeature([AuditLog, AddressUpdate]),
     // TypeOrmModule.forRootAsync({
     //   inject: [ConfigService],
     //   useFactory: (configService: ConfigService) => ({
@@ -64,11 +57,12 @@ const i18nOptions = {
   controllers: [AppController],
   providers: [
     AppService,
+    AuditLogService,
+    AddressUpdateService,
     {
       provide: APP_PIPE,
-      useFactory: () => new ValidationPipe({
+      useValue: new ValidationPipe({
         whitelist: true,
-        transform: true,
       }),
     },
     {
