@@ -53,10 +53,13 @@ const cookieSession = require('cookie-session');
   providers: [
     AppService,
     {
-      provide: APP_PIPE,
-      useValue: new ValidationPipe({
+    provide: APP_PIPE,
+    useFactory: () => {
+      return new ValidationPipe({
         whitelist: true,
-      }),
+        forbidNonWhitelisted: true,
+        transform: true,
+      });
     },
     {
       provide: APP_INTERCEPTOR,
