@@ -2,13 +2,29 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
+import { SuccessMessage } from '../success-messages/success-message.entity';
+import { ErrorMessage } from '../error-messages/error-message.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
+    @InjectRepository(SuccessMessage)
+    private successMessageRepository: Repository<SuccessMessage>,
+    @InjectRepository(ErrorMessage)
+    private errorMessageRepository: Repository<ErrorMessage>,
     @InjectRepository(User)
     private usersRepository: Repository<User>,
   ) {}
+
+  async createSuccessMessage(message: string, detail: string, user_id: number): Promise<SuccessMessage> {
+    const successMessage = this.successMessageRepository.create({ message, detail, user_id });
+    return this.successMessageRepository.save(successMessage);
+  }
+
+  async createErrorMessage(error_message: string, error_detail: string, user_id: number): Promise<ErrorMessage> {
+    const errorMessage = this.errorMessageRepository.create({ error_message, error_detail, user_id });
+    return this.errorMessageRepository.save(errorMessage);
+  }
 
   async create(email: string, password: string) {
     const user = this.usersRepository.create({ email, password });
@@ -43,14 +59,4 @@ export class UsersService {
     }
     return await this.usersRepository.remove(user);
   }
-
-  async validateEmployeeLogin(user_id: number): Promise<boolean> {
-    if (!user_id) {
-      return false;
-    }
-    const user = await this.usersRepository.findOneBy({ id: user_id });
-    return !!user;
-  }
-
-  // Other methods...
 }
