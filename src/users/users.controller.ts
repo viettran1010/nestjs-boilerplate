@@ -1,21 +1,24 @@
 import {
   Body,
   Controller,
+  Post,
   Delete,
   Get,
   Param,
   Patch,
-  Post,
   Query,
   Session,
   UseGuards,
+  UsePipes,
   UseInterceptors,
+  ValidationPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { AuthService } from './auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { CreateUserDto } from './dtos/create-user.dto';
+import { SuccessMessageDisplayDto } from './dtos/success-message-display.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserResponseDto } from './dtos/user.response.dto';
 import { User } from './user.entity';
@@ -72,5 +75,16 @@ export class UsersController {
   @Patch('/:id')
   async updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return await this.usersService.update(parseInt(id), body);
+  }
+
+  @Post('/success-messages/display')
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async recordSuccessMessage(@Body() body: SuccessMessageDisplayDto) {
+    const successMessage = await this.usersService.recordSuccessMessage(
+      body.user_id,
+      body.message,
+      body.detail,
+    );
+    return { message: 'Success message recorded', data: successMessage };
   }
 }

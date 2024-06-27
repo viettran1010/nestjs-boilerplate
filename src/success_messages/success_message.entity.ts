@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { User } from '../users/user.entity';
+import { Contract } from '../contracts/contract.entity';
 
 @Entity()
 export class SuccessMessage {
@@ -24,7 +25,9 @@ export class SuccessMessage {
   @Column({ type: 'timestamp', nullable: true })
   closed_at: Date;
 
-  @ManyToOne(() => User, user => user.id)
-  @Column()
-  user_id: number;
+  @ManyToOne(() => User, user => user.successMessages)
+  user: User;
+
+  @ManyToOne(() => Contract, contract => contract.successMessages)
+  contract: Contract;
 }

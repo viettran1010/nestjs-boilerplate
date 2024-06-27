@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
+import { SuccessMessage } from '../success_messages/success_message.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 
@@ -18,6 +19,26 @@ export class UsersService {
   }
 
   async findOne(id: number) {
+  async recordSuccessMessage(user_id: number, message: string, detail: string): Promise<SuccessMessage> {
+    const user = await this.usersRepository.findOneBy({ id: user_id });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const successMessage = new SuccessMessage();
+    successMessage.user = user;
+    successMessage.message = message;
+    successMessage.detail = detail;
+    successMessage.displayed_at = new Date();
+
+    // Assuming there's a repository injected for SuccessMessage
+    // If not, it should be added to the constructor and injected as done with usersRepository
+    const successMessagesRepository = this.moduleRef.get('SuccessMessageRepository', { strict: false });
+    await successMessagesRepository.save(successMessage);
+
+    return successMessage;
+  }
+
     if (!id) {
       return null;
     }
