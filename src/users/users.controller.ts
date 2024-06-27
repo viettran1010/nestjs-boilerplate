@@ -9,7 +9,8 @@ import {
   Query,
   Session,
   UseGuards,
-  UseInterceptors,
+  NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
@@ -17,6 +18,7 @@ import { AuthService } from './auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
+import { AddressUpdate } from '../address_updates/address_update.entity';
 import { UserResponseDto } from './dtos/user.response.dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
@@ -72,5 +74,27 @@ export class UsersController {
   @Patch('/:id')
   async updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return await this.usersService.update(parseInt(id), body);
+  }
+
+  @Patch('/address_updates/:addressUpdateId/cancel')
+  @UseGuards(AuthGuard)
+  async cancelAddressUpdate(
+    @Param('addressUpdateId') addressUpdateId: number,
+    @CurrentUser() user: User,
+  ) {
+    const addressUpdate = await this.usersService.findAddressUpdateById(addressUpdateId);
+
+    if (!addressUpdate) {
+      throw new NotFoundException('Address update process not found.');
+    }
+
+    if (addressUpdate.user.id !== user.id) {
+      throw new UnauthorizedException('Unauthorized to cancel this address update process.');
+    }
+
+    addressUpdate.status = 'cancelled';
+    await this.usersService.saveAddressUpdate(addressUpdate);
+
+    return { status: 200, message: 'Address update process has been successfully cancelled.' };
   }
 }
