@@ -13,11 +13,11 @@ export class SuccessMessageService {
   async dismissSuccessMessage(id: number): Promise<string> {
     const successMessage = await this.successMessageRepository.findOneBy({ id });
     if (!successMessage) {
-      throw new NotFoundException(`Success message with ID ${id} not found`);
+      throw new NotFoundException(`Success message not found.`);
     }
     successMessage.closed_at = new Date();
     await this.successMessageRepository.save(successMessage);
-    return 'Success message dismissed successfully';
+    return 'Success message modal has been dismissed.';
   }
 
   // Other service methods...
