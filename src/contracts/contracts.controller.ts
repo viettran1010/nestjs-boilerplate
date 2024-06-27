@@ -7,7 +7,7 @@ export class ContractsController {
   constructor(private readonly contractsService: ContractsService) {}
 
   // ... other route handlers ...
-
+  
   @Patch(':id')
   async updateContract(@Param('id') id: number, @Body() updateContractDto: UpdateContractDto) {
     await this.contractsService.updateContractDetails(id, updateContractDto);

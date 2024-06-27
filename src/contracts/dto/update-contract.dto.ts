@@ -5,7 +5,7 @@ export class UpdateContractDto {
   @IsInt()
   @IsNotEmpty()
   customer_id: number;
-
+  
   @IsString()
   @IsNotEmpty()
   @MinLength(1)
@@ -27,7 +27,7 @@ export class UpdateContractDto {
   @IsEnum(AccountType)
   @IsNotEmpty()
   account_type: AccountType;
-
+  
   @IsString()
   @IsNotEmpty()
   @MinLength(1)
@@ -37,7 +37,7 @@ export class UpdateContractDto {
   @IsString()
   @IsNotEmpty()
   opening_date: string;
-
+  
   @IsString()
   @IsOptional()
   remarks: string;
@@ -45,7 +45,7 @@ export class UpdateContractDto {
   @IsInt()
   @IsNotEmpty()
   deposit_period: number;
-
+  
   @IsString()
   @IsNotEmpty()
   maturity_date: string;
@@ -53,7 +53,7 @@ export class UpdateContractDto {
   @IsNumber()
   @IsNotEmpty()
   interest_rate: number;
-
+  
   @IsEnum(ContractStatus)
   @IsNotEmpty()
   status: ContractStatus;

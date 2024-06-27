@@ -15,7 +15,7 @@ async function bootstrap() {
   app.setBaseViewsDir(path.join(__dirname, '..', 'views'));
   app.setViewEngine('hbs');
   app.enableCors();
-
+  
   // Initialize i18n
   const i18nService = app.get(I18nService);
   await i18nService.init();
