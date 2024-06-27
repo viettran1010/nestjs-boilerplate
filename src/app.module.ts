@@ -1,5 +1,7 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
+import { I18nModule } from '@nestjs-modules/i18n';
+import { I18nJsonParser } from '@nestjs-modules/i18n/dist/parsers';
 import { AppService } from './app.service';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
@@ -7,6 +9,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/user.entity';
 import { Report } from './reports/report.entity';
 import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { I18nLanguageInterceptor } from '@nestjs-modules/i18n/dist/interceptors';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
 import { JanitorModule } from './janitor/janitor.module';
@@ -14,6 +17,12 @@ const cookieSession = require('cookie-session');
 
 @Module({
   imports: [
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      parserOptions: {
+        path: path.join(__dirname, '/i18n/'),
+      },
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
@@ -48,14 +57,12 @@ const cookieSession = require('cookie-session');
     //     synchronize: true,
     //   }),
     // }),
-  ],
-  controllers: [AppController],
-  providers: [
-    AppService,
+      provide: APP_PIPE,
+      useClass: ValidationPipe,
     {
       provide: APP_PIPE,
-      useValue: new ValidationPipe({
-        whitelist: true,
+      provide: APP_INTERCEPTOR,
+      useClass: I18nLanguageInterceptor,
       }),
     },
     {
