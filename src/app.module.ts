@@ -1,5 +1,6 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
+import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
 import { AppService } from './app.service';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
@@ -13,6 +14,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
 import { JanitorModule } from './janitor/janitor.module';
 const cookieSession = require('cookie-session');
+import * as path from 'path';
 
 @Module({
   imports: [
@@ -21,6 +23,13 @@ const cookieSession = require('cookie-session');
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
     UsersModule,
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      parser: I18nJsonParser,
+      parserOptions: {
+        path: path.join(__dirname, '/i18n/'),
+      },
+    }),
     ReportsModule,
     TypeOrmModule.forRootAsync({
       useFactory: () => {
@@ -59,7 +68,7 @@ const cookieSession = require('cookie-session');
     AppService,
     {
       provide: APP_PIPE,
-      useValue: new ValidationPipe({
+      useClass: ValidationPipe,
         whitelist: true,
       }),
     },

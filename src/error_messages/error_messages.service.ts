@@ -1,15 +1,19 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { User } from '../users/user.entity';
+import { AuditLog } from '../audit_logs/audit_log.entity';
 import { Repository } from 'typeorm';
 import { ErrorMessage } from './error_message.entity';
-import { AuditLogsService } from '../audit_logs/audit_logs.service';
 
 @Injectable()
 export class ErrorMessagesService {
   constructor(
     @InjectRepository(ErrorMessage)
     private errorMessageRepository: Repository<ErrorMessage>,
-    private auditLogsService: AuditLogsService
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+    @InjectRepository(AuditLog)
+    private auditLogRepository: Repository<AuditLog>,
   ) {}
 
   async logErrorMessage(
@@ -22,6 +26,11 @@ export class ErrorMessagesService {
     contract_id?: number
   ) {
     try {
+      const user = await this.userRepository.findOne(user_id);
+      if (!user) {
+        throw new NotFoundException('Invalid user ID.');
+      }
+
       const errorMessage = this.errorMessageRepository.create({
         user_id,
         error_icon,
@@ -34,7 +43,13 @@ export class ErrorMessagesService {
       await this.errorMessageRepository.save(errorMessage);
 
       if (action_taken === 'retry') {
-        await this.auditLogsService.logAuditEntry(action_taken, timestamp, user_id, contract_id);
+        const auditLog = this.auditLogRepository.create({
+          action: 'error_retry',
+          timestamp: new Date(),
+          user_id: user_id,
+          contract_id: contract_id,
+        });
+        await this.auditLogRepository.save(auditLog);
       }
 
       return { success: true, message: 'Error logged successfully' };
