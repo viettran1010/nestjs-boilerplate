@@ -10,6 +10,7 @@ import {
   Session,
   UseGuards,
   UseInterceptors,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
@@ -72,5 +73,14 @@ export class UsersController {
   @Patch('/:id')
   async updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return await this.usersService.update(parseInt(id), body);
+  }
+
+  @Get('/menu')
+  @UseGuards(AuthGuard)
+  async getMenuOptions(@CurrentUser() user: User) {
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+    return await this.usersService.getUserMenuOptions(user.id);
   }
 }

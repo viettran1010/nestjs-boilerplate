@@ -1,5 +1,7 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
+import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
+import * as path from 'path';
 import { AppService } from './app.service';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
@@ -17,6 +19,13 @@ const cookieSession = require('cookie-session');
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
+    }),
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      parser: I18nJsonParser,
+      parserOptions: {
+        path: path.join(__dirname, '/i18n/'),
+      },
     }),
     UsersModule,
     ReportsModule,
