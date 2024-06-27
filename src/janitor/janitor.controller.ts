@@ -1,9 +1,12 @@
+import { UseFilters } from '@nestjs/common';
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { JanitorService } from './janitor.service';
+import { CustomExceptionFilter } from '../common/filters/custom-exception.filter';
 import { CreateJanitorDto } from './dto/create-janitor.dto';
 import { UpdateJanitorDto } from './dto/update-janitor.dto';
 
 @Controller('janitor')
+@UseFilters(CustomExceptionFilter)
 export class JanitorController {
   constructor(private readonly janitorService: JanitorService) {}
 

@@ -1,14 +1,20 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
 import { Contract } from '../contracts/contract.entity';
 import { User } from '../users/user.entity';
+
+export enum AuditActionType {
+  CREATE = 'CREATE',
+  UPDATE = 'UPDATE',
+  DELETE = 'DELETE',
+}
 
 @Entity()
 export class AuditLog {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  action: string;
+  @Column({ type: 'enum', enum: AuditActionType })
+  action: AuditActionType;
 
   @Column('timestamp')
   timestamp: Date;

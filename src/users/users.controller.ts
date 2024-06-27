@@ -10,9 +10,11 @@ import {
   Session,
   UseGuards,
   UseInterceptors,
+  UseFilters,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
+import { HttpExceptionFilter } from '../common/filters/http-exception.filter';
 import { AuthService } from './auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { CreateUserDto } from './dtos/create-user.dto';
@@ -23,6 +25,7 @@ import { UsersService } from './users.service';
 
 @Controller('auth')
 @Serialize(UserResponseDto)
+@UseFilters(new HttpExceptionFilter())
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
