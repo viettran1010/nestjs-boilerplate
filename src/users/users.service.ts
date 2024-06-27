@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
+import { UnauthorizedAccessException } from './exceptions/unauthorized-access.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { MenuOption } from '../menu-options/menu-option.entity';
@@ -63,5 +64,21 @@ export class UsersService {
       label: option.label,
       icon: option.icon,
     }));
+  }
+
+  async validateUserAccess(userId: number, menuOptionId: number): Promise<boolean> {
+    const permission = await this.userPermissionsRepository.findOne({
+      where: {
+        user_id: userId,
+        menu_option_id: menuOptionId,
+        has_access: true,
+      },
+    });
+
+    if (!permission) {
+      throw new UnauthorizedAccessException();
+    }
+
+    return true;
   }
 }

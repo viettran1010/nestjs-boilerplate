@@ -1,6 +1,8 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
+import { I18nModule, I18nJsonParser, I18nLanguageDetector } from '@nestjs-modules/i18n';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import * as path from 'path';
 import { UserPermissionsModule } from './user-permissions/user-permissions.module';
 import { MenuOptionsModule } from './menu-options/menu-options.module';
 import { ReportsModule } from './reports/reports.module';
@@ -20,6 +22,14 @@ const cookieSession = require('cookie-session');
     }),
     UsersModule,
     ReportsModule,
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      parser: I18nJsonParser,
+      parserOptions: {
+        path: path.join(__dirname, '/i18n/'),
+      },
+      languageDetector: I18nLanguageDetector,
+    }),
     TypeOrmModule.forRootAsync({
       useFactory: () => {
         return require('../ormconfig.js');
@@ -28,36 +38,15 @@ const cookieSession = require('cookie-session');
     JanitorModule,
     UserPermissionsModule,
     MenuOptionsModule,
-    // TypeOrmModule.forRootAsync({
-    //   inject: [ConfigService],
-    //   useFactory: (configService: ConfigService) => ({
-    //     type: 'postgres',
-    //     host: configService.get('DB_HOST'),
-    //     port: configService.get('DB_PORT'),
-    //     username: configService.get('DB_USERNAME'),
-    //     password: configService.get('DB_PASSWORD'),
-    //     database: configService.get('DB_NAME'),
-    //     entities: [User, Report],
-    //     synchronize: true,
-    //   }),
-    // }),
-    // TypeOrmModule.forRootAsync({
-    //   inject: [ConfigService],
-    //   useFactory: (configService: ConfigService) => ({
-    //     type: 'sqlite',
-    //     database: configService.get('DB_NAME'),
-    //     entities: [User, Report],
-    //     synchronize: true,
-    //   }),
-    // }),
   ],
   controllers: [AppController],
   providers: [
     AppService,
     {
-      provide: APP_PIPE,
+      provide: APP_PIPE, // Global validation pipe
       useValue: new ValidationPipe({
         whitelist: true,
+        transform: true,
       }),
     },
     {
