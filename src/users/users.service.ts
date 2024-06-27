@@ -1,34 +1,22 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { UserPermission } from '../user-permissions/user-permission.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
+import { MenuOption } from '../menu-options/menu-option.entity';
+import { UserPermission } from '../user-permissions/user-permission.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    @InjectRepository(MenuOption)
+    private menuOptionsRepository: Repository<MenuOption>,
+    @InjectRepository(UserPermission)
+    private userPermissionsRepository: Repository<UserPermission>,
   ) {}
 
-  async checkUserPermission(userId: number, menuOptionId: number): Promise<boolean> {
-    const userPermission = await this.usersRepository.manager.findOne(UserPermission, {
-      where: {
-        user_id: userId,
-        menu_option_id: menuOptionId,
-      },
-    });
-
-    if (!userPermission || !userPermission.has_access) {
-      throw new NotFoundException('UnauthorizedAccessException');
-    }
-
-    return true;
-  }
-
   async create(email: string, password: string) {
-    // to make sure user is valid before saving
-    // also hooks are called
     const user = this.usersRepository.create({ email, password });
     return await this.usersRepository.save(user);
   }
@@ -60,5 +48,20 @@ export class UsersService {
       throw new NotFoundException('user not found');
     }
     return await this.usersRepository.remove(user);
+  }
+
+  async getMenuOptions(userId: number) {
+    const accessibleMenuOptions = await this.menuOptionsRepository
+      .createQueryBuilder('menu_option')
+      .leftJoinAndSelect('menu_option.user_permissions', 'user_permission')
+      .where('user_permission.user_id = :userId', { userId })
+      .andWhere('user_permission.has_access = :hasAccess', { hasAccess: true })
+      .select(['menu_option.label', 'menu_option.icon'])
+      .getMany();
+
+    return accessibleMenuOptions.map(option => ({
+      label: option.label,
+      icon: option.icon,
+    }));
   }
 }

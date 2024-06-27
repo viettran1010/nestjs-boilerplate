@@ -1,13 +1,11 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
-import * as path from 'path';
 import { AppService } from './app.service';
+import { UserPermissionsModule } from './user-permissions/user-permissions.module';
+import { MenuOptionsModule } from './menu-options/menu-options.module';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './users/user.entity';
-import { Report } from './reports/report.entity';
 import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
@@ -20,13 +18,6 @@ const cookieSession = require('cookie-session');
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
-    I18nModule.forRoot({
-      fallbackLanguage: 'en',
-      parser: I18nJsonParser,
-      parserOptions: {
-        path: path.join(__dirname, '/i18n/'),
-      },
-    }),
     UsersModule,
     ReportsModule,
     TypeOrmModule.forRootAsync({
@@ -35,6 +26,8 @@ const cookieSession = require('cookie-session');
       },
     }),
     JanitorModule,
+    UserPermissionsModule,
+    MenuOptionsModule,
     // TypeOrmModule.forRootAsync({
     //   inject: [ConfigService],
     //   useFactory: (configService: ConfigService) => ({

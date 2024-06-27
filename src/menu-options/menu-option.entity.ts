@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
-import { UserPermission } from '../user-permissions/user-permission.entity';
+import { UserPermission } from 'src/user-permissions/user-permission.entity';
 
 @Entity('menu_options')
 export class MenuOption {
@@ -12,6 +12,7 @@ export class MenuOption {
   @UpdateDateColumn({ type: 'timestamp' })
   updated_at: Date;
 
+  @OneToMany(() => UserPermission, userPermission => userPermission.menuOption)
   @Column({ type: 'varchar', length: 255 })
   label: string;
 
@@ -21,6 +22,5 @@ export class MenuOption {
   @Column({ type: 'boolean' })
   requires_permission: boolean;
 
-  @OneToMany(() => UserPermission, userPermission => userPermission.menu_option)
   user_permissions: UserPermission[];
 }
