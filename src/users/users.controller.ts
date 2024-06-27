@@ -1,6 +1,6 @@
 import {
   Body,
-  BadRequestException,
+  ParseIntPipe,
   ForbiddenException,
   Controller,
   Delete,
@@ -8,7 +8,6 @@ import {
   Param,
   Patch,
   Post,
-  ParseIntPipe,
   Query,
   Session,
   UseGuards,
@@ -18,6 +17,7 @@ import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { AuthService } from './auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
+import { CreateUserDto } from './dtos/create-user.dto';
 import { UnauthorizedAccessException } from '../exceptions/unauthorized-access.exception';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserResponseDto } from './dtos/user.response.dto';
@@ -26,7 +26,6 @@ import { UsersService } from './users.service';
 
 @Controller('auth')
 @Serialize(UserResponseDto)
-@UseGuards(AuthGuard)
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
@@ -34,6 +33,7 @@ export class UsersController {
   ) {}
 
   @Get('/whoami')
+  @UseGuards(AuthGuard)
   whoAmI(@CurrentUser() user: User) {
     return user;
   }
@@ -44,14 +44,14 @@ export class UsersController {
   }
 
   @Post('/signup')
-  async createUser(@Body() body: any, @Session() session: any) { // CreateUserDto import removed, so body type is any
+  async createUser(@Body() body: CreateUserDto, @Session() session: any) {
     const user = await this.authService.signup(body.email, body.password);
     session.userId = user.id;
     return user;
   }
 
   @Post('/signin')
-  async signin(@Body() body: any, @Session() session: any) { // CreateUserDto import removed, so body type is any
+  async signin(@Body() body: CreateUserDto, @Session() session: any) {
     const user = await this.authService.signin(body.email, body.password);
     session.userId = user.id;
     return user;
@@ -79,16 +79,18 @@ export class UsersController {
 
   @Get('/menu-access/:menuOptionId')
   @UseGuards(AuthGuard)
-  async menuAccess(@CurrentUser() user: User, @Param('menuOptionId', ParseIntPipe) menuOptionId: number) {
+  async menuAccess(
+    @CurrentUser() user: User, 
+    @Param('menuOptionId', ParseIntPipe) menuOptionId: number
+  ) {
     try {
       await this.usersService.checkUserPermission(user.id, menuOptionId);
       return { message: 'User is authorized to access the selected menu option.' };
     } catch (error) {
       if (error instanceof UnauthorizedAccessException) {
         throw new ForbiddenException(error.message);
-      } else {
-        throw new BadRequestException('Invalid parameters');
       }
+      throw error;
     }
   }
 }
