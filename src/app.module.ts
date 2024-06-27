@@ -20,13 +20,6 @@ const cookieSession = require('cookie-session');
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
-    I18nModule.forRoot({
-      fallbackLanguage: 'en',
-      parser: I18nJsonParser,
-      parserOptions: {
-        path: join(__dirname, '/i18n/'),
-      },
-    }),
     UsersModule,
     ReportsModule,
     TypeOrmModule.forRootAsync({
@@ -35,6 +28,13 @@ const cookieSession = require('cookie-session');
       },
     }),
     JanitorModule,
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      parser: I18nJsonParser,
+      parserOptions: {
+        path: join(__dirname, '/i18n/'),
+      },
+    }),
     // TypeOrmModule.forRootAsync({
     //   inject: [ConfigService],
     //   useFactory: (configService: ConfigService) => ({
@@ -63,10 +63,14 @@ const cookieSession = require('cookie-session');
     AppService,
     {
       provide: APP_PIPE,
-      useClass: ValidationPipe,
+      useValue: new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true, // reject any non-whitelisted properties
+        transform: true, // automatically transform payloads to be objects typed according to DTO classes
+      }),
     },
     {
-      provide: APP_INTERCEPTOR,
+      provide: APP_INTERCEPTor,
       useClass: CurrentUserInterceptor,
     },
   ],
