@@ -7,6 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/user.entity';
 import { Report } from './reports/report.entity';
 import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { AddressUpdateModule } from './address_updates/address_update.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
 import { JanitorModule } from './janitor/janitor.module';
@@ -21,6 +22,7 @@ const cookieSession = require('cookie-session');
     UsersModule,
     ReportsModule,
     TypeOrmModule.forRootAsync({
+    AddressUpdateModule,
       useFactory: () => {
         return require('../ormconfig.js');
       },
