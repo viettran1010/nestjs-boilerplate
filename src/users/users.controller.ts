@@ -1,5 +1,6 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
@@ -24,6 +25,7 @@ import { Contract } from '../contracts/contract.entity';
 import { ContractsService } from '../contracts/contracts.service';
 
 @Controller('auth')
+@UseInterceptors(ClassSerializerInterceptor)
 @Serialize(UserResponseDto)
 export class UsersController {
   constructor(
@@ -75,6 +77,18 @@ export class UsersController {
   @Patch('/:id')
   async updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return await this.usersService.update(parseInt(id), body);
+  }
+
+  @Get('/contracts')
+  async navigateBackToContractList() {
+    const contracts = await this.usersService.getAllContracts();
+    return {
+      status: 200,
+      contracts: contracts.map(contract => ({
+        id: contract.id,
+        // ... other contract fields
+      })),
+    };
   }
 
   @Get('/contracts/back')

@@ -47,6 +47,7 @@ export class UsersService {
   }
 
   async getAllContracts() {
+    // Retrieve all contracts from the database without any filters
     return await this.contractsRepository.find();
   }
 }

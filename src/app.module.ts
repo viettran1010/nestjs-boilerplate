@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ContractsModule } from './contracts/contracts.module';
 import { User } from './users/user.entity';
 import { Report } from './reports/report.entity';
 import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
@@ -35,6 +36,7 @@ const cookieSession = require('cookie-session');
       },
     }),
     JanitorModule,
+    ContractsModule,
     // TypeOrmModule.forRootAsync({
     //   inject: [ConfigService],
     //   useFactory: (configService: ConfigService) => ({
