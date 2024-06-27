@@ -1,4 +1,4 @@
-import { IsDate, IsEnum, IsFloat, IsInt, IsString, IsOptional } from 'class-validator';
+import { IsDate, IsEnum, IsNumber, IsInt, IsString, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export enum AccountType {
@@ -8,9 +8,11 @@ export enum AccountType {
   OTHER = 'other',
 }
 
-export enum ContractStatus { 
-  APPROVED = 'Approved',
-  DENIED = 'Denied',
+export enum ContractStatus {
+  // Assuming the enum values based on typical contract statuses
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  CLOSED = 'closed',
 }
 
 export class ContractDetailsResponseDto {
@@ -18,7 +20,8 @@ export class ContractDetailsResponseDto {
   customer_id: number;
 
   @IsString()
-  customer_name_katakana: string;
+  @IsOptional()
+  customer_name_katakana?: string;
 
   @IsString()
   bank_code: string;
@@ -26,47 +29,53 @@ export class ContractDetailsResponseDto {
   @IsString()
   branch_code: string;
 
-  @IsEnum(AccountType)
-  account_type: AccountType;
+  @IsString()
+  account_type: string;
 
   @IsString()
   account_number: string;
 
   @IsDate()
-  @Type(() => Date)
-  opening_date: Date;
+  @Type(() => String)
+  opening_date: string;
 
   @IsString()
   @IsOptional()
-  remarks: string;
+  remarks?: string;
 
   @IsInt()
-  deposit_period: number;
+  @IsOptional()
+  deposit_period?: number;
 
   @IsDate()
-  @Type(() => Date)
-  maturity_date: Date;
+  @Type(() => String)
+  maturity_date?: string;
 
-  @IsFloat()
-  interest_rate: number;
-
-  @IsEnum(ContractStatus)
-  status: ContractStatus;
+  @IsNumber()
+  @IsOptional()
+  interest_rate?: number;
 
   @IsString()
-  currency_deposited: string;
+  status: string;
 
-  @IsFloat()
-  deposit_amount: number;
+  @IsString()
+  @IsOptional()
+  currency_deposited?: string;
+
+  @IsNumber()
+  @IsOptional()
+  deposit_amount?: number;
 
   @IsDate()
-  @Type(() => Date)
-  deposit_date: Date;
+  @Type(() => String)
+  deposit_date?: string;
 
-  // Additional customer details
+  // Additional customer details, optional if not available
   @IsString()
-  name: string;
+  @IsOptional()
+  name?: string;
 
   @IsString()
-  name_katakana: string;
+  @IsOptional()
+  name_katakana?: string;
 }

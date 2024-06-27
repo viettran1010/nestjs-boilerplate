@@ -1,7 +1,6 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { AuditLog } from './audit_logs/audit_log.entity';
-import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
+import { I18nModule, I18nJsonParser, I18nService } from '@nestjs-modules/i18n';
 import { i18nextHttpMiddleware } from 'i18next-http-middleware';
 import { AppService } from './app.service';
 import { ContractsModule } from './contracts/contracts.module';
@@ -18,17 +17,17 @@ import * as path from 'path';
 const cookieSession = require('cookie-session');
 
 @Module({
-  imports: [
+  imports: [ 
     ConfigModule.forRoot({
-      isGlobal: true, // Indicates that the ConfigModule is a global module
+      isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
     UsersModule,
     ReportsModule,
     I18nModule.forRoot({
       fallbackLanguage: 'en',
-      parser: I18nJsonParser,
-      parserOptions: { // Options for the i18n JSON parser
+      parser: I18nJsonParser, 
+      parserOptions: {
         path: path.join(__dirname, '/i18n/'),
       },
     }),
@@ -36,15 +35,15 @@ const cookieSession = require('cookie-session');
     TypeOrmModule.forRootAsync({
       useFactory: () => {
         return require('../ormconfig.js');
-      }, // Loads the ORM configuration from the ormconfig.js file
+      },
     }),
     JanitorModule,
-    // TypeOrmModule.forRootAsync({
+    // TypeOrmModule.forRootAsync({ 
     //   inject: [ConfigService],
     //   useFactory: (configService: ConfigService) => ({
-    //     type: 'postgres',
+    //     type: 'postgres', 
     //     host: configService.get('DB_HOST'),
-    //     port: configService.get('DB_PORT'), // Retrieves the database port from the configuration
+    //     port: configService.get('DB_PORT'),
     //     username: configService.get('DB_USERNAME'),
     //     password: configService.get('DB_PASSWORD'),
     //     database: configService.get('DB_NAME'),
@@ -52,7 +51,7 @@ const cookieSession = require('cookie-session');
     //     synchronize: true,
     //   }),
     // }),
-    // TypeOrmModule.forRootAsync({ // Alternative TypeOrmModule configuration for SQLite
+    // TypeOrmModule.forRootAsync({ 
     //   inject: [ConfigService],
     //   useFactory: (configService: ConfigService) => ({
     //     type: 'sqlite',
@@ -60,35 +59,35 @@ const cookieSession = require('cookie-session');
     //     entities: [User, Report],
     //     synchronize: true,
     //   }),
-    // }), // End of the commented out TypeOrmModule configuration
-  ],
+    // }),
+  ], 
   controllers: [AppController],
   providers: [
     AppService,
     {
       provide: APP_PIPE,
       useClass: ValidationPipe,
-    }, // Sets up the ValidationPipe as a global pipe for validation
+    },
     {
-      provide: APP_INTERCEPTOR,
+      provide: APP_INTERCEPTOR, 
       useClass: CurrentUserInterceptor,
     },
   ],
 })
 export class AppModule {
-  constructor(private configService: ConfigService) {} // Injects the ConfigService for use in the module
+  constructor(private configService: ConfigService) {}
 
-  configure(consumer: MiddlewareConsumer) {
+  configure(consumer: MiddlewareConsumer) { 
     consumer
       .apply(
         cookieSession({
           keys: [this.configService.get('COOKIE_KEY')], // for encryption
         }),
-        i18nextHttpMiddleware({ // Middleware for i18next to handle internationalization
+        i18nextHttpMiddleware({
           i18n: i18next,
           order: ['querystring', 'cookie', 'header'],
         }),
       )
-      .forRoutes('*'); // for all routes
+      .forRoutes('*'); // for all routes 
   }
 }

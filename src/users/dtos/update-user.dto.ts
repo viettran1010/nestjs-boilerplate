@@ -1,11 +1,12 @@
-import { IsEmail, IsOptional, IsString, IsInt, Min, Max } from 'class-validator';
+import { IsEmail, IsOptional, IsString, IsInt, Min, Max, MinLength, MaxLength } from 'class-validator';
 
 export class UpdateUserDto {
   @IsEmail()
   @IsOptional()
-  email: string;
+  email?: string;
 
   @IsString()
+  @MinLength(2)
   @IsOptional()
   name?: string;
 
@@ -14,4 +15,6 @@ export class UpdateUserDto {
   @Min(0)
   @Max(150)
   age?: number;
+
+  // Add other properties that can be updated with appropriate validation decorators
 }

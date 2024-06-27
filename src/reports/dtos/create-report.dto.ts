@@ -2,7 +2,7 @@ import {
   IsLatitude,
   IsLongitude,
   IsNotEmpty,
-  IsNumber,
+  IsNumber, IsPositive,
   IsString,
   Max,
   Min,
@@ -10,6 +10,7 @@ import {
 
 export class CreateReportDto {
   @IsNumber()
+  @IsPositive()
   @Min(0)
   @Max(1000000)
   @IsNotEmpty()
@@ -24,6 +25,7 @@ export class CreateReportDto {
   model: string;
 
   @IsNumber()
+  @IsPositive()
   @Min(1930)
   @IsNotEmpty()
   year: number;
@@ -35,6 +37,7 @@ export class CreateReportDto {
   lng: number;
 
   @IsNumber()
+  @IsPositive()
   @Min(0)
   @Max(1000000)
   @IsNotEmpty()

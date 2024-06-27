@@ -7,9 +7,13 @@ export class UpdateJanitorDto extends PartialType(CreateJanitorDto) {
   @IsOptional()
   name?: string;
 
-  @Min(18)
-  @Max(65)
   @IsNumber()
   @IsOptional()
+  @Min(18)
+  @Max(65)
   age?: number;
+
+  @IsString()
+  @IsOptional()
+  workShift?: string;
 }

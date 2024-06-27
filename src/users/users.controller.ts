@@ -1,6 +1,6 @@
 import {
   Body,
-  Catch,
+  BadRequestException,
   Controller,
   Delete,
   Get,
@@ -9,49 +9,28 @@ import {
   Post,
   Query,
   Session,
-  ExceptionFilter,
   UseGuards,
   UseInterceptors,
   UseFilters,
-  ArgumentsHost,
-  HttpException,
-  HttpStatus,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { AuthService } from './auth.service';
+import { UsersService } from './users.service';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserResponseDto } from './dtos/user.response.dto';
 import { User } from './user.entity';
-import { UsersService } from './users.service';
 import { HttpExceptionFilter } from '../filters/http-exception.filter';
 
-@Catch(HttpException)
-export class CustomHttpExceptionFilter implements ExceptionFilter {
-  catch(exception: HttpException, host: ArgumentsHost) {
-    const ctx = host.switchToHttp();
-    const response = ctx.getResponse();
-    const request = ctx.getRequest();
-    const status = exception.getStatus();
-
-    response.status(status).json({
-      statusCode: status,
-      timestamp: new Date().toISOString(),
-      path: request.url,
-    });
-  }
-}
-
-@Controller('auth')
 @Serialize(UserResponseDto)
+@Controller('users')
 @UseFilters(new HttpExceptionFilter())
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
     private authService: AuthService,
-    private customHttpExceptionFilter: CustomHttpExceptionFilter,
   ) {}
 
   @Get('/whoami')
@@ -66,7 +45,6 @@ export class UsersController {
   }
 
   @Post('/signup')
-  @UseFilters(CustomHttpExceptionFilter)
   async createUser(@Body() body: CreateUserDto, @Session() session: any) {
     const user = await this.authService.signup(body.email, body.password);
     session.userId = user.id;
@@ -81,8 +59,13 @@ export class UsersController {
   }
 
   @Get('/:id')
-  async findUser(@Param('id') id: string) {
-    return await this.usersService.findOne(parseInt(id));
+  @UseGuards(AuthGuard)
+  async getUser(@Param('id') id: string) {
+    const userId = parseInt(id);
+    if (isNaN(userId)) {
+      throw new BadRequestException('Invalid user ID');
+    }
+    return this.usersService.findOne(userId);
   }
 
   @Get()
@@ -99,4 +82,8 @@ export class UsersController {
   async updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return await this.usersService.update(parseInt(id), body);
   }
+
+  // ... other routes
+
+  // Add more routes as needed
 }

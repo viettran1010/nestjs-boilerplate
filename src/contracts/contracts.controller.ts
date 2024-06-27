@@ -1,18 +1,18 @@
 import {
   Body,
   Controller,
-  Patch,
   Post,
   UseGuards,
   UseInterceptors,
+  Get,
   Param,
-  ParseIntPipe,
+  BadRequestException,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { ContractActionsService } from './contract_actions.service';
 import { ContractsService } from './contracts.service';
-import { ContractDetailsResponseDto, ContractStatus } from './dto/contract-details-response.dto';
+import { ContractDetailsResponseDto } from './dto/contract-details-response.dto';
 
 class RecordActionDto {
   contract_id: number;
@@ -20,20 +20,13 @@ class RecordActionDto {
   action: string;
 }
 
+@Serialize(ContractDetailsResponseDto)
 @Controller('contracts')
 export class ContractsController {
   constructor(
+    private readonly contractActionsService: ContractActionsService,
     private readonly contractsService: ContractsService,
-    private readonly contractActionsService: ContractActionsService
   ) {}
-
-  @Patch('/:id/status')
-  @UseGuards(AuthGuard)
-  @UseInterceptors(Serialize(ContractDetailsResponseDto))
-  async updateContractStatus(@Param('id', ParseIntPipe) id: number, @Body('status') status: ContractStatus) {
-    await this.contractsService.updateContractStatus(id, status);
-    return { message: 'Contract status updated successfully' };
-  }
 
   @Post('/record-action')
   @UseGuards(AuthGuard)
@@ -45,5 +38,14 @@ export class ContractsController {
       recordActionDto.action,
     );
     return { message: successMessage };
+  }
+
+  @Get('/:id')
+  async getContractDetails(@Param('id') id: string) {
+    const contractId = parseInt(id);
+    if (isNaN(contractId)) {
+      throw new BadRequestException('Invalid contract ID');
+    }
+    return this.contractsService.getContractDetails(contractId);
   }
 }
