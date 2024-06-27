@@ -1,5 +1,6 @@
 import { Report } from '../reports/report.entity';
 import { Student } from '../students/student.entity';
+import { Customer } from '../customers/customer.entity';
 import { UserRole } from '../user_roles/user_role.entity';
 import { LoginAttempt } from '../login_attempts/login_attempt.entity';
 import { UserPermission } from '../user_permissions/user_permission.entity';
@@ -38,7 +39,7 @@ export class User {
   @ManyToOne(() => Contract, contract => contract.user, { nullable: true })
   @JoinColumn({ name: 'contract_id' })
   contract?: Contract;
-
+  
   @ManyToOne(() => ContractAction, contractAction => contractAction.user, { nullable: true })
   @JoinColumn({ name: 'contract_action_id' })
   contractAction?: ContractAction;
@@ -46,6 +47,14 @@ export class User {
   @ManyToOne(() => AuditLog, auditLog => auditLog.user, { nullable: true })
   @JoinColumn({ name: 'audit_log_id' })
   auditLog?: AuditLog;
+  
+  @ManyToOne(() => Customer, customer => customer.user, { nullable: true })
+  @JoinColumn({ name: 'customer_id' })
+  customer?: Customer;
+
+  @ManyToOne(() => UserPermission, userPermission => userPermission.user, { nullable: true })
+  @JoinColumn({ name: 'user_permission_id' })
+  userPermission?: UserPermission;
 
   @OneToMany(() => Report, (report) => report.user)
   reports: Report[];
