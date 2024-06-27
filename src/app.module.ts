@@ -1,9 +1,6 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
-import { join } from 'path';
 import { AppService } from './app.service';
-import { ContractsModule } from './contracts/contracts.module';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -13,6 +10,8 @@ import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
 import { JanitorModule } from './janitor/janitor.module';
+import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
+import { join } from 'path';
 const cookieSession = require('cookie-session');
 
 @Module({
@@ -21,11 +20,17 @@ const cookieSession = require('cookie-session');
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      parser: I18nJsonParser,
+      parserOptions: {
+        path: join(__dirname, '/i18n/'),
+      },
+    }),
     UsersModule,
     ReportsModule,
     TypeOrmModule.forRootAsync({
       useFactory: () => {
-    ContractsModule,
         return require('../ormconfig.js');
       },
     }),
@@ -34,17 +39,6 @@ const cookieSession = require('cookie-session');
     //   inject: [ConfigService],
     //   useFactory: (configService: ConfigService) => ({
     //     type: 'postgres',
-    I18nModule.forRoot({
-      fallbackLanguage: 'en',
-      parser: I18nJsonParser,
-      parserOptions: {
-        path: join(__dirname, '/i18n/'),
-        watch: true,
-      },
-      resolvers: [
-        { use: 'query', options: ['lang', 'locale', 'l'] },
-      ],
-    }),
     //     host: configService.get('DB_HOST'),
     //     port: configService.get('DB_PORT'),
     //     username: configService.get('DB_USERNAME'),
@@ -66,16 +60,18 @@ const cookieSession = require('cookie-session');
   ],
   controllers: [AppController],
   providers: [
-  controllers: [AppController], // This line remains unchanged
+    AppService,
     {
       provide: APP_PIPE,
       useValue: new ValidationPipe({
         whitelist: true,
+        forbidNonWhitelisted: true, // to throw errors for any unknown properties
+        transform: true, // to automatically transform payloads to be objects typed according to their DTO classes
       }),
     },
     {
       provide: APP_INTERCEPTOR,
-    { // This line remains unchanged
+      useClass: CurrentUserInterceptor,
     },
   ],
 })
