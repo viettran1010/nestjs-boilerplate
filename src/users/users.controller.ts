@@ -1,5 +1,6 @@
 import {
   Body,
+  ForbiddenException,
   Controller,
   Delete,
   Get,
@@ -16,6 +17,7 @@ import { Serialize } from '../interceptors/serialize.interceptor';
 import { AuthService } from './auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { CreateUserDto } from './dtos/create-user.dto';
+import { UnauthorizedAccessException } from '../exceptions/unauthorized-access.exception';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserResponseDto } from './dtos/user.response.dto';
 import { User } from './user.entity';
@@ -72,5 +74,17 @@ export class UsersController {
   @Patch('/:id')
   async updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return await this.usersService.update(parseInt(id), body);
+  }
+
+  @Get('/menu-access/:menuOptionId')
+  async menuAccess(@CurrentUser() user: User, @Param('menuOptionId') menuOptionId: string) {
+    try {
+      await this.usersService.checkUserPermission(user.id, parseInt(menuOptionId));
+      return { message: 'User is authorized to access the selected menu option.' };
+    } catch (error) {
+      if (error instanceof UnauthorizedAccessException) {
+        throw new ForbiddenException(error.message);
+      }
+    }
   }
 }
