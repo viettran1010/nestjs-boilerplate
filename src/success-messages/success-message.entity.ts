@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { User } from '../users/user.entity';
 import { Contract } from '../contracts/contract.entity';
 
@@ -25,11 +25,11 @@ export class SuccessMessage {
   @Column({ type: 'timestamp', nullable: true })
   closed_at?: Date;
 
-  @ManyToOne(() => User, user => user.id)
-  @Column({ type: 'int' })
+  @ManyToOne(() => User, user => user.successMessages)
+  @JoinColumn({ name: 'user_id' })
   user_id: number;
 
-  @ManyToOne(() => Contract, contract => contract.id)
-  @Column({ type: 'int' })
+  @ManyToOne(() => Contract, contract => contract.successMessages)
+  @JoinColumn({ name: 'contract_id' })
   contract_id: number;
 }

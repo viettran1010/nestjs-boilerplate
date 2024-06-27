@@ -1,6 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-import { User } from '../users/user.entity';
-import { Contract } from '../contracts/contract.entity';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { User } from '../users/user.entity'; // Assuming User entity exists
+import { Contract } from '../contracts/contract.entity'; // Assuming Contract entity exists
 
 @Entity()
 export class ErrorMessage {
@@ -28,11 +28,11 @@ export class ErrorMessage {
   @Column({ type: 'text', nullable: true })
   action_taken: string;
 
-  @ManyToOne(() => User, user => user.id)
-  @Column({ type: 'int' })
+  @ManyToOne(() => User, user => user.errorMessages)
+  @JoinColumn({ name: 'user_id' })
   user_id: number;
 
-  @ManyToOne(() => Contract, contract => contract.id)
-  @Column({ type: 'int' })
+  @ManyToOne(() => Contract, contract => contract.errorMessages)
+  @JoinColumn({ name: 'contract_id' })
   contract_id: number;
 }

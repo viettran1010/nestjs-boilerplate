@@ -4,8 +4,8 @@ import { AccountTypeInformation } from '../account_type_informations/account_typ
 import { ContractAction } from '../contract_actions/contract_action.entity';
 import { AuditLog } from '../audit_logs/audit_log.entity';
 import { Customer } from '../customers/customer.entity';
-import { SuccessMessage } from '../success_messages/success_message.entity'; // Placeholder for actual import
-import { ErrorMessage } from '../error_messages/error_message.entity'; // Placeholder for actual import
+import { SuccessMessage } from '../success_messages/success_message.entity';
+import { ErrorMessage } from '../error_messages/error_message.entity';
 
 @Entity()
 export class Contract {
@@ -100,13 +100,25 @@ export class Contract {
   @Column({ type: 'date', nullable: true })
   deposit_date?: Date;
 
-  @ManyToOne(() => SuccessMessage, successMessage => successMessage.contracts)
+  @ManyToOne(() => SuccessMessage, successMessage => successMessage.contract)
   @JoinColumn({ name: 'success_message_id' })
   successMessage: SuccessMessage;
 
-  @ManyToOne(() => ErrorMessage, errorMessage => errorMessage.contracts)
+  @ManyToOne(() => ErrorMessage, errorMessage => errorMessage.contract)
   @JoinColumn({ name: 'error_message_id' })
   errorMessage: ErrorMessage;
+
+  @OneToMany(() => SuccessMessage, successMessage => successMessage.contract)
+  successMessages: SuccessMessage[];
+
+  @OneToMany(() => ErrorMessage, errorMessage => errorMessage.contract)
+  errorMessages: ErrorMessage[];
+
+  @Column({ nullable: true })
+  success_message_id?: number;
+
+  @Column({ nullable: true })
+  error_message_id?: number;
 
   @OneToOne(() => Customer, customer => customer.contract)
   customerContract: Customer;

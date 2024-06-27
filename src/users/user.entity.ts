@@ -39,7 +39,8 @@ export class User {
   @ManyToOne(() => Contract, contract => contract.user, { nullable: true })
   @JoinColumn({ name: 'contract_id' })
   contract?: Contract;
-  
+  // Add other ManyToOne relationships here following the same pattern
+
   @ManyToOne(() => ContractAction, contractAction => contractAction.user, { nullable: true })
   @JoinColumn({ name: 'contract_action_id' })
   contractAction?: ContractAction;
@@ -47,7 +48,7 @@ export class User {
   @ManyToOne(() => AuditLog, auditLog => auditLog.user, { nullable: true })
   @JoinColumn({ name: 'audit_log_id' })
   auditLog?: AuditLog;
-  
+
   @ManyToOne(() => Customer, customer => customer.user, { nullable: true })
   @JoinColumn({ name: 'customer_id' })
   customer?: Customer;
@@ -63,16 +64,17 @@ export class User {
   students: Student[];
 
   @OneToMany(() => UserRole, userRole => userRole.user)
+  // Add other OneToMany relationships here following the same pattern
   userRoles: UserRole[];
 
   @OneToMany(() => LoginAttempt, loginAttempt => loginAttempt.user)
   loginAttempts: LoginAttempt[];
 
   @OneToMany(() => UserPermission, userPermission => userPermission.user)
+  // Add other OneToMany relationships here following the same pattern
   userPermissions: UserPermission[];
 
-  // Add other OneToMany relationships here following the same pattern
-  // ...
+  // ... other OneToMany relationships
 
   @Column({ nullable: true })
   age?: number;
