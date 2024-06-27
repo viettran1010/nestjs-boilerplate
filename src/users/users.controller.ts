@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  HttpException,
   Delete,
   Get,
   Param,
@@ -10,9 +11,9 @@ import {
   Session,
   UseGuards,
   UseInterceptors,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
+import { UnauthorizedAccessException } from './exceptions/unauthorized-access.exception';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { AuthService } from './auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
@@ -75,12 +76,20 @@ export class UsersController {
     return await this.usersService.update(parseInt(id), body);
   }
 
-  @Get('/menu')
+  @Get('/menu-access')
   @UseGuards(AuthGuard)
-  async getMenuOptions(@CurrentUser() user: User) {
-    if (!user) {
-      throw new UnauthorizedException('User not found');
+  async handleUnauthorizedMenuAccess(
+    @Query('userId') userId: number,
+    @Query('menuOptionId') menuOptionId: number,
+  ) {
+    try {
+      await this.usersService.checkUserPermission(userId, menuOptionId);
+      return { message: 'User is authorized to access the selected menu option.' };
+    } catch (error) {
+      if (error instanceof UnauthorizedAccessException) {
+        throw new HttpException('Unauthorized access', 403);
+      }
+      throw error;
     }
-    return await this.usersService.getUserMenuOptions(user.id);
   }
 }

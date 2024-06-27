@@ -1,9 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
+import { UserPermission } from '../user-permissions/user-permission.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
-import { UserPermission } from '../user-permissions/user-permission.entity';
-import { MenuOption } from '../menu-options/menu-option.entity';
 
 @Injectable()
 export class UsersService {
@@ -11,6 +10,21 @@ export class UsersService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
   ) {}
+
+  async checkUserPermission(userId: number, menuOptionId: number): Promise<boolean> {
+    const userPermission = await this.usersRepository.manager.findOne(UserPermission, {
+      where: {
+        user_id: userId,
+        menu_option_id: menuOptionId,
+      },
+    });
+
+    if (!userPermission || !userPermission.has_access) {
+      throw new NotFoundException('UnauthorizedAccessException');
+    }
+
+    return true;
+  }
 
   async create(email: string, password: string) {
     // to make sure user is valid before saving
@@ -24,22 +38,6 @@ export class UsersService {
       return null;
     }
     return await this.usersRepository.findOneBy({ id });
-  }
-
-  async getUserMenuOptions(userId: number): Promise<MenuOption[]> {
-    const userPermissions = await this.usersRepository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.userPermissions', 'userPermission')
-      .leftJoinAndSelect('userPermission.menuOption', 'menuOption')
-      .where('user.id = :userId', { userId })
-      .andWhere('userPermission.has_access = :hasAccess', { hasAccess: true })
-      .getOne();
-
-    if (!userPermissions) {
-      throw new NotFoundException('User permissions not found');
-    }
-
-    return userPermissions.userPermissions.map((permission) => permission.menuOption);
   }
 
   async find(email: string) {
