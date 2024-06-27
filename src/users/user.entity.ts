@@ -3,10 +3,6 @@ import { Student } from '../students/student.entity';
 import { Contract } from '../contracts/contract.entity';
 import { ContractAction } from '../contract_actions/contract_action.entity';
 import { AuditLog } from '../audit_logs/audit_log.entity';
-import { Customer } from '../customers/customer.entity';
-import { Contract } from '../contracts/contract.entity';
-import { ContractAction } from '../contract_actions/contract_action.entity';
-import { AuditLog } from '../audit_logs/audit_log.entity';
 import {
   Entity,
   Column,
@@ -16,6 +12,7 @@ import {
   AfterRemove,
   OneToMany,
   ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 
 @Entity()
@@ -33,24 +30,31 @@ export class User {
   password: string;
 
   @ManyToOne(() => Contract, contract => contract.user, { nullable: true })
+  @JoinColumn({ name: 'contract_id' })
+  contract?: Contract;
+
   @Column({ nullable: true })
   contract_id?: number;
-  @ManyToOne(() => Customer, customer => customer.user, { nullable: true })
 
   @ManyToOne(() => ContractAction, contractAction => contractAction.user, { nullable: true })
+  @JoinColumn({ name: 'contract_action_id' })
+  contractAction?: ContractAction;
+
   @Column({ nullable: true })
   contract_action_id?: number;
 
   @ManyToOne(() => AuditLog, auditLog => auditLog.user, { nullable: true })
+  @JoinColumn({ name: 'audit_log_id' })
+  auditLog?: AuditLog;
+
   @Column({ nullable: true })
   audit_log_id?: number;
-  @Column({ nullable: true }) customer_id?: number;
 
   @OneToMany(() => Report, (report) => report.user)
+  reports: Report[];
+
   @OneToMany(() => Student, (student) => student.user)
   students: Student[];
-
-  reports: Report[];
 
   @Column({ nullable: true })
   age?: number;
