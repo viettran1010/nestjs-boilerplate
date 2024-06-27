@@ -1,4 +1,4 @@
-import { Body, Controller, Post, HttpException, HttpStatus } from '@nestjs/common';
+import { Body, Controller, Post, HttpException, HttpStatus, HttpCode } from '@nestjs/common';
 import { CustomersService } from '../customers/customers.service';
 import { CreateCustomerDto } from './dtos/create-customer.dto';
 
@@ -6,6 +6,7 @@ import { CreateCustomerDto } from './dtos/create-customer.dto';
 export class CustomersController {
   constructor(private readonly customersService: CustomersService) {}
 
+  @HttpCode(HttpStatus.CREATED)
   @Post()
   async createCustomer(@Body() createCustomerDto: CreateCustomerDto) {
     try {
@@ -14,7 +15,7 @@ export class CustomersController {
         message: 'Customer registered successfully',
         customerId: customer.id,
       };
-    } catch (error) {
+    } catch (error: any) {
       throw new HttpException({
         status: HttpStatus.BAD_REQUEST,
         error: error.message,
