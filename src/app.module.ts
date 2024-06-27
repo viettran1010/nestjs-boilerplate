@@ -2,14 +2,20 @@ import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
 import { AppService } from './app.service';
+import { AuditLog } from './audit_logs/audit_log.entity';
+import { SuccessMessage } from './success_messages/success_message.entity';
+import { ErrorMessage } from './error_messages/error_message.entity';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from './users/user.entity';
+import { Report } from './reports/report.entity';
 import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
-import * as path from 'path';
+import { JanitorModule } from './janitor/janitor.module';
 const cookieSession = require('cookie-session');
+import * as path from 'path';
 
 @Module({
   imports: [
@@ -17,7 +23,7 @@ const cookieSession = require('cookie-session');
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
-    UsersModule,
+    }),
     I18nModule.forRoot({
       fallbackLanguage: 'en',
       parser: I18nJsonParser,
@@ -25,13 +31,15 @@ const cookieSession = require('cookie-session');
         path: path.join(__dirname, '/i18n/'),
         watch: true,
       },
-    }),
+    UsersModule,
     ReportsModule,
     TypeOrmModule.forRootAsync({
       useFactory: () => {
         return require('../ormconfig.js');
       },
+        entities: [User, Report, AuditLog, SuccessMessage, ErrorMessage],
     }),
+    JanitorModule,
     // TypeOrmModule.forRootAsync({
     //   inject: [ConfigService],
     //   useFactory: (configService: ConfigService) => ({
@@ -58,7 +66,7 @@ const cookieSession = require('cookie-session');
   controllers: [AppController],
   providers: [
     AppService,
-    {
+    AppService, I18nService,
       provide: APP_PIPE,
       useValue: new ValidationPipe({
         whitelist: true,

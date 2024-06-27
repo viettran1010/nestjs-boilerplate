@@ -2,31 +2,37 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
-import { SuccessMessage } from '../success-messages/success-message.entity';
-import { ErrorMessage } from '../error-messages/error-message.entity';
+import { AuditLog } from '../audit_logs/audit_log.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(SuccessMessage)
-    private successMessageRepository: Repository<SuccessMessage>,
-    @InjectRepository(ErrorMessage)
-    private errorMessageRepository: Repository<ErrorMessage>,
+    @InjectRepository(AuditLog)
+    private auditLogRepository: Repository<AuditLog>,
+
     @InjectRepository(User)
     private usersRepository: Repository<User>,
   ) {}
 
-  async createSuccessMessage(message: string, detail: string, user_id: number): Promise<SuccessMessage> {
-    const successMessage = this.successMessageRepository.create({ message, detail, user_id });
-    return this.successMessageRepository.save(successMessage);
-  }
+  async logEntryAction(action: string, timestamp: Date, contract_id: number, user_id: number) {
+    try {
+      const auditLog = this.auditLogRepository.create({
+        action,
+        timestamp,
+        contract_id,
+        user_id,
+      });
 
-  async createErrorMessage(error_message: string, error_detail: string, user_id: number): Promise<ErrorMessage> {
-    const errorMessage = this.errorMessageRepository.create({ error_message, error_detail, user_id });
-    return this.errorMessageRepository.save(errorMessage);
+      await this.auditLogRepository.save(auditLog);
+      return { message: 'Log entry action successfully recorded.' };
+    } catch (error) {
+      throw new Error('Failed to log entry action.');
+    }
   }
 
   async create(email: string, password: string) {
+    // to make sure user is valid before saving
+    // also hooks are called
     const user = this.usersRepository.create({ email, password });
     return await this.usersRepository.save(user);
   }
