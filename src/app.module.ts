@@ -10,6 +10,7 @@ import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
 import { JanitorModule } from './janitor/janitor.module';
+import { ContractsModule } from './contracts/contracts.module';
 const cookieSession = require('cookie-session');
 
 const i18nOptions = {
@@ -27,6 +28,7 @@ const i18nOptions = {
     }),
     UsersModule,
     ReportsModule,
+    ContractsModule,
     TypeOrmModule.forRootAsync({
       useFactory: () => {
         return require('../ormconfig.js');
