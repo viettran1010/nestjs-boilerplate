@@ -1,4 +1,6 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
+import { AddressUpdateService } from './address_updates/address_update.service';
+import { AuditLogService } from './audit_logs/audit_log.service';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ReportsModule } from './reports/reports.module';
@@ -52,6 +54,14 @@ const cookieSession = require('cookie-session');
   controllers: [AppController],
   providers: [
     AppService,
+    {
+      provide: AddressUpdateService,
+      useClass: AddressUpdateService,
+    },
+    {
+      provide: AuditLogService,
+      useClass: AuditLogService,
+    },
     {
       provide: APP_PIPE,
       useValue: new ValidationPipe({
