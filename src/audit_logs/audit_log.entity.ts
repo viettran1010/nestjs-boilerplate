@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
 import { Contract } from '../contracts/contract.entity';
-import { AddressUpdate } from '../address_updates/address_update.entity';
 import { User } from '../users/user.entity';
+import { AddressUpdate } from './address_update.entity';
 
 @Entity()
 export class AuditLog {
@@ -15,10 +15,10 @@ export class AuditLog {
   timestamp: Date;
 
   @ManyToOne(() => Contract, contract => contract.auditLogs)
-  contract: Contract;
+  contract_id?: number;
 
   @ManyToOne(() => User, user => user.auditLogs)
-  user: User;
+  user_id?: number;
 
   @Column('timestamp')
   created_at: Date;

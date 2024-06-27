@@ -1,10 +1,8 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
-import { AppService } from './app.service';
+import { Contract } from './contracts/contract.entity';
 import { AuditLog } from './audit_logs/audit_log.entity';
-import { SuccessMessage } from './success_messages/success_message.entity';
-import { ErrorMessage } from './error_messages/error_message.entity';
+import { AppService } from './app.service';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -15,7 +13,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
 import { JanitorModule } from './janitor/janitor.module';
 const cookieSession = require('cookie-session');
-import * as path from 'path';
 
 @Module({
   imports: [
@@ -23,21 +20,15 @@ import * as path from 'path';
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
-    }),
-    I18nModule.forRoot({
-      fallbackLanguage: 'en',
-      parser: I18nJsonParser,
-      parserOptions: {
-        path: path.join(__dirname, '/i18n/'),
-        watch: true,
-      },
     UsersModule,
     ReportsModule,
     TypeOrmModule.forRootAsync({
       useFactory: () => {
-        return require('../ormconfig.js');
+        return {
+          ...require('../ormconfig.js'),
+          entities: [User, Report, Contract, AuditLog],
+        };
       },
-        entities: [User, Report, AuditLog, SuccessMessage, ErrorMessage],
     }),
     JanitorModule,
     // TypeOrmModule.forRootAsync({
@@ -66,7 +57,7 @@ import * as path from 'path';
   controllers: [AppController],
   providers: [
     AppService,
-    AppService, I18nService,
+    {
       provide: APP_PIPE,
       useValue: new ValidationPipe({
         whitelist: true,
