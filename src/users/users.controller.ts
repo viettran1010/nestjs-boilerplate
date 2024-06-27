@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Put,
   Delete,
   Get,
   Param,
@@ -9,6 +10,7 @@ import {
   Query,
   Session,
   UseGuards,
+  HttpStatus,
   UseInterceptors,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
@@ -16,6 +18,7 @@ import { Serialize } from '../interceptors/serialize.interceptor';
 import { AuthService } from './auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { CreateUserDto } from './dtos/create-user.dto';
+import { UpdateCustomerDto } from './dtos/update-customer.dto'; // Assuming this DTO exists
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserResponseDto } from './dtos/user.response.dto';
 import { User } from './user.entity';
@@ -70,6 +73,19 @@ export class UsersController {
   }
 
   @Patch('/:id')
+  @Put('/customer-information/:id')
+  @UseGuards(AuthGuard)
+  async updateCustomerInformation(
+    @Param('id') id: string,
+    @Body() body: UpdateCustomerDto,
+  ) {
+    await this.usersService.updateCustomer(parseInt(id), body);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Customer information has been successfully updated.',
+    };
+  }
+
   async updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return await this.usersService.update(parseInt(id), body);
   }
