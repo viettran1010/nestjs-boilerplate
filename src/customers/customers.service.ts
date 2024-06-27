@@ -1,5 +1,6 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CreateCustomerDto } from './dto/create-customer.dto';
 import { Repository } from 'typeorm';
 import { Customer } from './customer.entity';
 import { User } from '../users/user.entity';
@@ -7,22 +8,10 @@ import { User } from '../users/user.entity';
 @Injectable()
 export class CustomersService {
   constructor(
-    @InjectRepository(Customer)
-    private customersRepository: Repository<Customer>,
-  ) {}
+    @InjectRepository(Customer) private customersRepository: Repository<Customer>,
+  ) { }
 
-  async registerCustomer(customerData: {
-    name: string;
-    name_katakana: string;
-    company_name: string;
-    zip_code: string;
-    address: string;
-    phone_number: string;
-    email_address: string;
-    date_of_birth: Date;
-    contact_date: Date;
-    remarks: string;
-  }) {
+  async registerCustomer(customerData: CreateCustomerDto) {
     const mandatoryFields = [
       'name',
       'name_katakana',
@@ -37,7 +26,7 @@ export class CustomersService {
       if (!customerData[field]) {
         throw new HttpException(
           `Field ${field} is required`,
-          HttpStatus.BAD_REQUEST,
+      if (!(field in customerData) || !customerData[field]) {
         );
       }
     }

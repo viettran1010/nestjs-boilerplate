@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsEmail, IsString, IsOptional, IsDate } from 'class-validator';
+import { IsNotEmpty, IsEmail, IsString, IsOptional, IsDate, ValidateIf } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateCustomerDto {
@@ -6,7 +6,7 @@ export class CreateCustomerDto {
   @IsString()
   name: string;
 
-  @IsNotEmpty()
+  @ValidateIf(o => o.name_katakana !== '')
   @IsString()
   name_katakana: string;
 
@@ -14,7 +14,7 @@ export class CreateCustomerDto {
   @IsString()
   company_name: string;
 
-  @IsNotEmpty()
+  @ValidateIf(o => o.zip_code !== '')
   @IsString()
   zip_code: string;
 
@@ -22,7 +22,7 @@ export class CreateCustomerDto {
   @IsString()
   address: string;
 
-  @IsNotEmpty()
+  @ValidateIf(o => o.phone_number !== '')
   @IsString()
   phone_number: string;
 
@@ -30,7 +30,7 @@ export class CreateCustomerDto {
   @IsEmail()
   email_address: string;
 
-  @IsOptional()
+  @ValidateIf(o => o.date_of_birth != null)
   @IsDate()
   @Type(() => Date)
   date_of_birth: Date;
@@ -40,7 +40,7 @@ export class CreateCustomerDto {
   @Type(() => Date)
   contact_date: Date;
 
-  @IsOptional()
+  @ValidateIf(o => o.remarks !== '')
   @IsString()
   remarks: string;
 }

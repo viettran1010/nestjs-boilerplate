@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseInterceptors, HttpException, HttpStatus } from '@nestjs/common';
+import { Body, Controller, Post, HttpException, HttpStatus } from '@nestjs/common';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { CustomersService } from './customers.service';
 import { Serialize } from '../interceptors/serialize.interceptor';
@@ -15,7 +15,7 @@ export class CustomersController {
       const customer = await this.customersService.registerCustomer(createCustomerDto);
       return customer;
     } catch (error) {
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+      throw new HttpException(error.response || error.message, error.status || HttpStatus.BAD_REQUEST);
     }
   }
 }
