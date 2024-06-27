@@ -1,9 +1,9 @@
 import { IsNumber } from 'class-validator';
 
 export class DismissErrorMessageDto {
-  @IsNumber()
+  @IsNumber({}, { message: 'userId must be a number' })
   userId: number;
 
-  @IsNumber()
+  @IsNumber({}, { message: 'errorMessageId must be a number' })
   errorMessageId: number;
 }

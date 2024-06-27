@@ -1,22 +1,22 @@
-import { MiddlewareConsumer, Module, NestModule, ValidationPipe } from '@nestjs/common';
+import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { APP_PIPE } from '@nestjs/core';
 import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
 import path from 'path';
 import { AppService } from './app.service';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
 import { JanitorModule } from './janitor/janitor.module';
-import { AllExceptionsFilter } from './filters/all-exceptions.filter';
 const cookieSession = require('cookie-session');
 
 @Module({
   imports: [
     I18nModule.forRoot({
-      fallbackLanguage: 'en',
+      fallbackLanguage: 'en', // Define the fallback language
       parser: I18nJsonParser,
       parserOptions: {
         path: path.join(__dirname, '/i18n/'),
@@ -37,23 +37,24 @@ const cookieSession = require('cookie-session');
     JanitorModule,
   ],
   controllers: [AppController],
-  providers: [AppService,
+  providers: [
+    AppService,
     {
       provide: APP_PIPE,
-      useValue: new ValidationPipe({ whitelist: true }),
+      useValue: new ValidationPipe({
+        whitelist: true, // Strip properties that do not have any decorators
+        forbidNonWhitelisted: true, // Throw errors for non-whitelisted properties
+        transform: true, // Automatically transform payloads to be objects typed according to their DTO classes
+      }),
     },
     {
-      provide: APP_FILTER,
-      useClass: AllExceptionsFilter,
-    },
-    {
-      provide: APP_INTERCEPTor,
+      provide: APP_INTERCEPTOR,
       useClass: CurrentUserInterceptor,
     },
   ],
 })
-export class AppModule implements NestModule {
-  constructor(private readonly configService: ConfigService) {}
+export class AppModule {
+  constructor(private configService: ConfigService) {}
 
   configure(consumer: MiddlewareConsumer) {
     consumer
