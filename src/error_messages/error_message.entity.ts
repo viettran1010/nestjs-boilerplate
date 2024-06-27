@@ -2,6 +2,11 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 't
 import { User } from '../users/user.entity';
 import { Contract } from '../contracts/contract.entity';
 
+export enum ActionTaken {
+  CLOSE = 'close',
+  // Add other actions as needed
+}
+
 @Entity('error_messages')
 export class ErrorMessage {
   @PrimaryGeneratedColumn()
@@ -25,8 +30,12 @@ export class ErrorMessage {
   @Column({ type: 'timestamp' })
   timestamp: Date;
 
-  @Column()
-  action_taken: string;
+  @Column({
+    type: 'enum',
+    enum: ActionTaken,
+    default: ActionTaken.CLOSE,
+  })
+  action_taken: ActionTaken;
 
   @ManyToOne(() => Contract, contract => contract.error_messages)
   @JoinColumn({ name: 'contract_id' })
