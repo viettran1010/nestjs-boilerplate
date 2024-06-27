@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsOptional } from 'class-validator';
+import { IsString, IsNumber, IsOptional, Min, Max } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateJanitorDto } from './create-janitor.dto';
 
@@ -7,6 +7,8 @@ export class UpdateJanitorDto extends PartialType(CreateJanitorDto) {
   @IsOptional()
   name?: string;
 
+  @Min(18)
+  @Max(65)
   @IsNumber()
   @IsOptional()
   age?: number;

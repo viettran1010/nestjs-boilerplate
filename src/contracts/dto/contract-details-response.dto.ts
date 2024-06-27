@@ -8,11 +8,9 @@ export enum AccountType {
   OTHER = 'other',
 }
 
-export enum ContractStatus {
-  // Assuming the enum values based on typical contract statuses
-  ACTIVE = 'active',
-  INACTIVE = 'inactive',
-  CLOSED = 'closed',
+export enum ContractStatus { 
+  APPROVED = 'Approved',
+  DENIED = 'Denied',
 }
 
 export class ContractDetailsResponseDto {

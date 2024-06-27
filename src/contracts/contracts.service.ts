@@ -3,15 +3,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Contract } from './contract.entity';
 import { Customer } from '../customers/customer.entity';
-import { ContractDetailsResponseDto } from './dto/contract-details-response.dto';
+import { ContractDetailsResponseDto, ContractStatus } from './dto/contract-details-response.dto';
+import { AuditLog } from '../audit_logs/audit_log.entity';
 
 @Injectable()
 export class ContractsService {
   constructor(
-    @InjectRepository(Contract)
-    private contractsRepository: Repository<Contract>,
-    @InjectRepository(Customer)
-    private customersRepository: Repository<Customer>
+    @InjectRepository(AuditLog) private auditLogsRepository: Repository<AuditLog>,
+    @InjectRepository(Contract) private contractsRepository: Repository<Contract>,
+    @InjectRepository(Customer) private customersRepository: Repository<Customer>
   ) {}
 
   async getContractDetails(contractId: number): Promise<ContractDetailsResponseDto> {
@@ -55,5 +55,34 @@ export class ContractsService {
     } catch (error) {
       throw new NotFoundException(error.message);
     }
+  }
+
+  async updateContractStatus(contractId: number, newStatus: ContractStatus): Promise<void> {
+    const contract = await this.contractsRepository.findOne({ where: { id: contractId } });
+
+    if (!contract) {
+      throw new NotFoundException(`Contract with ID ${contractId} not found`);
+    }
+
+    contract.status = newStatus;
+    await this.contractsRepository.save(contract);
+
+    const auditLog = new AuditLog();
+    auditLog.action = newStatus;
+    auditLog.timestamp = new Date();
+    auditLog.contract_id = contractId;
+    // Assuming user_id is obtained from the current session or token
+    // Replace 'currentUserId' with the actual logic to retrieve the current user's ID
+    const currentUserId = this.getCurrentUserId();
+    auditLog.user_id = currentUserId;
+
+    await this.auditLogsRepository.save(auditLog);
+  }
+
+  // Placeholder for the getCurrentUserId method
+  // Implement the actual logic to retrieve the current user's ID
+  private getCurrentUserId(): number {
+    // This is a placeholder. Replace with actual logic to obtain the current user's ID.
+    return 1; // Example user ID
   }
 }

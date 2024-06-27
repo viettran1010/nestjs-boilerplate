@@ -1,5 +1,6 @@
 import {
   Body,
+  Catch,
   UseFilters,
   Controller,
   Get,
@@ -8,8 +9,11 @@ import {
   Post,
   Query,
   UseGuards,
+  ExceptionFilter,
+  HttpException,
+  HttpStatus,
+  ArgumentsHost,
 } from '@nestjs/common';
-  UseInterceptors,
 import { AdminGuard } from '../guards/admin.guard';
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
@@ -22,9 +26,28 @@ import { GetEstimateDto } from './dtos/get-estimate.dto';
 import { ReportResponseDto } from './dtos/report.response.dto';
 import { ReportsService } from './reports.service';
 
+@Catch(HttpException)
+export class HttpExceptionFilter implements ExceptionFilter {
+  catch(exception: HttpException, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse<Response>();
+    const request = ctx.getRequest<Request>();
+    const status = exception.getStatus();
+
+    response
+      .status(status)
+      .json({
+        statusCode: status,
+        timestamp: new Date().toISOString(),
+        path: request.url,
+      });
+  }
+}
+
 @Controller('reports')
+@UseFilters(new HttpExceptionFilter())
 export class ReportsController {
-@UseFilters(CustomExceptionFilter)
+  @UseFilters(CustomExceptionFilter)
   constructor(private reportsService: ReportsService) {}
 
   @Post()
