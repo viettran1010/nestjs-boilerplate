@@ -11,8 +11,6 @@ export class UsersService {
   ) {}
 
   async create(email: string, password: string) {
-    // to make sure user is valid before saving
-    // also hooks are called
     const user = this.usersRepository.create({ email, password });
     return await this.usersRepository.save(user);
   }
@@ -45,4 +43,14 @@ export class UsersService {
     }
     return await this.usersRepository.remove(user);
   }
+
+  async validateEmployeeLogin(user_id: number): Promise<boolean> {
+    if (!user_id) {
+      return false;
+    }
+    const user = await this.usersRepository.findOneBy({ id: user_id });
+    return !!user;
+  }
+
+  // Other methods...
 }
