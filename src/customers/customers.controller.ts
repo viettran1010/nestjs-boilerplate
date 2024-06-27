@@ -4,6 +4,9 @@ import {
   Param,
   Put,
   UseGuards,
+  ParseIntPipe,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { CustomersService } from './customers.service';
 import { AuthGuard } from '../guards/auth.guard';
@@ -16,12 +19,16 @@ export class CustomersController {
   @Put('/:id')
   @UseGuards(AuthGuard)
   async updateCustomer(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateCustomerDto: UpdateCustomerDto,
   ) {
-    return await this.customersService.updateCustomer({
-      id: parseInt(id),
-      ...updateCustomerDto,
-    });
+    try {
+      return await this.customersService.updateCustomer({
+        id,
+        ...updateCustomerDto,
+      });
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 }

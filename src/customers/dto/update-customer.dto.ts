@@ -1,12 +1,12 @@
-import { IsString, IsOptional, IsEmail, IsNumber, IsDate } from 'class-validator';
+import { IsString, IsNotEmpty, IsEmail, IsNumber, IsDate } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class UpdateCustomerDto {
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   name?: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   name_katakana?: string;
 
@@ -26,7 +26,6 @@ export class UpdateCustomerDto {
   @IsString()
   phone_number?: string;
 
-  @IsOptional()
   @IsEmail()
   email_address?: string;
 
