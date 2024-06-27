@@ -23,14 +23,13 @@ export class ContractsController {
     @Body() updateContractDto: UpdateContractDto,
     @Session() session: any
   ) {
+    // Retrieve the "userId" from the session object
     const userId = session.userId;
-    if (!userId) {
-      throw new BadRequestException('User ID is required');
-    }
+    // Validate that the "userId" is present
+    if (!userId) throw new BadRequestException('User ID is required');
 
-    if (+id !== updateContractDto.id) {
-      throw new BadRequestException('Contract ID in the URL and body must match');
-    }
+    // Validate that the "id" parameter matches the "id" field in "updateContractDto"
+    if (+id !== updateContractDto.id) throw new BadRequestException('Contract ID in the URL and body must match');
 
     try {
       const updatedContract = await this.contractsService.updateContract(updateContractDto, userId);
