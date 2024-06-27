@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { User } from '../users/user.entity';
 import { ContractAction } from '../contract_actions/contract_action.entity';
 import { AuditLog } from '../audit_logs/audit_log.entity';
@@ -9,31 +9,31 @@ export class Contract {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @Column()
   created_at: Date;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+  @Column()
   updated_at: Date;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column()
   customer_name_katakana: string;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column()
   bank_code: string;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column()
   branch_code: string;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column()
   account_type: string;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column()
   account_number: string;
 
   @Column()
   opening_date: Date;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ nullable: true })
   remarks: string;
 
   @Column()
@@ -42,46 +42,33 @@ export class Contract {
   @Column()
   maturity_date: Date;
 
-  @Column({ type: 'decimal' })
+  @Column()
   interest_rate: number;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column()
   status: string;
 
   @ManyToOne(() => User, user => user.contracts)
-  @Column()
-  user_id: number;
+  user: User;
 
   @ManyToOne(() => ContractAction, contractAction => contractAction.contracts)
-  @Column()
-  contract_action_id: number;
+  contractAction: ContractAction;
 
   @ManyToOne(() => AuditLog, auditLog => auditLog.contracts)
-  @Column()
-  audit_log_id: number;
+  auditLog: AuditLog;
 
   @ManyToOne(() => Customer, customer => customer.contracts)
-  @Column()
-  customer_id: number;
-
-  @Column({ type: 'varchar', length: 255 })
-  currency_deposited: string;
-
-  @Column({ type: 'decimal' })
-  deposit_amount: number;
-
-  @Column()
-  deposit_date: Date;
+  customer: Customer;
 
   @OneToMany(() => ContractAction, contractAction => contractAction.contract)
   contractActions: ContractAction[];
 
-  @OneToMany(() => AuditLog, auditLog => auditLog.contract)
-  auditLogs: AuditLog[];
-
   @OneToMany(() => User, user => user.contract)
   users: User[];
 
-  @OneToMany(() => Customer, customer => customer.contract)
-  customers: Customer[];
+  @OneToMany(() => AuditLog, auditLog => auditLog.contract)
+  auditLogs: AuditLog[];
+
+  @OneToOne(() => Customer, customer => customer.contract)
+  customerContract: Customer;
 }
