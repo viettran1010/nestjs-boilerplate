@@ -1,6 +1,8 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
+import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
 import { AddressUpdateService } from './address_updates/address_update.service';
 import { AuditLogService } from './audit_logs/audit_log.service';
+import { AllExceptionsFilter } from './filters/all-exceptions.filter';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ReportsModule } from './reports/reports.module';
@@ -8,10 +10,11 @@ import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/user.entity';
 import { Report } from './reports/report.entity';
-import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { APP_INTERCEPTOR, APP_PIPE, APP_FILTER } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
 import { JanitorModule } from './janitor/janitor.module';
+import * as path from 'path';
 const cookieSession = require('cookie-session');
 
 @Module({
@@ -28,28 +31,13 @@ const cookieSession = require('cookie-session');
       },
     }),
     JanitorModule,
-    // TypeOrmModule.forRootAsync({
-    //   inject: [ConfigService],
-    //   useFactory: (configService: ConfigService) => ({
-    //     type: 'postgres',
-    //     host: configService.get('DB_HOST'),
-    //     port: configService.get('DB_PORT'),
-    //     username: configService.get('DB_USERNAME'),
-    //     password: configService.get('DB_PASSWORD'),
-    //     database: configService.get('DB_NAME'),
-    //     entities: [User, Report],
-    //     synchronize: true,
-    //   }),
-    // }),
-    // TypeOrmModule.forRootAsync({
-    //   inject: [ConfigService],
-    //   useFactory: (configService: ConfigService) => ({
-    //     type: 'sqlite',
-    //     database: configService.get('DB_NAME'),
-    //     entities: [User, Report],
-    //     synchronize: true,
-    //   }),
-    // }),
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      parser: I18nJsonParser,
+      parserOptions: {
+        path: path.join(__dirname, '/i18n/'),
+      },
+    }),
   ],
   controllers: [AppController],
   providers: [
@@ -61,6 +49,10 @@ const cookieSession = require('cookie-session');
     {
       provide: AuditLogService,
       useClass: AuditLogService,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
     },
     {
       provide: APP_PIPE,

@@ -21,6 +21,7 @@ export class SerializerInterceptor implements NestInterceptor {
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     // Run something before a request is handled by the request handler
+    // Transform the data to instance of dto
     return next.handle().pipe(
       map((data) => {
         return plainToClass(this.dto, data, {

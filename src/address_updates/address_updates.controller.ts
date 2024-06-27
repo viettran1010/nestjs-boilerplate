@@ -10,7 +10,14 @@ export class AddressUpdatesController {
     @Param('addressUpdateId') addressUpdateId: number,
     @Body('userId') userId: number
   ) {
-    return await this.addressUpdateService.cancelAddressUpdate(userId, addressUpdateId);
+    try {
+      return await this.addressUpdateService.cancelAddressUpdate(userId, addressUpdateId);
+    } catch (error) {
+      // Handle the error based on the type of exception thrown
+      // For example, if it's a NotFoundException or BadRequestException
+      // return the appropriate HTTP status code and error message
+      throw error;
+    }
   }
 
   // Other route handlers...
