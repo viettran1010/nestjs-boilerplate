@@ -2,13 +2,21 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Contract } from '../contracts/contract.entity';
 import { User } from '../users/user.entity';
 
+export enum AuditAction {
+  CONTRACT_REGISTRATION = 'contract_registration',
+  // other actions can be added here
+}
+
 @Entity()
 export class AuditLog {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  action: string;
+  @Column({
+    type: 'enum',
+    enum: AuditAction,
+  })
+  action: AuditAction;
 
   @Column('timestamp')
   timestamp: Date;
