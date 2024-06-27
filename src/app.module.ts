@@ -1,5 +1,6 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
+import { AddressUpdateModule } from './address_updates/address_update.module';
 import { AppService } from './app.service';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
@@ -25,6 +26,7 @@ const cookieSession = require('cookie-session');
         return require('../ormconfig.js');
       },
     }),
+    AddressUpdateModule,
     JanitorModule,
     // TypeOrmModule.forRootAsync({
     //   inject: [ConfigService],
