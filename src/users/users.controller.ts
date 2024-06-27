@@ -20,6 +20,8 @@ import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserResponseDto } from './dtos/user.response.dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
+import { Contract } from '../contracts/contract.entity';
+import { ContractsService } from '../contracts/contracts.service';
 
 @Controller('auth')
 @Serialize(UserResponseDto)
@@ -27,6 +29,7 @@ export class UsersController {
   constructor(
     private readonly usersService: UsersService,
     private authService: AuthService,
+    private contractsService: ContractsService,
   ) {}
 
   @Get('/whoami')
@@ -72,5 +75,11 @@ export class UsersController {
   @Patch('/:id')
   async updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return await this.usersService.update(parseInt(id), body);
+  }
+
+  @Get('/contracts/back')
+  async navigateBack() {
+    const contracts = await this.contractsService.findAll();
+    return contracts.map(contract => new Contract(contract));
   }
 }
