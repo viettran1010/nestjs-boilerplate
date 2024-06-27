@@ -1,6 +1,5 @@
 import { Injectable, UnsupportedMediaTypeException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectRepository, Repository } from '@nestjs/typeorm';
 import { AddressUpdate } from './address_update.entity';
 import { User } from '../users/user.entity';
 import * as fs from 'fs';

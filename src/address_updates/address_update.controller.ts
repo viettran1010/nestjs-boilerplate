@@ -32,7 +32,7 @@ export class AddressUpdateController {
       };
     } catch (error) {
       if (error instanceof UnsupportedMediaTypeException) {
-        return new BadRequestException('Unsupported file type. Only .csv files are allowed');
+        throw new BadRequestException('Unsupported file type. Only .csv files are allowed');
       }
       throw error;
     }
