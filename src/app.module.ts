@@ -1,15 +1,19 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
-import path from 'path';
+import { i18nextHttpMiddleware } from 'i18next-http-middleware';
+import { AppService } from './app.service';
+import { ContractsModule } from './contracts/contracts.module';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from './users/user.entity';
+import { Report } from './reports/report.entity';
+import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
 import { JanitorModule } from './janitor/janitor.module';
-import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import * as path from 'path';
 const cookieSession = require('cookie-session');
 
 @Module({
@@ -20,20 +24,20 @@ const cookieSession = require('cookie-session');
     }),
     UsersModule,
     ReportsModule,
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      parser: I18nJsonParser,
+      parserOptions: {
+        path: path.join(__dirname, '/i18n/'),
+      },
+    }),
+    ContractsModule,
     TypeOrmModule.forRootAsync({
       useFactory: () => {
         return require('../ormconfig.js');
       },
     }),
     JanitorModule,
-    I18nModule.forRoot({
-      fallbackLanguage: 'en',
-      parser: I18nJsonParser,
-      parserOptions: {
-        path: path.join(__dirname, '/i18n/'),
-        watch: true,
-      },
-    }),
     // TypeOrmModule.forRootAsync({
     //   inject: [ConfigService],
     //   useFactory: (configService: ConfigService) => ({
@@ -61,17 +65,13 @@ const cookieSession = require('cookie-session');
   providers: [
     AppService,
     {
-      provide: APP_PIPE, useClass: ValidationPipe,
-      useFactory: () => new ValidationPipe({
-        whitelist: true,
-        forbidNonWhitelisted: true,
-        transform: true,
-      }),
+      provide: APP_PIPE,
+      useClass: ValidationPipe,
     },
     {
-      provide: APP_INTERCEPTOR,
+      provide: APP_INTERCEPTor,
       useClass: CurrentUserInterceptor,
-    }
+    },
   ],
 })
 export class AppModule {
@@ -82,6 +82,10 @@ export class AppModule {
       .apply(
         cookieSession({
           keys: [this.configService.get('COOKIE_KEY')], // for encryption
+        }),
+        i18nextHttpMiddleware({
+          i18n: i18next,
+          order: ['querystring', 'cookie', 'header'],
         }),
       )
       .forRoutes('*'); // for all routes

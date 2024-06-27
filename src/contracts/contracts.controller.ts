@@ -1,13 +1,33 @@
-import { Controller, Get, Param } from '@nestjs/common';
-import { ContractsService } from './contracts.service';
-import { ContractDetailsResponseDto } from './dto/contract-details-response.dto';
+import {
+  Body,
+  Controller,
+  Post,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
+import { AuthGuard } from '../guards/auth.guard';
+import { Serialize } from '../interceptors/serialize.interceptor';
+import { ContractActionsService } from './contract_actions.service';
+
+class RecordActionDto {
+  contract_id: number;
+  user_id: number;
+  action: string;
+}
 
 @Controller('contracts')
 export class ContractsController {
-  constructor(private readonly contractsService: ContractsService) {}
+  constructor(private readonly contractActionsService: ContractActionsService) {}
 
-  @Get(':id')
-  async getContractDetails(@Param('id') id: string): Promise<ContractDetailsResponseDto> {
-    return await this.contractsService.getContractDetails(parseInt(id));
+  @Post('/record-action')
+  @UseGuards(AuthGuard)
+  @UseInterceptors(Serialize(RecordActionDto))
+  async recordOfficerAction(@Body() recordActionDto: RecordActionDto) {
+    const successMessage = await this.contractActionsService.recordOfficerAction(
+      recordActionDto.contract_id,
+      recordActionDto.user_id,
+      recordActionDto.action,
+    );
+    return { message: successMessage };
   }
 }
