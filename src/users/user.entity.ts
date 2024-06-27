@@ -39,22 +39,13 @@ export class User {
   @JoinColumn({ name: 'contract_id' })
   contract?: Contract;
 
-  @Column({ nullable: true })
-  contract_id?: number;
-
   @ManyToOne(() => ContractAction, contractAction => contractAction.user, { nullable: true })
   @JoinColumn({ name: 'contract_action_id' })
   contractAction?: ContractAction;
 
-  @Column({ nullable: true })
-  contract_action_id?: number;
-
   @ManyToOne(() => AuditLog, auditLog => auditLog.user, { nullable: true })
   @JoinColumn({ name: 'audit_log_id' })
   auditLog?: AuditLog;
-
-  @Column({ nullable: true })
-  audit_log_id?: number;
 
   @OneToMany(() => Report, (report) => report.user)
   reports: Report[];

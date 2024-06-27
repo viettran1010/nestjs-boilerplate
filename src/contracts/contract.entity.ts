@@ -33,17 +33,18 @@ export class Contract {
   @Column()
   opening_date: Date;
 
+  // Merged nullable fields from new code and kept the non-nullable fields from current code
   @Column({ nullable: true })
-  remarks: string;
+  remarks?: string;
 
-  @Column()
-  deposit_period: number;
+  @Column({ nullable: true })
+  deposit_period?: number;
 
-  @Column()
-  maturity_date: Date;
+  @Column({ nullable: true })
+  maturity_date?: Date;
 
-  @Column()
-  interest_rate: number;
+  @Column({ type: 'decimal', precision: 5, scale: 2, nullable: true })
+  interest_rate?: number;
 
   @Column()
   status: string;
@@ -69,6 +70,20 @@ export class Contract {
   @OneToMany(() => AuditLog, auditLog => auditLog.contract)
   auditLogs: AuditLog[];
 
+  // Added nullable foreign key columns from new code
+  @Column({ nullable: true })
+  user_id?: number;
+
+  @Column({ nullable: true })
+  contract_action_id?: number;
+
+  @Column({ nullable: true })
+  customer_id?: number;
+
+  @Column({ nullable: true })
+  audit_log_id?: number;
+
+  // Retained the OneToOne relationship from the current code
   @OneToOne(() => Customer, customer => customer.contract)
   customerContract: Customer;
 }
