@@ -1,6 +1,9 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
+import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
+import { join } from 'path';
 import { AppService } from './app.service';
+import { ContractsModule } from './contracts/contracts.module';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -22,6 +25,7 @@ const cookieSession = require('cookie-session');
     ReportsModule,
     TypeOrmModule.forRootAsync({
       useFactory: () => {
+    ContractsModule,
         return require('../ormconfig.js');
       },
     }),
@@ -30,6 +34,17 @@ const cookieSession = require('cookie-session');
     //   inject: [ConfigService],
     //   useFactory: (configService: ConfigService) => ({
     //     type: 'postgres',
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      parser: I18nJsonParser,
+      parserOptions: {
+        path: join(__dirname, '/i18n/'),
+        watch: true,
+      },
+      resolvers: [
+        { use: 'query', options: ['lang', 'locale', 'l'] },
+      ],
+    }),
     //     host: configService.get('DB_HOST'),
     //     port: configService.get('DB_PORT'),
     //     username: configService.get('DB_USERNAME'),
@@ -51,7 +66,7 @@ const cookieSession = require('cookie-session');
   ],
   controllers: [AppController],
   providers: [
-    AppService,
+  controllers: [AppController], // This line remains unchanged
     {
       provide: APP_PIPE,
       useValue: new ValidationPipe({
@@ -60,7 +75,7 @@ const cookieSession = require('cookie-session');
     },
     {
       provide: APP_INTERCEPTOR,
-      useClass: CurrentUserInterceptor,
+    { // This line remains unchanged
     },
   ],
 })
