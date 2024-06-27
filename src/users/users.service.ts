@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Repository } from 'typeorm';
-import { UnauthorizedAccessException } from './exceptions/unauthorized-access.exception';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { MenuOption } from '../menu-options/menu-option.entity';
@@ -51,14 +50,19 @@ export class UsersService {
     return await this.usersRepository.remove(user);
   }
 
-  async getMenuOptions(userId: number) {
-    const accessibleMenuOptions = await this.menuOptionsRepository
-      .createQueryBuilder('menu_option')
-      .leftJoinAndSelect('menu_option.user_permissions', 'user_permission')
-      .where('user_permission.user_id = :userId', { userId })
-      .andWhere('user_permission.has_access = :hasAccess', { hasAccess: true })
-      .select(['menu_option.label', 'menu_option.icon'])
-      .getMany();
+  async getMenuOptions(userId: number): Promise<{ label: string; icon: string }[]> {
+    let accessibleMenuOptions: MenuOption[];
+    try {
+      accessibleMenuOptions = await this.menuOptionsRepository
+        .createQueryBuilder('menu_option')
+        .leftJoin('menu_option.user_permissions', 'user_permission')
+        .where('user_permission.user_id = :userId', { userId })
+        .andWhere('user_permission.has_access = :hasAccess', { hasAccess: true })
+        .select(['menu_option.label', 'menu_option.icon'])
+        .getMany();
+    } catch (error) {
+      throw new NotFoundException('Error fetching menu options');
+    }
 
     return accessibleMenuOptions.map(option => ({
       label: option.label,
@@ -66,19 +70,5 @@ export class UsersService {
     }));
   }
 
-  async validateUserAccess(userId: number, menuOptionId: number): Promise<boolean> {
-    const permission = await this.userPermissionsRepository.findOne({
-      where: {
-        user_id: userId,
-        menu_option_id: menuOptionId,
-        has_access: true,
-      },
-    });
-
-    if (!permission) {
-      throw new UnauthorizedAccessException();
-    }
-
-    return true;
-  }
+  // Other service methods...
 }

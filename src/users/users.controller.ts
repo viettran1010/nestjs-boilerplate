@@ -1,23 +1,22 @@
 import {
   Body,
+  UnauthorizedException,
   Controller,
-  HttpException,
-  HttpStatus,
+  Delete,
   Get,
   Param,
   Patch,
   Post,
   Query,
   Session,
-  UsePipes,
   UseGuards,
   UseInterceptors,
   NotFoundException,
+  Request,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { AuthService } from './auth.service';
-import { ValidationPipe } from '@nestjs/common';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
@@ -25,7 +24,6 @@ import { UserResponseDto } from './dtos/user.response.dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
 import { MenuOption } from '../menu-options/menu-option.entity';
-import { UnauthorizedAccessException } from './exceptions/unauthorized-access.exception';
 
 @Controller('auth')
 @Serialize(UserResponseDto)
@@ -81,34 +79,19 @@ export class UsersController {
   }
 
   @Get('/menu-options')
-  @UseGuards(AuthGuard)
-  async getMenuOptions(@CurrentUser() user: User) {
-    if (!user) {
-      throw new NotFoundException('User not found');
+  async getMenuOptions(@Request() req) {
+    if (!req.headers.authorization) {
+      throw new UnauthorizedException('No authorization token provided');
     }
+
+    const token = req.headers.authorization.split(' ')[1];
+    const user = await this.authService.validateToken(token);
+    if (!user) {
+      throw new UnauthorizedException('Invalid or expired token');
+    }
+
     return await this.usersService.getMenuOptions(user.id);
   }
 
-  @Get('/api/menu-options/access')
-  @UseGuards(AuthGuard)
-  @UsePipes(new ValidationPipe({ transform: true }))
-  async validateUserAccess(
-    @Query('user_id') userId: number,
-    @Query('menu_option_id') menuOptionId: number,
-  ) {
-    try {
-      await this.usersService.validateUserAccess(userId, menuOptionId);
-      const menuOption = await this.menuOptionsRepository.findOneBy({ id: menuOptionId });
-      if (!menuOption) {
-        throw new HttpException('Menu option does not exist', HttpStatus.NOT_FOUND);
-      }
-      return {
-        status: HttpStatus.OK,
-        access_granted: true,
-        menu_option: menuOption,
-      };
-    } catch (error) {
-      throw new UnauthorizedAccessException();
-    }
-  }
+  // Other route handlers...
 }

@@ -1,8 +1,9 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
-import { I18nModule, I18nJsonParser, I18nLanguageDetector } from '@nestjs-modules/i18n';
 import { AppController } from './app.controller';
+import { I18nModule } from '@nestjs-modules/i18n';
+import { I18nJsonParser } from 'i18next-fs-backend';
+import { I18nLanguageDetector } from 'i18next-http-middleware';
 import { AppService } from './app.service';
-import * as path from 'path';
 import { UserPermissionsModule } from './user-permissions/user-permissions.module';
 import { MenuOptionsModule } from './menu-options/menu-options.module';
 import { ReportsModule } from './reports/reports.module';
@@ -20,16 +21,19 @@ const cookieSession = require('cookie-session');
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
-    UsersModule,
-    ReportsModule,
     I18nModule.forRoot({
-      fallbackLanguage: 'en',
+      fallbackLng: 'en',
       parser: I18nJsonParser,
       parserOptions: {
-        path: path.join(__dirname, '/i18n/'),
+        path: process.cwd() + '/i18n/',
+        watch: true,
       },
-      languageDetector: I18nLanguageDetector,
+      resolvers: [
+        I18nLanguageDetector,
+      ],
     }),
+    UsersModule,
+    ReportsModule,
     TypeOrmModule.forRootAsync({
       useFactory: () => {
         return require('../ormconfig.js');
@@ -37,16 +41,39 @@ const cookieSession = require('cookie-session');
     }),
     JanitorModule,
     UserPermissionsModule,
-    MenuOptionsModule,
+    // MenuOptionsModule,
+    // TypeOrmModule.forRootAsync({
+    //   inject: [ConfigService],
+    //   useFactory: (configService: ConfigService) => ({
+    //     type: 'postgres',
+    //     host: configService.get('DB_HOST'),
+    //     port: configService.get('DB_PORT'),
+    //     username: configService.get('DB_USERNAME'),
+    //     password: configService.get('DB_PASSWORD'),
+    //     database: configService.get('DB_NAME'),
+    //     entities: [User, Report],
+    //     synchronize: true,
+    //   }),
+    // }),
+    // TypeOrmModule.forRootAsync({
+    //   inject: [ConfigService],
+    //   useFactory: (configService: ConfigService) => ({
+    //     type: 'sqlite',
+    //     database: configService.get('DB_NAME'),
+    //     entities: [User, Report],
+    //     synchronize: true,
+    //   }),
+    // }),
   ],
-  controllers: [AppController],
+  controllers: [AppController], // This line remains unchanged
   providers: [
     AppService,
     {
-      provide: APP_PIPE, // Global validation pipe
+      provide: APP_PIPE,
       useValue: new ValidationPipe({
         whitelist: true,
-        transform: true,
+        forbidNonWhitelisted: true,
+        transform: true, // This line remains unchanged
       }),
     },
     {
