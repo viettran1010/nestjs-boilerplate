@@ -56,6 +56,8 @@ const cookieSession = require('cookie-session');
       provide: APP_PIPE,
       useValue: new ValidationPipe({
         whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true, // automatically transform payloads to be objects typed according to their DTO classes
       }),
     },
     {
