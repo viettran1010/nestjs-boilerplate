@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
+import { Customer } from '../customers/customer.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 
@@ -9,6 +10,21 @@ export class UsersService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
   ) {}
+
+  async getRecentCustomerDetails(userId: number) {
+    const customer = await this.usersRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.customer', 'customer')
+      .where('user.id = :userId', { userId })
+      .orderBy('customer.created_at', 'DESC')
+      .getOne();
+
+    if (!customer || !customer.customer) {
+      throw new NotFoundException('No customer record found for the given user_id');
+    }
+
+    return customer.customer;
+  }
 
   async create(email: string, password: string) {
     // to make sure user is valid before saving

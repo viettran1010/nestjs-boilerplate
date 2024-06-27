@@ -1,5 +1,6 @@
 import {
   Body,
+  NotFoundException,
   Controller,
   Delete,
   Get,
@@ -7,6 +8,7 @@ import {
   Patch,
   Post,
   Query,
+  Res,
   Session,
   UseGuards,
   UseInterceptors,
@@ -73,4 +75,20 @@ export class UsersController {
   async updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return await this.usersService.update(parseInt(id), body);
   }
+
+  @Get('/users/:userId/add-contract')
+  async navigateToAddContractScreen(@Param('userId') userId: string, @Res() res) {
+    const user_id = parseInt(userId);
+    const customerDetails = await this.usersService.getRecentCustomerDetails(user_id);
+    if (!customerDetails) {
+      throw new NotFoundException('Customer information needs to be confirmed before proceeding.');
+    }
+    // Assuming there is a method to navigate to the "Add Contract" screen
+    // This is a placeholder response to simulate the navigation
+    return res.json({
+      navigateToAddContractScreen: true,
+      customerDetails: customerDetails,
+    });
+  }
+
 }
