@@ -9,8 +9,8 @@ import {
   Query,
   Session,
   UseGuards,
-  UseInterceptors,
-  NotFoundException,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
@@ -82,11 +82,15 @@ export class UsersController {
     @Query('katakana') katakana: string,
     @Query('email_address') email_address: string,
   ) {
-    const results = await this.usersService.searchCustomers({ name, katakana, email_address });
-    if (!results || results.length === 0) {
-      throw new NotFoundException('No customers found with the provided criteria.');
+    try {
+      const results = await this.usersService.searchCustomers({ name, katakana, email_address });
+      return results;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new HttpException('No customers found with the provided criteria.', HttpStatus.NOT_FOUND);
+      }
+      throw error;
     }
-    return results;
   }
 }
 
