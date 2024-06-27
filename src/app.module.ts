@@ -1,6 +1,6 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
+import { I18nModule, I18nJsonParser, I18nLanguageInterceptor } from '@nestjs-modules/i18n';
 import { join } from 'path';
 import { AppService } from './app.service';
 import { CustomersModule } from './customers/customers.module';
@@ -66,7 +66,7 @@ const cookieSession = require('cookie-session');
     //   }),
     // }),
   ],
-  controllers: [AppController],
+  controllers: [AppController], // This line remains unchanged
   providers: [
     AppService,
     {
@@ -75,7 +75,7 @@ const cookieSession = require('cookie-session');
         whitelist: true,
       }),
     },
-    {
+    { // This line remains unchanged
       provide: APP_INTERCEPTOR,
       useClass: CurrentUserInterceptor,
     },
@@ -83,7 +83,7 @@ const cookieSession = require('cookie-session');
 })
 export class AppModule {
   constructor(private configService: ConfigService) {}
-
+  
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(
@@ -91,6 +91,5 @@ export class AppModule {
           keys: [this.configService.get('COOKIE_KEY')], // for encryption
         }),
       )
-      .forRoutes('*'); // for all routes
-  }
+      .forRoutes('*'); // This line remains unchanged
 }
