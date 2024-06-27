@@ -29,4 +29,14 @@ export class ScheduledDeposit {
 
   @Column({ type: 'varchar', nullable: true })
   status: string;
+
+  static scheduleDeposit(accountTypeInformation: AccountTypeInformation, deposit_date: Date) {
+    const scheduledDeposit = new ScheduledDeposit();
+    scheduledDeposit.account_type_information = accountTypeInformation;
+    scheduledDeposit.scheduled_date = deposit_date;
+    scheduledDeposit.status = 'pending';
+    // Here you would typically save the entity using the repository
+    // For this example, we'll assume it's saved and return the instance
+    return scheduledDeposit;
+  }
 }
