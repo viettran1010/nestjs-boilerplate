@@ -10,6 +10,15 @@ export class AuditLogService {
     private auditLogRepository: Repository<AuditLog>,
   ) {}
 
+  async create(auditLog: AuditLog): Promise<AuditLog> {
+    try {
+      return await this.auditLogRepository.save(auditLog);
+    } catch (error) {
+      // Error handling logic here
+      throw error;
+    }
+  }
+
   async logAddressUpdate(userId: number, action: string, timestamp: Date, addressUpdateId: number): Promise<AuditLog> {
     try {
       const auditLog = this.auditLogRepository.create({

@@ -17,10 +17,10 @@ export class UserPermission {
   has_access: boolean;
 
   @ManyToOne(() => User, user => user.userPermissions)
-  @Column()
+  @JoinColumn({ name: 'user_id' })
   user_id: number;
 
   @ManyToOne(() => MenuOption, menuOption => menuOption.userPermissions)
-  @Column()
+  @JoinColumn({ name: 'menu_option_id' })
   menu_option_id: number;
 }

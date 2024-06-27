@@ -38,7 +38,7 @@ export class UsersController {
     private auditLogService: AuditLogService,
   ) {}
 
-  @Post('/address-update')
+  @Post('/address-update/process')
   async initiateAddressUpdate(@Body() body: AddressUpdateDto, @CurrentUser() user: User) {
     // Validate user permission
     const hasPermission = await this.usersService.validateUserPermission(user.id, 'address_update');

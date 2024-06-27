@@ -3,12 +3,17 @@ import { Contract } from '../contracts/contract.entity';
 import { AddressUpdate } from '../address_updates/address_update.entity';
 import { User } from '../users/user.entity';
 
+enum AuditAction {
+  ADDRESS_UPDATE_INITIATED = 'address_update_initiated',
+  // ... other actions
+}
+
 @Entity()
 export class AuditLog {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  action: AuditAction;
   action: string;
 
   @Column('timestamp')

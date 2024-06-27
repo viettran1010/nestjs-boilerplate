@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { UserPermission } from '../user-permissions/user-permission.entity';
-import { MenuOption } from '../menu-options/menu-option.entity';
+import { UserPermission } from '../user_permissions/user_permission.entity';
+import { MenuOption } from '../menu_options/menu_option.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 
@@ -12,14 +12,6 @@ export class UsersService {
     private usersRepository: Repository<User>,
   ) {}
 
-  async create(email: string, password: string) {
-    // to make sure user is valid before saving
-    // also hooks are called
-    const user = this.usersRepository.create({ email, password });
-    return await this.usersRepository.save(user);
-  }
-
-  async findOne(id: number) {
   async validateUserPermission(userId: number, permissionLabel: string): Promise<boolean> {
     const userPermission = await this.usersRepository
       .createQueryBuilder('user')
@@ -33,6 +25,14 @@ export class UsersService {
     return !!userPermission;
   }
 
+  async create(email: string, password: string) {
+    // to make sure user is valid before saving
+    // also hooks are called
+    const user = this.usersRepository.create({ email, password });
+    return await this.usersRepository.save(user);
+  }
+
+  async findOne(id: number) {
     if (!id) {
       return null;
     }

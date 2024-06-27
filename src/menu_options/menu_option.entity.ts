@@ -3,6 +3,7 @@ import { UserPermission } from '../user_permissions/user_permission.entity';
 
 @Entity('menu_options')
 export class MenuOption {
+  @Column({ type: 'varchar' })
   @PrimaryGeneratedColumn()
   id: number;
 

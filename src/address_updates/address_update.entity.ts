@@ -4,6 +4,8 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { User } from '../users/user.entity';
 import { Customer } from '../customers/customer.entity';
@@ -13,10 +15,10 @@ export class AddressUpdate {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn()
   created_at: Date;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @UpdateDateColumn()
   updated_at: Date;
 
   @Column({ nullable: true })
@@ -28,7 +30,11 @@ export class AddressUpdate {
   @Column({ type: 'timestamp', nullable: true })
   date_of_end_converting: Date;
 
-  @Column()
+  @Column({
+    type: 'enum',
+    enum: ['pending', 'in_progress', 'completed', 'failed'],
+    default: 'pending'
+  })
   status: string;
 
   @ManyToOne(() => User)
