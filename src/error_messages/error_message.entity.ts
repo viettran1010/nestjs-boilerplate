@@ -29,10 +29,10 @@ export class ErrorMessage {
   action_taken: string;
 
   @ManyToOne(() => User, user => user.error_messages)
-  @ManyToOne(() => Contract, contract => contract.error_messages)
-  @JoinColumn({ name: 'contract_id' })
-  contract: Contract;
-
   @JoinColumn({ name: 'user_id' })
   user: User;
+
+  @ManyToOne(() => Contract)
+  @JoinColumn({ name: 'contract_id' })
+  contract: Contract;
 }

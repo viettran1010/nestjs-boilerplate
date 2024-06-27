@@ -1,10 +1,10 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
-import { join } from 'path';
 import { AppService } from './app.service';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
+import { ErrorMessagesModule } from './error_messages/error_messages.module';
+import { AuditLogsModule } from './audit_logs/audit_logs.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/user.entity';
 import { Report } from './reports/report.entity';
@@ -28,15 +28,11 @@ const cookieSession = require('cookie-session');
       },
     }),
     JanitorModule,
+    // Add new modules here
+    ErrorMessagesModule,
+    AuditLogsModule,
     // TypeOrmModule.forRootAsync({
     //   inject: [ConfigService],
-    I18nModule.forRoot({
-      fallbackLanguage: 'en',
-      parser: I18nJsonParser,
-      parserOptions: {
-        path: join(__dirname, '/i18n/'),
-      },
-    }),
     //   useFactory: (configService: ConfigService) => ({
     //     type: 'postgres',
     //     host: configService.get('DB_HOST'),
@@ -56,8 +52,10 @@ const cookieSession = require('cookie-session');
     //     entities: [User, Report],
     //     synchronize: true,
     //   }),
-      provide: APP_PIPE,
-      useClass: ValidationPipe,
+    // }),
+  ],
+  controllers: [AppController],
+  providers: [
     AppService,
     {
       provide: APP_PIPE,

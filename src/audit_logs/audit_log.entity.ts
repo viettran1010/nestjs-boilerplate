@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
 import { Contract } from '../contracts/contract.entity';
+import { ErrorMessage } from '../error_messages/error_message.entity';
 import { User } from '../users/user.entity';
 
 @Entity()
@@ -26,6 +27,9 @@ export class AuditLog {
 
   @Column('timestamp')
   updated_at: Date;
+
+  @OneToMany(() => ErrorMessage, errorMessage => errorMessage.auditLog)
+  errorMessages: ErrorMessage[];
 
   // Relations with address_updates table will be defined when the AddressUpdate entity is available
   // @OneToMany(() => AddressUpdate, addressUpdate => addressUpdate.auditLog)
