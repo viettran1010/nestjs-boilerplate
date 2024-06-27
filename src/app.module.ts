@@ -1,5 +1,6 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
+import { AddressUpdateModule } from './address_updates/address_update.module';
 import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
 import * as path from 'path';
 import { AppService } from './app.service';
@@ -30,6 +31,7 @@ const cookieSession = require('cookie-session');
     }),
     UsersModule,
     ReportsModule,
+    AddressUpdateModule,
     TypeOrmModule.forRootAsync({
       useFactory: () => {
         return require('../ormconfig.js');
@@ -38,7 +40,7 @@ const cookieSession = require('cookie-session');
     JanitorModule,
     // TypeOrmModule.forRootAsync({
     //   inject: [ConfigService],
-    //   useFactory: (configService: ConfigService) => ({
+    //   useFactory: (configService: ConfigService) => ({ 
     //     type: 'postgres',
     //     host: configService.get('DB_HOST'),
     //     port: configService.get('DB_PORT'),
@@ -61,7 +63,7 @@ const cookieSession = require('cookie-session');
   ],
   controllers: [AppController],
   providers: [
-    AppService,
+    AppService, 
     {
       provide: APP_PIPE,
       useClass: ValidationPipe,
