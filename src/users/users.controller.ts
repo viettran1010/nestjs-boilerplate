@@ -10,6 +10,7 @@ import {
   Session,
   UseGuards,
   UseInterceptors,
+  BadRequestException,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
@@ -73,4 +74,15 @@ export class UsersController {
   async updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return await this.usersService.update(parseInt(id), body);
   }
+
+  @Get('/contracts/:id')
+  async getContractDetails(@Param('id') id: string) {
+    const contractId = parseInt(id);
+    if (isNaN(contractId)) {
+      throw new BadRequestException('Invalid contract ID');
+    }
+    return await this.usersService.displayContractDetails(contractId);
+  }
+
+  // Other methods...
 }
