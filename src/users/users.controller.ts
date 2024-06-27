@@ -10,6 +10,8 @@ import {
   Session,
   UseGuards,
   UseInterceptors,
+  ClassSerializerInterceptor,
+  BadRequestException,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
@@ -41,24 +43,22 @@ export class UsersController {
   }
 
   @Post('/signup')
-  async createUser(@Body() body: CreateUserDto, @Session() session: any, @Res() res: Response) {
-    try {
-      const user = await this.authService.signup(body.email, body.password);
-      session.userId = user.id;
-      return res.json(user);
-    } catch (error) {
-      return res.status(400).json({ error: error.message });
-    }
+  async createUser(@Body() body: CreateUserDto, @Session() session: any) {
+    const user = await this.authService.signup(body.email, body.password);
+    session.userId = user.id;
+    return user;
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Post('/signin')
-  async signin(@Body() body: CreateUserDto, @Session() session: any, @Res() res: Response) {
+  async signin(@Body() body: CreateUserDto, @Session() session: any) {
     try {
-      const user = await this.authService.signin(body.email, body.password);
+      const { email, password } = body;
+      const user = await this.authService.signin(email, password);
       session.userId = user.id;
-      return res.json(user);
+      return user;
     } catch (error) {
-      return res.status(400).json({ error: error.message });
+      throw new BadRequestException(error.message);
     }
   }
 

@@ -1,7 +1,7 @@
 import { IsEmail, IsString, Length, Matches } from 'class-validator';
 
 export class CreateUserDto {
-  @IsEmail()
+  @IsEmail({}, { message: 'Invalid email format.' })
   email: string;
 
   @IsString({ message: 'Password must be a string' })

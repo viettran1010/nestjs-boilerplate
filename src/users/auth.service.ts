@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { promisify } from 'util';
+import { validate } from 'class-validator';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
@@ -31,7 +32,6 @@ export class AuthService {
     return user;
   }
 
-  // This method has been updated to include new validation logic for login input
   async signin(email: string, password: string) {
     const [user] = await this.usersService.find(email);
     if (!user) {
@@ -40,16 +40,14 @@ export class AuthService {
 
     const [salt, storedHash] = user.password.split('.');
     
-    // Validate the email and password using CreateUserDto validation logic
     const credentials = new CreateUserDto();
     credentials.email = email;
     credentials.password = password;
-    // You should implement the actual validation logic here
-    // For example, using class-validator to validate the credentials object
-    // If validation fails, throw an exception
-    // if (!isValid(credentials)) {
-    //   throw new BadRequestException('Validation failed for email or password');
-    // }
+
+    const errors = await validate(credentials);
+    if (errors.length > 0) {
+      throw new BadRequestException('Validation failed for email or password');
+    }
 
     const hash = (await scrypt(password, salt, 32)) as Buffer;
 
