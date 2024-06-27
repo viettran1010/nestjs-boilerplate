@@ -5,6 +5,8 @@ import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
 import path from 'path';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
+import { AccountTypeInformation } from './account-type-informations/account-type-information.entity';
+import { ScheduledDeposit } from './scheduled-deposits/scheduled-deposit.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/user.entity';
 import { Report } from './reports/report.entity';
@@ -36,6 +38,7 @@ const cookieSession = require('cookie-session');
       },
     }),
     JanitorModule,
+    TypeOrmModule.forFeature([AccountTypeInformation, ScheduledDeposit]),
     // TypeOrmModule.forRootAsync({
     //   inject: [ConfigService],
     //   useFactory: (configService: ConfigService) => ({

@@ -1,11 +1,16 @@
 import {
   Body,
+  BadRequestException,
+  HttpCode,
+  HttpStatus,
   Controller,
   Delete,
   Get,
   Param,
   Patch,
   Post,
+  UsePipes,
+  ValidationPipe,
   Query,
   Session,
   UseGuards,
@@ -22,6 +27,29 @@ import { UserResponseDto } from './dtos/user.response.dto';
 import { User } from './user.entity';
 import { ScheduledDeposit } from '../scheduled-deposits/scheduled-deposit.entity';
 import { UsersService } from './users.service';
+import { IsNumber, IsDateString, Min } from 'class-validator';
+import { Type } from '@nestjs/common';
+import { parseISO, isFuture } from 'date-fns';
+
+class CreateAccountTypeInformationDto {
+  @IsNumber()
+  @Min(0)
+  deposit_amount: number;
+
+  @IsDateString()
+  deposit_date: string;
+
+  @IsNumber()
+  user_id: number;
+}
+
+const validateDepositDate = (value: string) => {
+  const parsedDate = parseISO(value);
+  if (!isFuture(parsedDate)) {
+    throw new BadRequestException('Deposit date must be a valid future date.');
+  }
+  return value;
+};
 
 @Controller('auth')
 @Serialize(UserResponseDto)
@@ -77,21 +105,26 @@ export class UsersController {
   }
 
   @Post('/account-type-information')
+  @UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
   async createAccountTypeInformation(
-    @Body('deposit_amount') depositAmount: number,
-    @Body('deposit_date') depositDate: string,
-    @Body('user_id') userId: number,
+    @Body() createAccountTypeInformationDto: CreateAccountTypeInformationDto,
   ) {
     try {
-      const accountTypeInformation = await AccountTypeInformation.validateAndCreate(depositAmount, depositDate, userId);
-      const scheduledDeposit = await ScheduledDeposit.scheduleDeposit(accountTypeInformation, depositDate);
+      const { deposit_amount, deposit_date, user_id } = createAccountTypeInformationDto;
+
+      // Additional validation for deposit_date
+      validateDepositDate(deposit_date);
+
+      const accountTypeInformation = await AccountTypeInformation.validateAndCreate(deposit_amount, deposit_date, user_id);
+      const scheduledDeposit = await ScheduledDeposit.scheduleDeposit(accountTypeInformation, new Date(deposit_date));
+
       return {
         message: 'Account type information and scheduled deposit have been saved successfully.',
         accountTypeInformation,
         scheduledDeposit,
       };
     } catch (error) {
-      return { error: error.message };
+      throw new BadRequestException(error.message);
     }
   }
   

@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 import { User } from '../users/user.entity';
-import { UsersService } from '../users/users.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { ScheduledDeposit } from '../scheduled-deposits/scheduled-deposit.entity';
 import { Contract } from '../contracts/contract.entity';
 import { BadRequestException } from '@nestjs/common';
@@ -9,6 +10,9 @@ import { BadRequestException } from '@nestjs/common';
 export class AccountTypeInformation {
   @PrimaryGeneratedColumn()
   id: number;
+  
+  @InjectRepository(User)
+  private static usersRepository: Repository<User>;
 
   @Column({ type: 'varchar', nullable: true })
   currencyDeposited: string;
@@ -37,8 +41,7 @@ export class AccountTypeInformation {
   deposit_date: Date;
 
   static async validateAndCreate(deposit_amount: number, deposit_date: string, user_id: number) {
-    const usersService = new UsersService(); // This should be injected, but for the purpose of this example, we're instantiating it directly.
-    const user = await usersService.findOne(user_id);
+    const user = await this.usersRepository.findOneBy({ id: user_id });
 
     if (!user) {
       throw new BadRequestException('Invalid user_id, user does not exist.');
@@ -56,7 +59,7 @@ export class AccountTypeInformation {
     const accountTypeInformation = new AccountTypeInformation();
     accountTypeInformation.deposit_amount = deposit_amount;
     accountTypeInformation.deposit_date = depositDate;
-    accountTypeInformation.user = user;
+    accountTypeInformation.user = user; // Assign the found user to the new account type information
 
     // Here you would typically save the entity using the repository
     // For this example, we'll assume it's saved and return the instance
