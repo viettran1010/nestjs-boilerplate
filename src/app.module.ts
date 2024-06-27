@@ -1,6 +1,7 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
+import { I18nModule, I18nJsonParser, I18nLanguageDetector } from '@nestjs-modules/i18n';
+import { I18nModuleOptions } from '@nestjs-modules/i18n/dist/interfaces/i18n-options.interface';
 import * as path from 'path';
 import { AppService } from './app.service';
 import { APP_PIPE, APP_INTERCEPTOR } from '@nestjs/core';
@@ -17,7 +18,7 @@ const cookieSession = require('cookie-session');
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true,
+      isGlobal: true, // The configuration module is global
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
     UsersModule,
@@ -28,12 +29,19 @@ const cookieSession = require('cookie-session');
       },
     }),
     JanitorModule,
-    I18nModule.forRoot({
-      fallbackLanguage: 'en',
-      parser: I18nJsonParser,
-      parserOptions: {
-        path: path.join(__dirname, '/i18n/'),
-      },
+    // Set up the i18n module with language detection and JSON parser
+    I18nModule.forRootAsync({
+      useFactory: (): I18nModuleOptions => ({
+        fallbackLanguage: 'en',
+        parserOptions: {
+          path: path.join(__dirname, '/i18n/'),
+          watch: true,
+        },
+        parser: I18nJsonParser,
+        resolvers: [
+          { use: I18nLanguageDetector, options: { order: ['querystring', 'cookie', 'header'] } },
+        ],
+      }),
     }),
     // TypeOrmModule.forRootAsync({
     //   inject: [ConfigService],
@@ -63,11 +71,16 @@ const cookieSession = require('cookie-session');
     AppService, {
       provide: APP_PIPE,
       useValue: new ValidationPipe({
-        whitelist: true,
-        transform: true,
-      }),
-    },
-    {
+      provide: APP_PIPE, // Global validation pipe
+      useClass: ValidationPipe, // Use the class instead of an instance
+      useFactory: () => {
+        return new ValidationPipe({
+          whitelist: true, // Strip properties that do not have any decorators
+          forbidNonWhitelisted: true, // Throw an error when non-whitelisted values are provided
+          transform: true, // Automatically transform payloads to be objects typed according to their DTO classes
+          validationError: { target: false }, // Do not include the target value in the validation error
+        });
+      },
       provide: APP_INTERCEPTOR,
       useClass: CurrentUserInterceptor,
     },
