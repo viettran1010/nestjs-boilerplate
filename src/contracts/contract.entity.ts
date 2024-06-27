@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { User } from '../users/user.entity';
+import { IsString, IsCurrency } from 'class-validator';
 import { ContractAction } from '../contract_actions/contract_action.entity';
 import { AuditLog } from '../audit_logs/audit_log.entity';
 import { Customer } from '../customers/customer.entity';
@@ -50,6 +51,11 @@ export class Contract {
   status: string;
 
   @ManyToOne(() => User, user => user.contracts)
+  @IsString()
+  @IsCurrency()
+  @Column({ type: 'varchar', length: 3 })
+  currency_deposited: string;
+
   user: User;
 
   @ManyToOne(() => ContractAction, contractAction => contractAction.contracts)
