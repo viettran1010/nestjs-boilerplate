@@ -1,5 +1,6 @@
 import {
   Body,
+  UseFilters,
   Controller,
   Get,
   Param,
@@ -8,6 +9,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+  UseInterceptors,
 import { AdminGuard } from '../guards/admin.guard';
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
@@ -15,12 +17,14 @@ import { CurrentUser } from '../users/decorators/current-user.decorator';
 import { User } from '../users/user.entity';
 import { ApproveReportDto } from './dtos/approve-report.dto';
 import { CreateReportDto } from './dtos/create-report.dto';
+import { CustomExceptionFilter } from '../filters/custom-exception.filter';
 import { GetEstimateDto } from './dtos/get-estimate.dto';
 import { ReportResponseDto } from './dtos/report.response.dto';
 import { ReportsService } from './reports.service';
 
 @Controller('reports')
 export class ReportsController {
+@UseFilters(CustomExceptionFilter)
   constructor(private reportsService: ReportsService) {}
 
   @Post()

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { JanitorService } from './janitor.service';
-import { JanitorController } from './janitor.controller';
+import { JanitorService } from './services/janitor.service';
+import { JanitorController } from './controllers/janitor.controller';
 
 @Module({
   controllers: [JanitorController],

@@ -1,9 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseFilters } from '@nestjs/common';
 import { JanitorService } from './janitor.service';
+import { HttpExceptionFilter } from '../common/filters/http-exception.filter';
+import { QueryFailedExceptionFilter } from '../common/filters/query-failed-exception.filter';
 import { CreateJanitorDto } from './dto/create-janitor.dto';
 import { UpdateJanitorDto } from './dto/update-janitor.dto';
 
 @Controller('janitor')
+@UseFilters(HttpExceptionFilter, QueryFailedExceptionFilter)
 export class JanitorController {
   constructor(private readonly janitorService: JanitorService) {}
 

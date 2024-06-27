@@ -1,6 +1,7 @@
 import {
   IsLatitude,
   IsLongitude,
+  IsNotEmpty,
   IsNumber,
   IsString,
   Max,
@@ -11,15 +12,20 @@ export class CreateReportDto {
   @IsNumber()
   @Min(0)
   @Max(1000000)
+  @IsNotEmpty()
   price: number;
 
   @IsString()
+  @IsNotEmpty()
   maker: string;
 
   @IsString()
+  @IsNotEmpty()
   model: string;
 
+  @IsNumber()
   @Min(1930)
+  @IsNotEmpty()
   year: number;
 
   @IsLatitude()
@@ -31,5 +37,6 @@ export class CreateReportDto {
   @IsNumber()
   @Min(0)
   @Max(1000000)
+  @IsNotEmpty()
   mileage: number;
 }
