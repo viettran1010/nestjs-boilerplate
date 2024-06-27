@@ -1,5 +1,7 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
+import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
+import { join } from 'path';
 import { AppService } from './app.service';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
@@ -28,6 +30,13 @@ const cookieSession = require('cookie-session');
     JanitorModule,
     // TypeOrmModule.forRootAsync({
     //   inject: [ConfigService],
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      parser: I18nJsonParser,
+      parserOptions: {
+        path: join(__dirname, '/i18n/'),
+      },
+    }),
     //   useFactory: (configService: ConfigService) => ({
     //     type: 'postgres',
     //     host: configService.get('DB_HOST'),
@@ -47,10 +56,8 @@ const cookieSession = require('cookie-session');
     //     entities: [User, Report],
     //     synchronize: true,
     //   }),
-    // }),
-  ],
-  controllers: [AppController],
-  providers: [
+      provide: APP_PIPE,
+      useClass: ValidationPipe,
     AppService,
     {
       provide: APP_PIPE,

@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { User } from '../users/user.entity';
+import { Contract } from '../contracts/contract.entity';
 
 @Entity('error_messages')
 export class ErrorMessage {
@@ -28,6 +29,10 @@ export class ErrorMessage {
   action_taken: string;
 
   @ManyToOne(() => User, user => user.error_messages)
+  @ManyToOne(() => Contract, contract => contract.error_messages)
+  @JoinColumn({ name: 'contract_id' })
+  contract: Contract;
+
   @JoinColumn({ name: 'user_id' })
   user: User;
 }
