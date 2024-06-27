@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
+import { UnauthorizedAccessException } from '../exceptions/unauthorized-access.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { UserPermission } from '../user_permissions/user_permission.entity';
