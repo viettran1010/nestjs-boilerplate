@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Inject,
   Param,
   Patch,
   Post,
@@ -12,6 +13,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
+import { AuditLogService } from '../audit_logs/audit_log.service';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { AuthService } from './auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
@@ -24,6 +26,7 @@ import { UsersService } from './users.service';
 @Controller('auth')
 @Serialize(UserResponseDto)
 export class UsersController {
+  @Inject(AuditLogService) private readonly auditLogService: AuditLogService;
   constructor(
     private readonly usersService: UsersService,
     private authService: AuthService,
@@ -71,6 +74,16 @@ export class UsersController {
 
   @Patch('/:id')
   async updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
-    return await this.usersService.update(parseInt(id), body);
+    const updatedUser = await this.usersService.update(parseInt(id), body);
+    // After a successful update, log the action
+    if (updatedUser) {
+      const action = 'update';
+      const timestamp = new Date(); // Assuming the current timestamp is used for logging
+      const contract_id = updatedUser.contract_id; // Assuming the user has a contract_id field
+      const user_id = updatedUser.id;
+      await this.auditLogService.logUpdateAction(action, timestamp, contract_id, user_id);
+    }
+    // Return the updated user information
+    return updatedUser;
   }
 }
