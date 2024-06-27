@@ -8,7 +8,6 @@ import {
   Patch,
   Post,
   Query,
-  Res,
   Session,
   UseGuards,
   UseInterceptors,
@@ -16,12 +15,12 @@ import {
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { AuthService } from './auth.service';
+import { UsersService } from './users.service';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserResponseDto } from './dtos/user.response.dto';
 import { User } from './user.entity';
-import { UsersService } from './users.service';
 
 @Controller('auth')
 @Serialize(UserResponseDto)
@@ -77,7 +76,7 @@ export class UsersController {
   }
 
   @Get('/users/:userId/add-contract')
-  async navigateToAddContractScreen(@Param('userId') userId: string, @Res() res) {
+  async navigateToAddContractScreen(@Param('userId') userId: string) {
     const user_id = parseInt(userId);
     const customerDetails = await this.usersService.getRecentCustomerDetails(user_id);
     if (!customerDetails) {
@@ -85,10 +84,11 @@ export class UsersController {
     }
     // Assuming there is a method to navigate to the "Add Contract" screen
     // This is a placeholder response to simulate the navigation
-    return res.json({
-      navigateToAddContractScreen: true,
-      customerDetails: customerDetails,
-    });
+    return {
+      status: 200,
+      message: "Navigate to the Add Contract screen.",
+      customer: customerDetails
+    };
   }
 
 }

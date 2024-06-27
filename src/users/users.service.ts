@@ -7,28 +7,36 @@ import { User } from './user.entity';
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User)
-    private usersRepository: Repository<User>,
+    @InjectRepository(User) private usersRepository: Repository<User>,
+    @InjectRepository(Customer) private customersRepository: Repository<Customer>,
   ) {}
 
   async getRecentCustomerDetails(userId: number) {
     const customer = await this.usersRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.customer', 'customer')
-      .where('user.id = :userId', { userId })
+      .where('user.id = :userId', { userId: userId })
       .orderBy('customer.created_at', 'DESC')
       .getOne();
 
-    if (!customer || !customer.customer) {
+    if (!customer) {
+      throw new NotFoundException('User not found.');
+    }
+
+    const customerDetails = await this.customersRepository
+      .createQueryBuilder('customer')
+      .where('customer.user_id = :userId', { userId: userId })
+      .orderBy('customer.created_at', 'DESC')
+      .getOne();
+
+    if (!customerDetails) {
       throw new NotFoundException('No customer record found for the given user_id');
     }
 
-    return customer.customer;
+    return customerDetails;
   }
 
   async create(email: string, password: string) {
-    // to make sure user is valid before saving
-    // also hooks are called
     const user = this.usersRepository.create({ email, password });
     return await this.usersRepository.save(user);
   }

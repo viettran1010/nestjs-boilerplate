@@ -1,5 +1,5 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
-import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
+import { I18nModule, I18nJsonParser, I18nService } from '@nestjs-modules/i18n';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import * as path from 'path';
@@ -15,7 +15,7 @@ import { JanitorModule } from './janitor/janitor.module';
 const cookieSession = require('cookie-session');
 
 @Module({
-  imports: [
+  imports: [ 
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
@@ -32,11 +32,11 @@ const cookieSession = require('cookie-session');
     TypeOrmModule.forRootAsync({
       useFactory: () => {
         return require('../ormconfig.js');
-      },
+      }, 
     }),
     JanitorModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController], 
   providers: [
     AppService,
     {
@@ -45,7 +45,7 @@ const cookieSession = require('cookie-session');
         whitelist: true,
         forbidNonWhitelisted: true,
       }),
-    },
+    }, 
     {
       provide: APP_INTERCEPTOR,
       useClass: CurrentUserInterceptor,
@@ -53,7 +53,7 @@ const cookieSession = require('cookie-session');
   ],
 })
 export class AppModule {
-  constructor(private configService: ConfigService) {}
+  constructor(private configService: ConfigService, private i18nService: I18nService) {}
 
   configure(consumer: MiddlewareConsumer) {
     consumer
@@ -61,7 +61,7 @@ export class AppModule {
         cookieSession({
           keys: [this.configService.get('COOKIE_KEY')], // for encryption
         }),
-      )
+      ) 
       .forRoutes('*'); // for all routes
   }
 }
