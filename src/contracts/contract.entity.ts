@@ -1,5 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { User } from '../users/user.entity';
+import { SuccessMessage } from '../success_messages/success_message.entity';
+import { ErrorMessage } from '../error_messages/error_message.entity';
 import { ContractAction } from '../contract_actions/contract_action.entity';
 import { AuditLog } from '../audit_logs/audit_log.entity';
 import { Customer } from '../customers/customer.entity';
@@ -47,6 +49,21 @@ export class Contract {
   interest_rate?: number;
 
   @Column()
+  @OneToMany(() => SuccessMessage, successMessage => successMessage.contract)
+  successMessages: SuccessMessage[];
+
+  @OneToMany(() => ErrorMessage, errorMessage => errorMessage.contract)
+  errorMessages: ErrorMessage[];
+
+  @Column({ nullable: true })
+  currency_deposited?: string;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  deposit_amount?: number;
+
+  @Column({ type: 'date', nullable: true })
+  deposit_date?: Date;
+
   status: string;
 
   @ManyToOne(() => User, user => user.contracts)

@@ -1,21 +1,24 @@
 import {
   Body,
   Controller,
+  Post,
   Delete,
   Get,
   Param,
   Patch,
-  Post,
   Query,
   Session,
   UseGuards,
   UseInterceptors,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { AuthService } from './auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { CreateUserDto } from './dtos/create-user.dto';
+import { LogUpdateDto } from './dtos/log-update.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserResponseDto } from './dtos/user.response.dto';
 import { User } from './user.entity';
@@ -72,5 +75,13 @@ export class UsersController {
   @Patch('/:id')
   async updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return await this.usersService.update(parseInt(id), body);
+  }
+
+  @Post('/log-update')
+  @UseGuards(AuthGuard)
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  async logUpdate(@Body() body: LogUpdateDto, @CurrentUser() user: User) {
+    const { action, timestamp, contract_id } = body;
+    return await this.usersService.logUpdateAction(action, timestamp, contract_id, user.id);
   }
 }
