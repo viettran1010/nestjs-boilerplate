@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsOptional, IsDate, IsEnum, IsFloat } from 'class-validator';
+import { IsString, IsNumber, IsOptional, IsDate, IsEnum, IsFloat, ValidateIf } from 'class-validator';
 
 export enum AccountType {
   Savings = 'savings',
@@ -26,7 +26,7 @@ export class ContractDetailsDto {
   @IsString()
   account_number: string;
 
-  @IsDate()
+  @IsString()
   opening_date: Date;
 
   @IsOptional()
@@ -34,7 +34,7 @@ export class ContractDetailsDto {
   deposit_period?: number;
 
   @IsOptional()
-  @IsDate()
+  @IsString()
   maturity_date?: Date;
 
   @IsOptional()
@@ -42,7 +42,11 @@ export class ContractDetailsDto {
   interest_rate?: number;
 
   @IsEnum(ContractStatus)
-  status: ContractStatus;
+  status: string;
+
+  @ValidateIf(o => o.user_id !== null)
+  @IsNumber()
+  user_id?: number;
 
   @IsOptional()
   @IsNumber()
