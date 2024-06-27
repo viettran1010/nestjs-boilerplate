@@ -1,7 +1,6 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { I18nModule } from '@nestjs-modules/i18n';
-import { I18nJsonParser } from '@nestjs-modules/i18n/dist/parsers';
+import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
 import { AppService } from './app.service';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
@@ -13,6 +12,8 @@ import { I18nLanguageInterceptor } from '@nestjs-modules/i18n/dist/interceptors'
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
 import { JanitorModule } from './janitor/janitor.module';
+import { CustomersModule } from './customers/customers.module';
+import * as path from 'path';
 const cookieSession = require('cookie-session');
 
 @Module({
@@ -21,6 +22,7 @@ const cookieSession = require('cookie-session');
       fallbackLanguage: 'en',
       parserOptions: {
         path: path.join(__dirname, '/i18n/'),
+        parser: I18nJsonParser,
       },
     }),
     ConfigModule.forRoot({
@@ -32,9 +34,11 @@ const cookieSession = require('cookie-session');
     TypeOrmModule.forRootAsync({
       useFactory: () => {
         return require('../ormconfig.js');
+        // Other TypeOrmModule.forRootAsync configurations are commented out
       },
     }),
     JanitorModule,
+    CustomersModule,
     // TypeOrmModule.forRootAsync({
     //   inject: [ConfigService],
     //   useFactory: (configService: ConfigService) => ({
@@ -57,12 +61,12 @@ const cookieSession = require('cookie-session');
     //     synchronize: true,
     //   }),
     // }),
-      provide: APP_PIPE,
-      useClass: ValidationPipe,
+  ],
+  providers: [
     {
       provide: APP_PIPE,
-      provide: APP_INTERCEPTOR,
-      useClass: I18nLanguageInterceptor,
+      useClass: ValidationPipe({
+        whitelist: true,
       }),
     },
     {
