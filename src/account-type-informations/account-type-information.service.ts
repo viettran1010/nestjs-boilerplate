@@ -16,7 +16,7 @@ export class AccountTypeInformationService {
     private usersService: UsersService,
   ) {}
 
-  async validateAndSaveAccountTypeInformation(deposit_amount: number, deposit_date: Date, user_id: number): Promise<string> {
+  async validateAndSaveAccountTypeInformation(deposit_amount: number, deposit_date: Date, user_id: number): Promise<AccountTypeInformation> {
     // 1. Use "UsersService" to check if the "user_id" corresponds to an existing user.
     const user = await this.usersService.findOne(user_id);
     if (!user) {
@@ -28,7 +28,7 @@ export class AccountTypeInformationService {
       throw new Error('ValidationException: Deposit amount must be positive');
     }
 
-    // 3. Validate that "deposit_date" is in the correct format and represents a valid future date.
+    // 3. Validate that "deposit_date" is a valid future date.
     if (!(deposit_date instanceof Date) || isNaN(deposit_date.getTime()) || deposit_date <= new Date()) {
       throw new Error('ValidationException: Deposit date is invalid or formatted incorrectly');
     }
@@ -36,19 +36,20 @@ export class AccountTypeInformationService {
     // 4. Create a new instance of "AccountTypeInformation" and save it.
     const accountTypeInformation = this.accountTypeInformationRepository.create({
       deposit_amount,
-      deposit_date,
+      deposit_date: deposit_date,
+      user: user,
     });
     await this.accountTypeInformationRepository.save(accountTypeInformation);
 
     // 5. Create a new "ScheduledDeposit" instance with the appropriate values and save it.
     const scheduledDeposit = this.scheduledDepositRepository.create({
-      account_type_information_id: accountTypeInformation.id,
+      accountTypeInformation: accountTypeInformation,
       scheduled_date: deposit_date,
       status: 'pending',
     });
     await this.scheduledDepositRepository.save(scheduledDeposit);
 
-    // 6. Return a success message upon completion.
-    return 'Account type information and scheduled deposit have been saved successfully';
+    // 6. Return the account type information entity instead of a string message
+    return accountTypeInformation;
   }
 }

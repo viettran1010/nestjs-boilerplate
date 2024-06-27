@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { AccountTypeInformation } from '../account-type-informations/account-type-information.entity';
 import { Repository } from 'typeorm';
 import { ScheduledDeposit } from './scheduled-deposit.entity';
 
@@ -8,20 +9,38 @@ export class ScheduledDepositService {
   constructor(
     @InjectRepository(ScheduledDeposit)
     private scheduledDepositRepository: Repository<ScheduledDeposit>,
+    @InjectRepository(AccountTypeInformation)
+    private accountTypeInformationRepository: Repository<AccountTypeInformation>,
   ) {}
 
-  async scheduleDeposit(accountTypeInformationId: number, deposit_date: Date): Promise<ScheduledDeposit> {
-    // 1. Create a new instance of "ScheduledDeposit"
-    const scheduledDeposit = this.scheduledDepositRepository.create({
-      account_type_information_id: accountTypeInformationId,
-      scheduled_date: deposit_date,
-      status: 'pending',
-    });
+  async scheduleRecurringDeposit(accountTypeInformationId: number, scheduledDate: Date): Promise<ScheduledDeposit[]> {
+    const accountTypeInformation = await this.accountTypeInformationRepository.findOneBy({ id: accountTypeInformationId });
+    if (!accountTypeInformation) {
+      throw new Error(`AccountTypeInformation with ID ${accountTypeInformationId} not found`);
+    }
 
-    // 2. Save the new "ScheduledDeposit" to the database
-    await this.scheduledDepositRepository.save(scheduledDeposit);
+    // Assuming the recurrence pattern is monthly on the same date
+    const scheduledDeposits: ScheduledDeposit[] = [];
+    const currentDate = new Date();
+    let nextScheduledDate = new Date(scheduledDate);
 
-    // 3. Return the newly created "ScheduledDeposit" entity
-    return scheduledDeposit;
+    while (nextScheduledDate > currentDate) {
+      // Create a new instance of "ScheduledDeposit"
+      const scheduledDeposit = this.scheduledDepositRepository.create({
+        accountTypeInformation: accountTypeInformation,
+        scheduled_date: nextScheduledDate,
+        status: 'scheduled',
+      });
+
+      // Save the new "ScheduledDeposit" to the database
+      await this.scheduledDepositRepository.save(scheduledDeposit);
+      scheduledDeposits.push(scheduledDeposit);
+
+      // Calculate the next occurrence of the recurring deposit
+      nextScheduledDate.setMonth(nextScheduledDate.getMonth() + 1);
+    }
+
+    // Return the list of scheduled deposit dates and their statuses
+    return scheduledDeposits;
   }
 }

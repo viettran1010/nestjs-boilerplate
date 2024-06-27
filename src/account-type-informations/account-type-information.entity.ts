@@ -1,4 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { User } from '../users/user.entity';
+import { ManyToOne, JoinColumn } from 'typeorm';
 
 @Entity()
 export class AccountTypeInformation {
@@ -16,4 +18,8 @@ export class AccountTypeInformation {
 
   @Column({ type: 'timestamp', nullable: true })
   deposit_date: Date;
+
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'user_id' })
+  user: User;
 }

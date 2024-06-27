@@ -4,7 +4,10 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
+import { AccountTypeInformation } from '../account-type-informations/account-type-information.entity';
 
 @Entity({ name: 'scheduled_deposits' })
 export class ScheduledDeposit {
@@ -22,4 +25,8 @@ export class ScheduledDeposit {
 
   @Column({ type: 'varchar', nullable: true })
   status: string;
+
+  @ManyToOne(() => AccountTypeInformation)
+  @JoinColumn({ name: 'account_type_information_id' })
+  accountTypeInformation: AccountTypeInformation;
 }
