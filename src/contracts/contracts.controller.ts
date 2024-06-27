@@ -4,6 +4,7 @@ import {
   Param,
   Patch,
   NotFoundException,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { ContractsService } from './contracts.service';
 import { UpdateContractStatusDto } from './dtos/update-contract-status.dto';
@@ -16,13 +17,11 @@ export class ContractsController {
 
   @Patch('/:id/status')
   async updateStatus(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateContractStatusDto: UpdateContractStatusDto
   ) {
-    const contract = await this.contractsService.updateContractStatus(
-      parseInt(id),
-      updateContractStatusDto.status
-    );
+    updateContractStatusDto.id = id;
+    const contract = await this.contractsService.updateContractStatus(updateContractStatusDto);
     if (!contract) {
       throw new NotFoundException('Contract not found');
     }
