@@ -41,17 +41,25 @@ export class UsersController {
   }
 
   @Post('/signup')
-  async createUser(@Body() body: CreateUserDto, @Session() session: any) {
-    const user = await this.authService.signup(body.email, body.password);
-    session.userId = user.id;
-    return user;
+  async createUser(@Body() body: CreateUserDto, @Session() session: any, @Res() res: Response) {
+    try {
+      const user = await this.authService.signup(body.email, body.password);
+      session.userId = user.id;
+      return res.json(user);
+    } catch (error) {
+      return res.status(400).json({ error: error.message });
+    }
   }
 
   @Post('/signin')
-  async signin(@Body() body: CreateUserDto, @Session() session: any) {
-    const user = await this.authService.signin(body.email, body.password);
-    session.userId = user.id;
-    return user;
+  async signin(@Body() body: CreateUserDto, @Session() session: any, @Res() res: Response) {
+    try {
+      const user = await this.authService.signin(body.email, body.password);
+      session.userId = user.id;
+      return res.json(user);
+    } catch (error) {
+      return res.status(400).json({ error: error.message });
+    }
   }
 
   @Get('/:id')
