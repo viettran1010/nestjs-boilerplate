@@ -24,9 +24,10 @@ import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserResponseDto } from './dtos/user.response.dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
-import { ContractValidationDto } from './dtos/contract-validation.dto'; // Assuming this DTO exists
+import { ContractValidationDto } from './dtos/contract-validation.dto';
 
 @Controller('auth')
+@UsePipes(new ValidationPipe())
 @Serialize(UserResponseDto)
 export class UsersController {
   constructor(
@@ -35,43 +36,19 @@ export class UsersController {
     private i18n: I18nService,
   ) {}
 
-  @Post('/validate-contract')
-  @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }))
-  async validateContractInformation(@Body() contractInfo: ContractValidationDto) {
-    const errors = [];
-    const currentDate = new Date();
-
-    // Check if all required fields are provided
-    const requiredFields = ['contract_id', 'customer_id', 'customer_name_katakana', 'bank_code', 'branch_code', 'account_type', 'account_number', 'opening_date', 'deposit_period', 'maturity_date', 'interest_rate'];
-    for (const field of requiredFields) {
-      if (contractInfo[field] === undefined) {
-        errors.push(this.i18n.translate('errors.missingField', { args: { field }, lang: 'en' }));
-      }
+  @Post('/contracts/validate')
+  async validateContractInformation(@Body() contractValidationDto: ContractValidationDto) {
+    // The actual validation logic will be handled by the service using the DTO
+    // Here we just call the service method and pass the DTO
+    try {
+      await this.usersService.validateContract(contractValidationDto);
+      return {
+        status: 200,
+        message: await this.i18n.translate('contract.validation.success', { lang: 'en' }),
+      };
+    } catch (error) {
+      throw error;
     }
-
-    // Validate 'opening_date' is not in the future
-    if (contractInfo.opening_date && contractInfo.opening_date > currentDate) {
-      errors.push(this.i18n.translate('errors.openingDateInFuture', { lang: 'en' }));
-    }
-
-    // Validate 'maturity_date' is after 'opening_date'
-    if (contractInfo.maturity_date && contractInfo.opening_date && contractInfo.maturity_date <= contractInfo.opening_date) {
-      errors.push(this.i18n.translate('errors.maturityDateBeforeOpeningDate', { lang: 'en' }));
-    }
-
-    // Validate 'interest_rate' is within acceptable range
-    // Assuming there is a defined range for interest rates
-    const minInterestRate = 0.0;
-    const maxInterestRate = 10.0;
-    if (contractInfo.interest_rate && (contractInfo.interest_rate < minInterestRate || contractInfo.interest_rate > maxInterestRate)) {
-      errors.push(this.i18n.translate('errors.interestRateOutOfRange', { args: { min: minInterestRate, max: maxInterestRate }, lang: 'en' }));
-    }
-
-    if (errors.length > 0) {
-      throw new BadRequestException(errors);
-    }
-
-    return this.i18n.translate('messages.validationSuccess', { lang: 'en' });
   }
 
   @Get('/whoami')
