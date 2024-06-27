@@ -8,5 +8,6 @@ import { ContractsController } from './contracts.controller';
   imports: [TypeOrmModule.forFeature([Contract])],
   controllers: [ContractsController],
   providers: [ContractsService],
+  exports: [ContractsService],
 })
 export class ContractsModule {}

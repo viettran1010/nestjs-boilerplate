@@ -1,5 +1,6 @@
 import {
   Body,
+  BadRequestException,
   Controller,
   Delete,
   Get,
@@ -10,6 +11,7 @@ import {
   Session,
   UseGuards,
   UseInterceptors,
+  UsePipes,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
@@ -18,6 +20,8 @@ import { CurrentUser } from './decorators/current-user.decorator';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserResponseDto } from './dtos/user.response.dto';
+import { AuditLog } from '../audit_logs/audit_log.entity';
+import { AuditLogsService } from '../audit_logs/audit_logs.service';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
 
@@ -25,6 +29,7 @@ import { UsersService } from './users.service';
 @Serialize(UserResponseDto)
 export class UsersController {
   constructor(
+    private readonly auditLogsService: AuditLogsService,
     private readonly usersService: UsersService,
     private authService: AuthService,
   ) {}
@@ -73,4 +78,22 @@ export class UsersController {
   async updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return await this.usersService.update(parseInt(id), body);
   }
+
+  @Post('/audit_logs')
+  async logContractRegistration(@Body() body: { contract_id: number; user_id: number }) {
+    if (!body.contract_id || !body.user_id) {
+      throw new BadRequestException('contract_id and user_id are required');
+    }
+
+    const auditLog = new AuditLog();
+    auditLog.action = 'contract_registration';
+    auditLog.timestamp = new Date();
+    auditLog.contract_id = body.contract_id;
+    auditLog.user_id = body.user_id;
+
+    await this.auditLogsService.create(auditLog);
+
+    return { status: 'success', message: 'Audit log created successfully' };
+  }
+
 }
