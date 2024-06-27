@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectRepository, Repository } from '@nestjs/typeorm';
 import { Contract } from './contract.entity';
 import { AuditLog } from '../audit_logs/audit_log.entity';
 
@@ -8,9 +7,9 @@ import { AuditLog } from '../audit_logs/audit_log.entity';
 export class ContractsService {
   constructor(
     @InjectRepository(Contract)
-    private contractsRepository: Repository<Contract>,
+    private readonly contractsRepository: Repository<Contract>,
     @InjectRepository(AuditLog)
-    private auditLogsRepository: Repository<AuditLog>,
+    private readonly auditLogsRepository: Repository<AuditLog>,
   ) {}
 
   async updateAccountTypeInformation(contract_id: number, deposit_amount: number, deposit_date: Date, user_id: number) {

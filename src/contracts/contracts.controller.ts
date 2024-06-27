@@ -6,8 +6,8 @@ import { UpdateAccountTypeDto } from './dtos/update-account-type.dto';
 export class ContractsController {
   constructor(private contractsService: ContractsService) {}
 
-  @Put(':contract_id')
-  async updateAccountTypeInformation(
+  @Put(':contract_id/account-type-information')
+  async updateAccountType(
     @Param('contract_id') contract_id: number,
     @Body() updateAccountTypeDto: UpdateAccountTypeDto
   ) {

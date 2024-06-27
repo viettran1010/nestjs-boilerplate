@@ -1,5 +1,7 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
+import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
+import path from 'path';
 import { Contract } from './contracts/contract.entity';
 import { AuditLog } from './audit_logs/audit_log.entity';
 import { AppService } from './app.service';
@@ -14,6 +16,13 @@ import { CurrentUserInterceptor } from './users/interceptors/current-user.interc
 import { JanitorModule } from './janitor/janitor.module';
 const cookieSession = require('cookie-session');
 
+const i18nOptions = {
+  fallbackLanguage: 'en',
+  parserOptions: {
+    path: path.join(__dirname, '/i18n/'),
+  },
+};
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -22,6 +31,11 @@ const cookieSession = require('cookie-session');
     }),
     UsersModule,
     ReportsModule,
+    I18nModule.forRoot({
+      fallbackLanguage: i18nOptions.fallbackLanguage,
+      parser: I18nJsonParser,
+      parserOptions: i18nOptions.parserOptions,
+    }),
     TypeOrmModule.forRootAsync({
       useFactory: () => {
         return {
@@ -31,36 +45,18 @@ const cookieSession = require('cookie-session');
       },
     }),
     JanitorModule,
-    // TypeOrmModule.forRootAsync({
-    //   inject: [ConfigService],
-    //   useFactory: (configService: ConfigService) => ({
-    //     type: 'postgres',
-    //     host: configService.get('DB_HOST'),
-    //     port: configService.get('DB_PORT'),
-    //     username: configService.get('DB_USERNAME'),
-    //     password: configService.get('DB_PASSWORD'),
-    //     database: configService.get('DB_NAME'),
-    //     entities: [User, Report],
-    //     synchronize: true,
-    //   }),
-    // }),
-    // TypeOrmModule.forRootAsync({
-    //   inject: [ConfigService],
-    //   useFactory: (configService: ConfigService) => ({
-    //     type: 'sqlite',
-    //     database: configService.get('DB_NAME'),
-    //     entities: [User, Report],
-    //     synchronize: true,
-    //   }),
-    // }),
   ],
   controllers: [AppController],
   providers: [
     AppService,
     {
       provide: APP_PIPE,
+      useClass: ValidationPipe,
       useValue: new ValidationPipe({
         whitelist: true,
+        transform: true,
+        forbidNonWhitelisted: true,
+        validationError: { target: false },
       }),
     },
     {
