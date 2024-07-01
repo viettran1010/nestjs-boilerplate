@@ -48,17 +48,12 @@ export class AddressUpdate {
   @Column({ nullable: true })
   address_update_file: string;
 
-  // Assuming the new relationships are to be added here
-  @OneToMany(() => User, user => user.addressUpdate)
-  users: User[];
+  @OneToMany(() => User, user => user.addressUpdates)
+  addressUpdates: AddressUpdate[];
 
-  @OneToMany(() => Customer, customer => customer.addressUpdate)
-  customers: Customer[];
+  @OneToMany(() => Customer, customer => customer.addressUpdates)
+  addressUpdates: AddressUpdate[];
 
-  @OneToMany(() => AuditLog, auditLog => auditLog.addressUpdate)
+  @OneToMany(() => AuditLog, auditLog => auditLog.addressUpdates)
   auditLogs: AuditLog[];
-
-  // Assuming there are no new columns to add, as the task description does not specify any.
-  // If there were new columns to add, they would be added here in a similar manner to the existing columns,
-  // using the @Column decorator with the appropriate options.
 }
