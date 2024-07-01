@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { AllExceptionsFilter } from './filters/all-exceptions.filter';
+import { AllExceptionsFilter } from './all-exceptions.filter';
 import path from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 

@@ -1,8 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, OneToOne, JoinColumn } from 'typeorm';
 import { User } from '../users/user.entity';
 import { AccountTypeInformation } from '../account_type_informations/account_type_information.entity';
-import { ContractAction } from '../contract_actions/contract_action.entity.ts';
-import { AuditLog } from '../audit_logs/audit_log.entity.ts';
+import { ContractAction } from '../contract_actions/contract_action.entity';
+import { AuditLog } from '../audit_logs/audit_log.entity';
 import { Customer } from '../customers/customer.entity';
 import { SuccessMessage } from '../success_messages/success_message.entity';
 import { ErrorMessage } from '../error_messages/error_message.entity';
@@ -51,7 +51,7 @@ export class Contract {
   @Column()
   status: string;
 
-  @ManyToOne(() => User, user => user.contracts)
+  @ManyToOne(() => User, user => user.contract)
   users: User;
 
   @ManyToOne(() => ContractAction, contractAction => contractAction.contracts)
@@ -60,7 +60,7 @@ export class Contract {
   @ManyToOne(() => AuditLog, auditLog => auditLog.contracts)
   auditLog: AuditLog;
 
-  @ManyToOne(() => Customer, customer => customer.contracts)
+  @ManyToOne(() => Customer, customer => customer.contract)
   customers: Customer;
 
   @OneToMany(() => ContractAction, contractAction => contractAction.contract)
@@ -100,7 +100,7 @@ export class Contract {
   @Column({ type: 'date', nullable: true })
   deposit_date?: Date;
 
-  @ManyToOne(() => SuccessMessage, successMessage => successMessage.contracts)
+  @ManyToOne(() => SuccessMessage, successMessage => successMessage.contract)
   @JoinColumn({ name: 'success_message_id' })
   successMessage: SuccessMessage;
 
