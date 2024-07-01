@@ -12,7 +12,9 @@ export class CustomersService {
   
   async getCustomerDetails(userId: number): Promise<Customer> {
     const customer = await this.customerRepository.findOne({
-      where: { user_id: userId },
+      where: {
+        userId: userId
+      },
       order: { created_at: 'DESC' }
     });
     if (!customer) {

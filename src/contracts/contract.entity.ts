@@ -1,8 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, OneToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, OneToOne, JoinColumn } from 'typeorm';
 import { User } from '../users/user.entity';
+import { AccountTypeInformation } from '../account_type_informations/account_type_information.entity';
 import { ContractAction } from '../contract_actions/contract_action.entity';
 import { AuditLog } from '../audit_logs/audit_log.entity';
 import { Customer } from '../customers/customer.entity';
+import { SuccessMessage } from '../success_messages/success_message.entity';
+import { ErrorMessage } from '../error_messages/error_message.entity';
 
 @Entity()
 export class Contract {
@@ -33,7 +36,6 @@ export class Contract {
   @Column()
   opening_date: Date;
 
-  // Merged nullable fields from new code and kept the non-nullable fields from current code
   @Column({ nullable: true })
   remarks?: string;
 
@@ -49,16 +51,16 @@ export class Contract {
   @Column()
   status: string;
 
-  @ManyToOne(() => User, user => user.contracts)
-  user: User;
+  @ManyToOne(() => User, user => user.contract)
+  users: User;
 
   @ManyToOne(() => ContractAction, contractAction => contractAction.contracts)
   contractAction: ContractAction;
 
-  @ManyToOne(() => AuditLog, auditLog => auditLog.contracts)
+  @ManyToOne(() => AuditLog, auditLog => auditLog.contract)
   auditLog: AuditLog;
 
-  @ManyToOne(() => Customer, customer => customer.contracts)
+  @ManyToOne(() => Customer, customer => customer.contract)
   customer: Customer;
 
   @OneToMany(() => ContractAction, contractAction => contractAction.contract)
@@ -68,9 +70,8 @@ export class Contract {
   users: User[];
 
   @OneToMany(() => AuditLog, auditLog => auditLog.contract)
-  auditLogs: AuditLog[];
+  auditLogs: AuditLog;
 
-  // Added nullable foreign key columns from new code
   @Column({ nullable: true })
   user_id?: number;
 
@@ -83,7 +84,31 @@ export class Contract {
   @Column({ nullable: true })
   audit_log_id?: number;
 
-  // Retained the OneToOne relationship from the current code
+  @ManyToOne(() => AccountTypeInformation, accountTypeInformation => accountTypeInformation.contracts)
+  @JoinColumn({ name: 'account_type_information_id' })
+  accountTypeInformation: AccountTypeInformation;
+
+  @Column({ nullable: true })
+  account_type_information_id?: number;
+
+  @Column({ type: 'varchar', length: 3, nullable: true })
+  currency_deposited?: string;
+
+  @Column({ type: 'decimal', precision: 15, scale: 2, nullable: true })
+  deposit_amount?: number;
+
+  @Column({ type: 'date', nullable: true })
+  deposit_date?: Date;
+
+  @ManyToOne(() => SuccessMessage, successMessage => successMessage.contracts)
+  @JoinColumn({ name: 'success_message_id' })
+  successMessage: SuccessMessage;
+
+  @ManyToOne(() => ErrorMessage, errorMessage => errorMessage.contracts)
+  @JoinColumn({ name: 'error_message_id' })
+  errorMessage: ErrorMessage;
+
   @OneToOne(() => Customer, customer => customer.contract)
+  @JoinColumn()
   customerContract: Customer;
 }

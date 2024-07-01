@@ -1,14 +1,13 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
+import { I18nModule, I18nJsonParser } from '@nestjs/i18n';
 import { AppService } from './app.service';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/user.entity';
 import { Report } from './reports/report.entity';
-import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
-import { I18nLanguageInterceptor } from '@nestjs-modules/i18n/dist/interceptors';
+import { APP_INTERCEPTOR, APP_PIPE, I18nLanguageInterceptor } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
 import { JanitorModule } from './janitor/janitor.module';
@@ -65,7 +64,7 @@ const cookieSession = require('cookie-session');
   providers: [
     {
       provide: APP_PIPE,
-      useClass: ValidationPipe({
+      useClass: new ValidationPipe({
         whitelist: true,
       }),
     },
