@@ -22,7 +22,7 @@ import { UserResponseDto } from './dtos/user.response.dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
 import { Contract } from '../contracts/contract.entity';
-import { ContractsService } from '../contracts/contracts.service'; // Ensure this path is correct
+import { ContractsService } from '../contracts/contracts.service';
 
 @Controller('auth')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -92,8 +92,8 @@ export class UsersController {
   }
 
   @Get('/contracts/back')
-  async navigateBack(): Promise<Contract[]> {
+  async navigateBack() {
     const contracts = await this.contractsService.findAll();
-    return contracts.map(contract => new Contract());
+    return contracts.map(contract => new ContractDTO(contract));
   }
 }

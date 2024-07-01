@@ -1,8 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, OneToOne, JoinColumn } from 'typeorm';
 import { User } from '../users/user.entity';
 import { AccountTypeInformation } from '../account_type_informations/account_type_information.entity';
-import { ContractAction } from '../contract_actions/contract_action.entity.ts';
-import { AuditLog } from '../audit_logs/audit_log.entity.ts';
+import { ContractAction } from '../contract_actions/contract_action.entity';
+import { AuditLog } from '../audit_logs/audit_log.entity';
 import { Customer } from '../customers/customer.entity';
 import { SuccessMessage } from '../success_messages/success_message.entity';
 import { ErrorMessage } from '../error_messages/error_message.entity';
@@ -51,8 +51,8 @@ export class Contract {
   @Column()
   status: string;
 
-  @ManyToOne(() => User, user => user.contract)
-  user: User;
+  @ManyToOne(() => User, user => user.contracts)
+  user: User[];
 
   @ManyToOne(() => ContractAction, contractAction => contractAction.contracts)
   contractAction: ContractAction;
@@ -60,8 +60,8 @@ export class Contract {
   @ManyToOne(() => AuditLog, auditLog => auditLog.contracts)
   auditLog: AuditLog;
 
-  @ManyToOne(() => Customer, customer => customer.contract)
-  customer: Customer;
+  @ManyToOne(() => Customer, customer => customer.contracts)
+  customer: Customer[];
 
   @OneToMany(() => ContractAction, contractAction => contractAction.contract)
   contractActions: ContractAction[];
@@ -70,7 +70,7 @@ export class Contract {
   users: User[];
 
   @OneToMany(() => AuditLog, auditLog => auditLog.contract)
-  auditLogs: AuditLog[];
+  auditLogs: AuditLog;
 
   @Column({ nullable: true })
   user_id?: number;
@@ -79,7 +79,7 @@ export class Contract {
   contract_action_id?: number;
 
   @Column({ nullable: true })
-  customer_id?: number;
+  customer_id?: number[];
 
   @Column({ nullable: true })
   audit_log_id?: number;
@@ -98,7 +98,7 @@ export class Contract {
   deposit_amount?: number;
 
   @Column({ type: 'date', nullable: true })
-  deposit_date?: Date;
+  deposit_date?: Date[];
 
   @ManyToOne(() => SuccessMessage, successMessage => successMessage.contracts)
   @JoinColumn({ name: 'success_message_id' })
@@ -108,7 +108,7 @@ export class Contract {
   @JoinColumn({ name: 'error_message_id' })
   errorMessage: ErrorMessage;
 
-  @OneToOne(() => Customer, customer => customer.contract, { nullable: true })
+  @OneToOne(() => Customer, customer => customer.contract_id)
   @JoinColumn()
   customerContract: Customer;
 }
