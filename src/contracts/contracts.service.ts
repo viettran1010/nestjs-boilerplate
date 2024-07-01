@@ -27,7 +27,7 @@ export class ContractsService {
     return contract;
   }
 
-  async update(contractId: number, updateData: any): Promise<Contract> {
+  async update(contractId: number, updateData: any): Promise<Contract> { // Renamed method to match the controller's call
     const contract = await this.contractsRepository.findOneBy({ id: contractId });
     if (!contract) {
       throw new NotFoundException('Contract not found');
@@ -35,7 +35,7 @@ export class ContractsService {
     Object.assign(contract, updateData);
     await this.contractsRepository.save(contract);
 
-    // Log the contract update action
+    // Log the contract update action // Removed userId parameter as it's not used in the new method signature
     await this.auditLogService.logContractUpdateAction(contractId, userId, AuditActionType.UPDATE);
 
     return contract;

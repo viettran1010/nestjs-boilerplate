@@ -1,14 +1,6 @@
 import { IsString, IsNotEmpty } from 'class-validator';
 
-// Define UpdateContractDto with the necessary validation rules
-export class UpdateContractDto {
-  // Add properties and validation decorators as needed
-  // Example:
-  // @IsString()
-  // propertyName: string;
-}
-
-export class UpdateContractRemarksDto {
+export class UpdateContractDto { // Renamed class to match the expected DTO
   @IsString()
   @IsNotEmpty()
   remarks: string;
