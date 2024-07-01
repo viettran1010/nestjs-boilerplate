@@ -3,13 +3,19 @@ import { Contract } from '../contracts/contract.entity';
 import { AddressUpdate } from '../address_updates/address_update.entity';
 import { User } from '../users/user.entity';
 
+export enum ActionType {
+  CREATE = 'CREATE',
+  UPDATE = 'UPDATE',
+  DELETE = 'DELETE',
+}
+
 @Entity()
 export class AuditLog {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
-  action: string;
+  action: ActionType;
 
   @Column('timestamp')
   timestamp: Date;

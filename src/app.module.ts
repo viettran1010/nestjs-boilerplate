@@ -10,8 +10,8 @@ import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
 import { JanitorModule } from './janitor/janitor.module';
-import { I18nModule } from '@nestjs-modules/i18n';
-import { I18nJsonParser } from '@nestjs-modules/i18n/dist/parsers/i18n.json.parser';
+import { I18nModule } from '@nestjs-modules/i18n'; // Correct import path
+import { I18nJsonParser } from '@nestjs-modules/i18n/dist/parsers/i18n.json.parser'; // Correct import path
 import path from 'path';
 import { AuditLogModule } from './audit_logs/audit_log.module';
 const cookieSession = require('cookie-session');
