@@ -18,7 +18,7 @@ import { Serialize } from '../interceptors/serialize.interceptor';
 import { AuthService } from './auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { CreateUserDto } from './dtos/create-user.dto';
-// import { UpdateCustomerDto } from './dtos/update-customer.dto'; // Assuming this DTO exists
+// import { UpdateCustomerDto } from './dtos/update-customer.dto'; // This import is removed as the file does not exist
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserResponseDto } from './dtos/user.response.dto';
 import { User } from './user.entity';
@@ -73,13 +73,13 @@ export class UsersController {
   }
 
   @Patch('/:id')
-  // @Put('/customer-information/:id') // Endpoint disabled until UpdateCustomerDto is available
+  // @Put('/customer-information/:id') // This decorator is commented out as the corresponding DTO does not exist
   @UseGuards(AuthGuard)
   async updateCustomerInformation(
     @Param('id') id: string,
-    @Body() body: UpdateUserDto, // Assuming UpdateUserDto is used instead of UpdateCustomerDto
+    @Body() body: UpdateCustomerDto,
   ) {
-    await this.usersService.update(parseInt(id), body);
+    await this.usersService.updateCustomer(parseInt(id), body);
     return {
       statusCode: HttpStatus.OK,
       message: 'Customer information has been successfully updated.',

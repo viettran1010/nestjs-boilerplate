@@ -45,10 +45,10 @@ export class Customer {
   remarks?: string;
 
   @ManyToOne(() => User, user => user.customers)
-  user: User;
+  user: User; // This line should be updated
 
   @ManyToOne(() => Contract, contract => contract.customers, { nullable: true })
-  contract?: Contract;
+  contract?: Contract; // This line should be updated
 
   @OneToMany(() => AddressUpdate, addressUpdate => addressUpdate.customer)
   addressUpdates?: AddressUpdate[];

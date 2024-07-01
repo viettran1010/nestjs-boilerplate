@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, OneToOne, JoinColumn } from 'typeorm';
 import { User } from '../users/user.entity';
 import { AccountTypeInformation } from '../account_type_informations/account_type_information.entity';
-import { ContractAction } from './contract_action.entity';
+import { ContractAction } from '../contract_actions/contract_action.entity'; // Correct the import path if necessary
 import { AuditLog } from '../audit_logs/audit_log.entity';
 import { Customer } from '../customers/customer.entity';
 import { SuccessMessage } from '../success_messages/success_message.entity';
@@ -51,8 +51,8 @@ export class Contract {
   @Column()
   status: string;
 
-  @ManyToOne(() => User, user => user.contract)
-  user: User;
+  @ManyToOne(() => User, user => user.contracts)
+  user: User; // Correct the property name to match User entity
 
   @ManyToOne(() => ContractAction, contractAction => contractAction.contracts)
   contractAction: ContractAction;
@@ -61,15 +61,15 @@ export class Contract {
   auditLog: AuditLog;
 
   @ManyToOne(() => Customer, customer => customer.contracts)
-  customer: Customer;
+  customer: Customer; // Correct the property name to match Customer entity
 
   @OneToMany(() => ContractAction, contractAction => contractAction.contract)
   contractActions: ContractAction[];
 
-  @OneToMany(() => User, user => user.contracts)
+  @OneToMany(() => User, user => user.contract)
   users: User[];
 
-  @OneToMany(() => AuditLog, auditLog => auditLog.contract)
+  @OneToMany(() => AuditLog, auditLog => auditLog.contract) // Ensure AuditLog has a 'contract' property
   auditLogs: AuditLog[];
 
   @Column({ nullable: true })
