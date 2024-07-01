@@ -1,14 +1,14 @@
 import { Report } from '../reports/report.entity';
-import { Student } from './student.entity';
+import { Student } from '../student/student.entity';
 import { Customer } from '../customers/customer.entity';
-import { UserRole } from './user_role.entity';
-import { LoginAttempt } from './login_attempt.entity';
-import { UserPermission } from '../user_permissions/user_permission.entity';
+import { UserRole } from '../user_role/user_role.entity';
+import { LoginAttempt } from '../login_attempt/login_attempt.entity';
+import { UserPermission } from '../user_permission/user_permission.entity';
 import { AddressUpdate } from '../address_updates/address_update.entity';
 import { SuccessMessage } from '../success_messages/success_message.entity';
 import { ErrorMessage } from '../error_messages/error_message.entity';
-import { Contract } from '../contracts/contract.entity';
-import { ContractAction } from './contract_action.entity';
+import { Contract } from '../contract/contract.entity';
+import { ContractAction } from '../contract_action/contract_action.entity';
 import { AuditLog } from '../audit_logs/audit_log.entity';
 import {
   Entity,
@@ -51,16 +51,16 @@ export class User {
   @OneToMany(() => Report, (report) => report.user)
   reports: Report[];
 
-  @OneToMany(() => Student, (student) => student.user)
+  @OneToMany(() => Student, (student) => student.user, { eager: true })
   students: Student[];
 
-  @OneToMany(() => UserRole, userRole => userRole.user)
+  @OneToMany(() => UserRole, (userRole) => userRole.user, { eager: true })
   userRoles: UserRole[];
 
-  @OneToMany(() => LoginAttempt, loginAttempt => loginAttempt.user)
+  @OneToMany(() => LoginAttempt, (loginAttempt) => loginAttempt.user, { eager: true })
   loginAttempts: LoginAttempt[];
 
-  @OneToMany(() => UserPermission, userPermission => userPermission.user)
+  @OneToMany(() => UserPermission, (userPermission) => userPermission.user, { eager: true })
   userPermissions: UserPermission[];
 
   @ManyToOne(() => Customer, customer => customer.user, { nullable: true })

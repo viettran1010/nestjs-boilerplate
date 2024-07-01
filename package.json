@@ -1,7 +1,6 @@
 {
   "dependencies": {
-+   "@nestjs-modules/i18n": "^1.0.0",
-    "nestjs": "^7.0.0",
-    "...": "..."
+    "@nestjs-modules/i18n": "^1.0.0",
+    // ... other dependencies
   }
 }
