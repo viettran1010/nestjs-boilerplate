@@ -45,4 +45,11 @@ export class UsersService {
     }
     return await this.usersRepository.remove(user);
   }
+
+  async existsById(userId: number): Promise<boolean> {
+    const user = await this.usersRepository.findOneBy({ id: userId });
+    return !!user;
+  }
+
+  // Other methods...
 }
