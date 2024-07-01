@@ -25,7 +25,7 @@ export class AuditLog {
   @Column({ nullable: true })
   contract_id?: number;
 
-  @ManyToOne(() => User, user => user.auditLogs)
+  @ManyToOne(() => User, user => user.auditLog)
   @Column({ nullable: true })
   user_id?: number;
 

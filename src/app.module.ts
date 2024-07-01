@@ -1,5 +1,6 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
+import * as path from 'path';
 import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
 import { AppService } from './app.service';
 import { ScheduledDepositsModule } from './scheduled_deposits/scheduled_deposits.module';
@@ -26,6 +27,17 @@ const cookieSession = require('cookie-session');
 @Module({
   imports: [
     ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: `.env.${process.env.NODE_ENV}`,
+    }),
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      parser: I18nJsonParser,
+      parserOptions: {
+        path: path.join(__dirname, '/i18n/'),
+        watch: true,
+      },
+    }),
     ScheduledDepositsModule,
     AccountTypeInformationsModule,
     SuccessMessagesModule,
@@ -35,18 +47,7 @@ const cookieSession = require('cookie-session');
     MenuOptionsModule,
     UserPermissionsModule,
     AddressUpdatesModule,
-    I18nModule.forRoot({
-      fallbackLanguage: 'en',
-      parser: I18nJsonParser,
-      parserOptions: {
-        path: path.join(__dirname, '/i18n/'),
-        watch: true,
-      },
-    }),
     CustomersModule,
-      isGlobal: true,
-      envFilePath: `.env.${process.env.NODE_ENV}`,
-    }),
     UsersModule,
     ReportsModule,
     TypeOrmModule.forRootAsync({
@@ -54,29 +55,21 @@ const cookieSession = require('cookie-session');
         return require('../ormconfig.js');
       },
     }),
-    JanitorModule,
-    // TypeOrmModule.forRootAsync({
-    //   inject: [ConfigService],
-    //   useFactory: (configService: ConfigService) => ({
-    //     type: 'postgres',
-    //     host: configService.get('DB_HOST'),
-    //     port: configService.get('DB_PORT'),
-    //     username: configService.get('DB_USERNAME'),
-    //     password: configService.get('DB_PASSWORD'),
-    //     database: configService.get('DB_NAME'),
-    //     entities: [User, Report],
-    //     synchronize: true,
-    //   }),
-    {
-    // TypeOrmModule.forRootAsync({
-    //   inject: [ConfigService],
-    //   useFactory: (configService: ConfigService) => ({
-    //     type: 'sqlite',
-    //     database: configService.get('DB_NAME'),
-    //     entities: [User, Report],
-    //     synchronize: true,
-    //   }),
-    // }),
+    JanitorModule
+    /* TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get('DB_HOST'),
+        port: configService.get('DB_PORT'),
+        username: configService.get('DB_USERNAME'),
+        password: configService.get('DB_PASSWORD'),
+        database: configService.get('DB_NAME'),
+        entities: [User, Report],
+        synchronize: true,
+      }),
+    }),
+    */
   ],
   controllers: [AppController],
   providers: [
