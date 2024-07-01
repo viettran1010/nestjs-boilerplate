@@ -1,7 +1,7 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
-import { AppController } from './app.controller';
+import { AppController } from './app.controller'; // Import AppController
 import { APP_PIPE } from '@nestjs/core';
-import { ConfigService } from '@nestjs/config'; // Import ConfigService
+import { ConfigService } from '@nestjs/config'; // Import ConfigService correctly
 import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
 import path from 'path';
 import { AppService } from './app.service';
@@ -61,7 +61,7 @@ export class AppModule {
     consumer
       .apply(
         cookieSession({
-          keys: [this.configService.get('COOKIE_KEY')], // for encryption
+          keys: [this.configService.get('COOKIE_KEY')], // Use ConfigService to get COOKIE_KEY
         }),
       )
       .forRoutes('*'); // for all routes
