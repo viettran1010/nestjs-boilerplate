@@ -9,6 +9,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AddressUpdateService } from './address_update.service';
 import { UnsupportedMediaTypeException } from '@nestjs/common';
+import { File } from 'multer';
 
 @Controller('address-updates')
 export class AddressUpdateController {
@@ -16,7 +17,10 @@ export class AddressUpdateController {
 
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadAddressUpdate(@UploadedFile() file: Express.Multer.File, @Req() req: any) {
+  async uploadAddressUpdate(
+    @UploadedFile() file: File,
+    @Req() req: any
+  ) {
     try {
       if (!file) {
         throw new BadRequestException('File must be provided');

@@ -1,5 +1,6 @@
 import { Report } from '../reports/report.entity';
 import { Student } from '../students/student.entity';
+import { Customer } from '../customers/customer.entity';
 import { UserRole } from '../user_roles/user_role.entity';
 import { LoginAttempt } from '../login_attempts/login_attempt.entity';
 import { UserPermission } from '../user_permissions/user_permission.entity';
@@ -33,7 +34,7 @@ export class User {
   admin: boolean;
 
   @Column()
-  password: string;
+  password: string; // No change needed here
 
   @ManyToOne(() => Contract, contract => contract.user, { nullable: true })
   @JoinColumn({ name: 'contract_id' })
@@ -61,6 +62,10 @@ export class User {
 
   @OneToMany(() => UserPermission, userPermission => userPermission.user)
   userPermissions: UserPermission[];
+
+  @ManyToOne(() => Customer, customer => customer.user, { nullable: true })
+  @JoinColumn({ name: 'customer_id' })
+  customer?: Customer;
 
   // Add other OneToMany relationships here following the same pattern
   // ...

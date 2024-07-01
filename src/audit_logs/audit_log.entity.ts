@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
 import { Contract } from '../contracts/contract.entity';
 import { User } from '../users/user.entity';
+import { AddressUpdate } from '../address_updates/address_update.entity';
 
 @Entity()
 export class AuditLog {
@@ -14,12 +15,14 @@ export class AuditLog {
   timestamp: Date;
 
   @ManyToOne(() => Contract, contract => contract.auditLogs)
-  @Column({ nullable: true })
-  contract_id?: number;
+  contract: Contract;
 
   @ManyToOne(() => User, user => user.auditLogs)
+  user: User;
+
+  @ManyToOne(() => AddressUpdate, addressUpdate => addressUpdate.auditLogs)
   @Column({ nullable: true })
-  user_id?: number;
+  address_update_id?: number;
 
   @Column('timestamp')
   created_at: Date;
@@ -27,7 +30,6 @@ export class AuditLog {
   @Column('timestamp')
   updated_at: Date;
 
-  // Relations with address_updates table will be defined when the AddressUpdate entity is available
-  // @OneToMany(() => AddressUpdate, addressUpdate => addressUpdate.auditLog)
-  // addressUpdates: AddressUpdate[];
+  @OneToMany(() => AddressUpdate, addressUpdate => addressUpdate.auditLog)
+  addressUpdates: AddressUpdate[];
 }
