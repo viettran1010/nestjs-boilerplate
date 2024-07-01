@@ -1,13 +1,16 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
+import { UnauthorizedAccessException } from '../exceptions/unauthorized-access.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
+import { UserPermission } from '../user_permissions/user_permission.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    @InjectRepository(UserPermission) private userPermissionRepository: Repository<UserPermission>,
   ) {}
 
   async create(email: string, password: string) {
@@ -44,5 +47,20 @@ export class UsersService {
       throw new NotFoundException('user not found');
     }
     return await this.usersRepository.remove(user);
+  }
+
+  async checkUserPermission(userId: number, menuOptionId: number): Promise<boolean> {
+    const permission = await this.userPermissionRepository.findOne({
+      where: {
+        user_id: userId,
+        menu_option_id: menuOptionId,
+      },
+    });
+
+    if (!permission || !permission.has_access) {
+      throw new UnauthorizedAccessException('Unauthorized access to menu option');
+    }
+
+    return true;
   }
 }
