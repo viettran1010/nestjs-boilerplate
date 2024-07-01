@@ -1,5 +1,6 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
+import { ConfigService } from '@nestjs/config';
 import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
 import * as path from 'path';
 import { AppService } from './app.service';
@@ -78,6 +79,7 @@ const cookieSession = require('cookie-session');
       provide: APP_INTERCEPTOR,
       useClass: CurrentUserInterceptor,
     },
+    // ... other providers
   ],
 })
 export class AppModule {

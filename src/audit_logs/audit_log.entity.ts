@@ -25,7 +25,7 @@ export class AuditLog {
   @Column('timestamp')
   created_at: Date;
 
-  @Column('timestamp')
+  @Column('timestamp') // Ensure this is the correct type and format for the updated_at field
   updated_at: Date;
 
   @OneToMany(() => ErrorMessage, errorMessage => errorMessage.auditLog)

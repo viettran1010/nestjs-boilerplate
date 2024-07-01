@@ -1,3 +1,34 @@
-It appears there is a misunderstanding. The information provided does not include the actual code from the file `error-message.entity.ts`. The patch information only indicates that the file has been renamed from `src/error-messages/error-message.entity.ts` to `src/error_messages/error_message.entity.ts`. Without the original code content of the file, it is impossible to provide the complete and correct code as requested.
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
-To assist you properly, please provide the original code from the file `error-message.entity.ts`, and I will be able to apply the patch and provide the complete code as per your request.
+@Entity()
+export class ErrorMessage {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  user_id: number;
+
+  @Column({ length: 255 })
+  error_icon: string;
+
+  @Column('text')
+  error_message: string;
+
+  @Column('text')
+  error_detail: string;
+
+  @CreateDateColumn({ type: 'timestamp' })
+  timestamp: Date;
+
+  @Column('text')
+  action_taken: string;
+
+  @Column({ nullable: true })
+  contract_id?: number;
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
+}
