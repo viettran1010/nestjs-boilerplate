@@ -1,34 +1,16 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
-@Entity()
+@Entity({ name: 'error_messages' })
 export class ErrorMessage {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  user_id: number;
+  @Column({ type: 'varchar', length: 255 })
+  message: string;
 
-  @Column({ length: 255 })
-  error_icon: string;
+  @Column({ type: 'varchar', length: 255 })
+  description: string;
 
-  @Column('text')
-  error_message: string;
-
-  @Column('text')
-  error_detail: string;
-
-  @CreateDateColumn({ type: 'timestamp' })
-  timestamp: Date;
-
-  @Column('text')
-  action_taken: string;
-
-  @Column({ nullable: true })
-  contract_id?: number;
-
-  @CreateDateColumn()
-  created_at: Date;
-
-  @UpdateDateColumn()
-  updated_at: Date;
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
 }

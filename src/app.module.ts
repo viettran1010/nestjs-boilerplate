@@ -1,7 +1,7 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { ConfigService } from '@nestjs/config';
-import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
+import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n'; // Ensure this package is installed
+import { ConfigService } from '@nestjs/config'; // Import ConfigService from the correct module
 import * as path from 'path';
 import { AppService } from './app.service';
 import { ReportsModule } from './reports/reports.module';
@@ -65,7 +65,7 @@ const cookieSession = require('cookie-session');
   ],
   controllers: [AppController],
   providers: [
-    AppService,
+    AppService, // Ensure ConfigService is provided in the module
     {
       provide: APP_PIPE,
       useClass: ValidationPipe,
@@ -79,7 +79,6 @@ const cookieSession = require('cookie-session');
       provide: APP_INTERCEPTOR,
       useClass: CurrentUserInterceptor,
     },
-    // ... other providers
   ],
 })
 export class AppModule {
