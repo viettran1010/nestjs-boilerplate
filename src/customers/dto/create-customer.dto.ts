@@ -30,7 +30,7 @@ export class CreateCustomerDto {
   email_address: string;
 
   @IsNotEmpty({ message: 'Date of birth is required and must be a valid date not in the future.' })
-  @ValidateIf((o) => !isDateString(o.date_of_birth) || new Date(o.date_of_birth) > new Date())
+  @IsDate()
   @ValidateIf((o) => !isDateString(o.date_of_birth) || isFuture(o.date_of_birth))
-  date_of_birth: Date;
+  date_of_birth: Date; // Custom future date validation logic needed here
 }
