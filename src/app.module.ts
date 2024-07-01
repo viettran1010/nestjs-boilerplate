@@ -11,7 +11,7 @@ import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
 import { JanitorModule } from './janitor/janitor.module';
-import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
+import { I18nModule, I18nJsonParser } from '@nestjs/i18n';
 import { join } from 'path';
 const cookieSession = require('cookie-session');
 
