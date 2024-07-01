@@ -57,6 +57,10 @@ export class User {
   @OneToMany(() => UserRole, userRole => userRole.user)
   userRoles: UserRole[];
 
+  @OneToMany(() => ErrorMessage, errorMessage => errorMessage.user)
+  @JoinColumn({ name: 'error_message_id' })
+  errorMessages: ErrorMessage[];
+
   @OneToMany(() => LoginAttempt, loginAttempt => loginAttempt.user)
   loginAttempts: LoginAttempt[];
 

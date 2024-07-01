@@ -25,11 +25,11 @@ export class SuccessMessage {
   @Column({ type: 'timestamp', nullable: true })
   closed_at?: Date;
 
-  @ManyToOne(() => User, user => user.successMessages)
+  @ManyToOne(() => User, user => user.successMessages, { eager: false })
   @JoinColumn({ name: 'user_id' })
   user_id: number;
 
-  @ManyToOne(() => Contract, contract => contract.successMessages)
+  @ManyToOne(() => Contract, contract => contract.successMessages, { eager: false })
   @JoinColumn({ name: 'contract_id' })
   contract_id: number;
 }

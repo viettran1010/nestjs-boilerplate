@@ -100,26 +100,19 @@ export class Contract {
   @Column({ type: 'date', nullable: true })
   deposit_date?: Date;
 
-  @ManyToOne(() => SuccessMessage, successMessage => successMessage.contract)
+  @ManyToOne(() => SuccessMessage, successMessage => successMessage.contracts)
   @JoinColumn({ name: 'success_message_id' })
   successMessage: SuccessMessage;
 
-  @ManyToOne(() => ErrorMessage, errorMessage => errorMessage.contract)
+  @ManyToOne(() => ErrorMessage, errorMessage => errorMessage.contracts)
   @JoinColumn({ name: 'error_message_id' })
   errorMessage: ErrorMessage;
 
-  @OneToMany(() => SuccessMessage, successMessage => successMessage.contract)
-  successMessages: SuccessMessage[];
-
   @OneToMany(() => ErrorMessage, errorMessage => errorMessage.contract)
+  @JoinColumn({ name: 'error_message_id' })
   errorMessages: ErrorMessage[];
 
-  @Column({ nullable: true })
-  success_message_id?: number;
-
-  @Column({ nullable: true })
-  error_message_id?: number;
-
   @OneToOne(() => Customer, customer => customer.contract)
+  @JoinColumn()
   customerContract: Customer;
 }
