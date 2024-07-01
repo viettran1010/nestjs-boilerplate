@@ -41,7 +41,7 @@ export class AddressUpdate {
   @JoinColumn({ name: 'audit_log_id' })
   auditLog: AuditLog;
 
-  @ManyToOne(() => Customer)
+  @ManyToOne(() => Customer, customer => customer.addressUpdates)
   @JoinColumn({ name: 'customer_id' })
   customer: Customer;
 
@@ -49,10 +49,10 @@ export class AddressUpdate {
   address_update_file: string;
 
   // Assuming the new relationships are to be added here
-  @OneToMany(() => User, user => user.addressUpdate)
+  @OneToMany(() => User, user => user.addressUpdates)
   users: User[];
 
-  @OneToMany(() => Customer, customer => customer.addressUpdate)
+  @OneToMany(() => Customer, customer => customer.addressUpdates)
   customers: Customer[];
 
   @OneToMany(() => AuditLog, auditLog => auditLog.addressUpdate)

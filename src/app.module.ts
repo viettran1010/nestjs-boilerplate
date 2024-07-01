@@ -1,5 +1,6 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
+import i18next from 'i18next';
 import { I18nModule, I18nJsonParser, I18nService } from '@nestjs-modules/i18n';
 import { i18nextHttpMiddleware } from 'i18next-http-middleware';
 import { AppService } from './app.service';

@@ -73,6 +73,9 @@ export class User {
   @Column({ nullable: true })
   age?: number;
 
+  @OneToMany(() => AuditLog, auditLog => auditLog.user)
+  auditLogs: AuditLog[];
+
   @AfterInsert()
   logInsert() {
     console.log('Inserted user with id: ', this.id);
