@@ -1,6 +1,6 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { I18nModule } from '@nestjs-modules/i18n';
+// import { I18nModule } from '@nestjs-modules/i18n'; // This import is causing the issue
 import { join } from 'path';
 import { AppService } from './app.service';
 import { ReportsModule } from './reports/reports.module';

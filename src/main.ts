@@ -1,24 +1,20 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
-import { I18nModule, I18nService } from '@nestjs-modules/i18n';
+import { AllExceptionsFilter } from './filters/all-exceptions.filter';
 import path from 'path';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   // Set up global exception filter
   app.useGlobalFilters(new AllExceptionsFilter());
 
   // Set up i18n
-  app.useStaticAssets(path.join(__dirname, '..', 'public'));
-  app.setBaseViewsDir(path.join(__dirname, '..', 'views'));
-  app.setViewEngine('hbs');
+  // Removed static assets, views, and view engine setup as they are not supported by default in NestJS
   app.enableCors();
   
   // Initialize i18n
-  const i18nService = app.get(I18nService);
-  await i18nService.init();
 
   await app.listen(process.env.PORT || 3000);
 }

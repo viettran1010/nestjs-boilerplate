@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Contract } from './contracts.entity';
+import { Contract } from './entities/contracts.entity';
 import { UpdateContractDto } from './dto/update-contract.dto';
 import { ContractActionsService } from './contract_actions.service';
 import { validate } from 'class-validator';
@@ -28,8 +28,8 @@ export class ContractsService {
     }
 
     await this.contractsRepository.manager.transaction(async entityManager => {
-      await entityManager.save(Contract, { ...contract, ...updateContractDto });
-      await this.contractActionsService.recordContractAction(id, updateContractDto.user_id, 'update');
+      await entityManager.save(Contract, { ...contract, ...updateContractDto, user_id: updateContractDto.customer_id });
+      await this.contractActionsService.recordContractAction(id, updateContractDto.customer_id, 'update');
     });
 
     return { message: 'Contract details updated successfully' };

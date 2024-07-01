@@ -4,6 +4,10 @@ import { AccountType, ContractStatus } from '../contracts.entity';
 export class UpdateContractDto {
   @IsInt()
   @IsNotEmpty()
+  user_id: number; // Added user_id property to match the service usage
+
+  @IsInt()
+  @IsNotEmpty()
   customer_id: number;
   
   @IsString()
