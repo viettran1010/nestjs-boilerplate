@@ -7,14 +7,14 @@ import { Contract } from '../contracts/contract.entity';
 export class AccountTypeInformation {
   @PrimaryGeneratedColumn()
   id: number;
-
+  
   @Column({ type: 'varchar', nullable: true })
   currencyDeposited: string;
 
   @ManyToOne(() => User, user => user.accountTypeInformation)
   @JoinColumn({ name: 'user_id' })
   user: User;
-
+  
   @ManyToOne(() => Contract)
   @JoinColumn({ name: 'contract_id' })
   contractId: Contract;
@@ -22,7 +22,7 @@ export class AccountTypeInformation {
   @OneToMany(() => ScheduledDeposit, scheduledDeposit => scheduledDeposit.account_type_information)
   scheduledDeposits: ScheduledDeposit[];
 
-  @CreateDateColumn()
+  @CreateDateColumn() 
   created_at: Date;
 
   @UpdateDateColumn()

@@ -20,10 +20,10 @@ export class AuditLog {
   @ManyToOne(() => User, user => user.auditLog)
   user: User;
 
-  @ManyToOne(() => AddressUpdate, addressUpdate => addressUpdate.auditLog)
+  @ManyToOne(() => AddressUpdate, addressUpdate => addressUpdate.auditLogs)
   addressUpdate: AddressUpdate;
 
-  @OneToMany(() => AddressUpdate, addressUpdate => addressUpdate.auditLog)
+  @OneToMany(() => AddressUpdate, addressUpdate => addressUpdate.auditLogs)
   addressUpdates: AddressUpdate[];
 
   @Column('timestamp')
