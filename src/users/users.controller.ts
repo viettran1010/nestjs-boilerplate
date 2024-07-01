@@ -1,7 +1,7 @@
 import {
   Body,
   ClassSerializerInterceptor,
-  Controller,
+  Controller, NotFoundException,
   Delete,
   Get,
   Param,
@@ -22,7 +22,7 @@ import { UserResponseDto } from './dtos/user.response.dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
 import { Contract } from '../contracts/contract.entity';
-import { ContractsService } from '../contracts/contracts.service';
+import { ContractsService } from '../contracts/contracts.service'; // Ensure this path is correct
 
 @Controller('auth')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -92,8 +92,8 @@ export class UsersController {
   }
 
   @Get('/contracts/back')
-  async navigateBack() {
+  async navigateBack(): Promise<Contract[]> {
     const contracts = await this.contractsService.findAll();
-    return contracts.map(contract => new Contract(contract));
+    return contracts.map(contract => new Contract());
   }
 }
