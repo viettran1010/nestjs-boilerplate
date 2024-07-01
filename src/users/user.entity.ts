@@ -4,13 +4,13 @@ import { Customer } from '../customers/customer.entity';
 import { UserRole } from '../user_roles/user_role.entity';
 import { LoginAttempt } from '../login_attempts/login_attempt.entity';
 import { UserPermission } from '../user_permissions/user_permission.entity';
-import { AccountTypeInformation } from '../account_type_informations/account_type_information.entity'; // Added import for AccountTypeInformation
 import { AddressUpdate } from '../address_updates/address_update.entity';
 import { SuccessMessage } from '../success_messages/success_message.entity';
 import { ErrorMessage } from '../error_messages/error_message.entity';
 import { Contract } from '../contracts/contract.entity';
 import { ContractAction } from '../contract_actions/contract_action.entity';
 import { AuditLog } from '../audit_logs/audit_log.entity';
+import { AccountTypeInformation } from '../account_type_informations/account_type_information.entity'; // Import the missing entity
 import {
   Entity,
   Column,
@@ -70,12 +70,12 @@ export class User {
   // Add other OneToMany relationships here following the same pattern
   // ...
 
-  @Column({ nullable: true })
-  age?: number;
-
   @ManyToOne(() => Customer, customer => customer.user, { nullable: true })
   @JoinColumn({ name: 'customer_id' })
   customer?: Customer;
+
+  @Column({ nullable: true })
+  age?: number;
 
   @AfterInsert()
   logInsert() {

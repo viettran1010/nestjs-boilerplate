@@ -1,9 +1,8 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { AppService } from './app.service'; // Keep existing imports
+import { AppService } from './app.service';
 import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
 import { join } from 'path';
-import { UserPermission } from './user_permissions/user_permission.entity';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -14,7 +13,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
 import { JanitorModule } from './janitor/janitor.module';
 const cookieSession = require('cookie-session');
-const i18nPath = join(__dirname, '/i18n/');
 
 @Module({
   imports: [
@@ -22,29 +20,21 @@ const i18nPath = join(__dirname, '/i18n/');
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
-    UsersModule,
-    ReportsModule,
     I18nModule.forRoot({
       fallbackLanguage: 'en',
       parser: I18nJsonParser,
       parserOptions: {
-        path: i18nPath,
+        path: join(__dirname, '/i18n/'),
         watch: true,
       },
     }),
+    UsersModule,
+    ReportsModule,
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get('DB_HOST'),
-        port: configService.get('DB_PORT'),
-        username: configService.get('DB_USERNAME'),
-        password: configService.get('DB_PASSWORD'),
-        database: configService.get('DB_DATABASE'),
-        entities: [User, Report, UserPermission],
-        synchronize: configService.get('DB_SYNCHRONIZE') === 'true', // Use config service to get environment variables
-      }),
-      inject: [ConfigService],
+      entities: [User, Report, UserPermission],
+      useFactory: () => {
+        return require('../ormconfig.js');
+      },
     }),
     JanitorModule,
   ],
