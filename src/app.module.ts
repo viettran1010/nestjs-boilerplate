@@ -70,7 +70,7 @@ const cookieSession = require('cookie-session');
     },
     {
       provide: APP_INTERCEPTOR,
-      useClass: CurrentyUserInterceptor,
+      useClass: CurrentUserInterceptor,
     },
   ],
 })
