@@ -1,0 +1,3 @@
+The information provided does not include the actual code from the file `migrations/1719459032961-create-user-permissions-table.js`. The patch indicates a rename operation of the file to `migrations/1719459032961-create-user_permissions-table.js`, but without the original code content, it is not possible to provide the complete and correct code.
+
+To apply the patch and provide the complete code, the original code from the file `migrations/1719459032961-create-user-permissions-table.js` is required. If you can provide the original code, I can then apply the patch and give you the complete code after the rename operation. Without the original code, I cannot fulfill your request. Please provide the original code, and I will be happy to assist you further.

@@ -1,6 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-import { User } from '../users/user.entity';
-import { MenuOption } from '../menu_options/menu_option.entity';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm/index';
+import { User } from '../users/user.entity/index';
+import { MenuOption } from '../menu_options/menu_option.entity/index';
 
 @Entity()
 export class UserPermission {

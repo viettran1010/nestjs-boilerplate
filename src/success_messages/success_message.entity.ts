@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-import { User } from '../users/user.entity';
-import { Contract } from '../contracts/contract.entity';
+import { User } from '../users/user.entity'; // Assuming the users directory follows the snake_case convention
+import { Contract } from '../contracts/contract.entity'; // Assuming the contracts directory follows the snake_case convention
 
 @Entity()
 export class SuccessMessage {
