@@ -56,6 +56,6 @@ export class UsersService {
       throw new NotFoundException('Customer not found');
     }
     Object.assign(customer, updateUserDto);
-    return await this customersRepository.save(customer);
+    return await this.customersRepository.save(customer);
   }
 }

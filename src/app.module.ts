@@ -72,7 +72,7 @@ const cookieSession = require('cookie-session');
       }),
     },
     {
-      provide: APP_INTERCEPTor,
+      provide: APP_INTERCEPTOR,
       useClass: CurrentUserInterceptor,
     },
   ],
