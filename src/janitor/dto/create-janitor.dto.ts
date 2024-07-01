@@ -14,4 +14,3 @@ export class CreateJanitorDto {
   @IsOptional()
   readonly certification?: string;
 }
-export class CreateJanitorDto {}

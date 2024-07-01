@@ -30,9 +30,8 @@ export class AddressUpdateService {
     await this.addressUpdateRepository.save(addressUpdate);
 
     await this.auditLogService.createAuditLog({
-      action: 'address_update_cancellation',
-      user_id: userId,
-      timestamp: new Date(),
+      'address_update_cancellation',
+      userId,
       // Other necessary fields for the audit log
     });
 

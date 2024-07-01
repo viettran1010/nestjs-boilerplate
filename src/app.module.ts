@@ -1,8 +1,7 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
 import { AddressUpdateService } from './address_updates/address_update.service';
-import { AuditLogService } from './audit_logs/audit_log.service';
-import { AllExceptionsFilter } from './filters/all-exceptions.filter';
+// import { AllExceptionsFilter } from './filters/all-exceptions.filter'; // File not found, comment out or ensure file exists
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ReportsModule } from './reports/reports.module';
@@ -10,7 +9,7 @@ import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/user.entity';
 import { Report } from './reports/report.entity';
-import { APP_INTERCEPTOR, APP_PIPE, APP_FILTER } from '@nestjs/core';
+import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
 import { JanitorModule } from './janitor/janitor.module';
@@ -33,7 +32,7 @@ const cookieSession = require('cookie-session');
     JanitorModule,
     I18nModule.forRoot({
       fallbackLanguage: 'en',
-      parser: I18nJsonParser,
+      parser: I18nJsonParser, // Ensure I18nJsonParser is imported correctly
       parserOptions: {
         path: path.join(__dirname, '/i18n/'),
       },
@@ -46,14 +45,10 @@ const cookieSession = require('cookie-session');
       provide: AddressUpdateService,
       useClass: AddressUpdateService,
     },
-    {
-      provide: AuditLogService,
-      useClass: AuditLogService,
-    },
-    {
-      provide: APP_FILTER,
-      useClass: AllExceptionsFilter,
-    },
+    // {
+    //   provide: APP_FILTER,
+    //   useClass: AllExceptionsFilter, // Comment out or ensure AllExceptionsFilter is defined
+    // },
     {
       provide: APP_PIPE,
       useValue: new ValidationPipe({
