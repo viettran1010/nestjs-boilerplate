@@ -2,16 +2,16 @@ import {
   Body,
   Controller,
   Post,
+  Patch,
   Delete,
   Get,
   Param,
-  Patch,
   Query,
   Session,
   UseGuards,
   UseInterceptors,
   UsePipes,
-  ValidationPipe,
+  ValidationPipe
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';

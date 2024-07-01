@@ -41,14 +41,13 @@ export class ContractDetailsDto {
   @IsNumber({}, { allowNaN: false, maxDecimalPlaces: 2 })
   interest_rate?: number;
 
-  @IsEnum(ContractStatus, { message: 'status must be a valid enum value' })
+  @IsEnum(ContractStatus)
   status: string;
 
-  @ValidateIf(o => o.user_id !== null)
+  @IsOptional()
   @IsNumber()
   user_id?: number;
 
-  // Removed duplicate user_id declaration
   @IsOptional()
   @IsNumber()
   contract_action_id?: number;

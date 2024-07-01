@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, OneToOne 
 import { User } from '../users/user.entity';
 import { SuccessMessage } from '../success_messages/success_message.entity';
 import { ErrorMessage } from '../error_messages/error_message.entity';
-import { ContractAction } from '../contract_actions/contract_action.entity'; // Correct the import path if necessary
+import { ContractAction } from '../actions/contract_action.entity'; // Updated import path
 import { AuditLog } from '../audit_logs/audit_log.entity';
 import { Customer } from '../customers/customer.entity';
 
@@ -47,10 +47,10 @@ export class Contract {
   @Column({ type: 'decimal', precision: 5, scale: 2, nullable: true })
   interest_rate?: number;
 
-  @OneToMany(() => SuccessMessage, successMessage => successMessage.contract)
+  @OneToMany(() => SuccessMessage, successMessage => successMessage.contract_id) // Updated relationship
   successMessages: SuccessMessage[];
 
-  @OneToMany(() => ErrorMessage, errorMessage => errorMessage.contract)
+  @OneToMany(() => ErrorMessage, errorMessage => errorMessage.contract_id) // Updated relationship
   errorMessages: ErrorMessage[];
 
   @Column({ nullable: true })
@@ -65,25 +65,22 @@ export class Contract {
   @Column()
   status: string;
 
-  @ManyToOne(() => User, user => user.contract)
+  @ManyToOne(() => User, user => user.contract) // Updated relationship
   user: User;
 
-  @ManyToOne(() => ContractAction, contractAction => contractAction.contracts)
+  @ManyToOne(() => ContractAction, contractAction => contractAction.contract_id) // Updated relationship
   contractAction: ContractAction;
 
-  @ManyToOne(() => AuditLog, auditLog => auditLog.contract)
+  @ManyToOne(() => AuditLog, auditLog => auditLog.contract) // Updated relationship
   auditLog: AuditLog;
 
-  @ManyToOne(() => Customer, customer => customer.contract)
+  @ManyToOne(() => Customer, customer => customer.contract) // Updated relationship
   customer: Customer;
 
-  @OneToMany(() => ContractAction, contractAction => contractAction.contract)
+  @OneToMany(() => ContractAction, contractAction => contractAction.contract_id) // Updated relationship
   contractActions: ContractAction[];
 
-  @OneToMany(() => User, user => user.contracts)
-  users: User[];
-
-  @OneToMany(() => AuditLog, auditLog => auditLog.contracts)
+  @OneToMany(() => AuditLog, auditLog => auditLog.contract_id) // Updated relationship
   auditLogs: AuditLog[];
 
   @Column({ nullable: true })
@@ -98,6 +95,6 @@ export class Contract {
   @Column({ nullable: true })
   audit_log_id?: number;
 
-  @OneToOne(() => Customer, customer => customer.contracts)
+  @OneToOne(() => Customer, customer => customer.contract) // Retained relationship
   customerContract: Customer;
 }

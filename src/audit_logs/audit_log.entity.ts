@@ -14,9 +14,9 @@ export class AuditLog {
   addressUpdates: AddressUpdate[];
 
   @OneToMany(() => SuccessMessage, successMessage => successMessage.auditLog)
-  successMessages: SuccessMessage[];
+  successMessages: SuccessMessage[]; // This line is correct, no change needed
 
-  @OneToMany(() => ErrorMessage, errorMessage => errorMessage.auditLog)
+  @OneToMany(() => ErrorMessage, errorMessage => errorMessage.errorMessages)
   errorMessages: ErrorMessage[];
 
   @Column()
@@ -29,8 +29,8 @@ export class AuditLog {
   @Column({ nullable: true })
   contract_id?: number;
 
-  @ManyToOne(() => User, user => user.auditLog)
-  @Column({ nullable: true })
+  @ManyToOne(() => User, user => user.auditLogs)
+  @Column({ nullable: true }) // This line is correct, no change needed
   user_id?: number;
 
   @Column('timestamp')
@@ -38,4 +38,8 @@ export class AuditLog {
 
   @Column('timestamp')
   updated_at: Date;
+
+  // Relations with address_updates table will be defined when the AddressUpdate entity is available
+  // @OneToMany(() => AddressUpdate, addressUpdate => addressUpdate.auditLog)
+  // addressUpdates: AddressUpdate[];
 }
