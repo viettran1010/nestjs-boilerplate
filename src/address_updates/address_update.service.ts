@@ -23,15 +23,14 @@ export class AddressUpdateService {
     }
 
     if (addressUpdate.status === 'completed' || addressUpdate.status === 'cancelled') {
-      throw new BadRequestException(`Address update with ID ${addressUpdateId} is already in a final state and cannot be cancelled`);
+      throw a BadRequestException(`Address update with ID ${addressUpdateId} is already in a final state and cannot be cancelled`);
     }
 
     addressUpdate.status = 'cancelled';
     await this.addressUpdateRepository.save(addressUpdate);
 
     await this.auditLogService.createAuditLog({
-      'address_update_cancellation',
-      userId,
+      'address_update_cancellation', userId,
       // Other necessary fields for the audit log
     });
 

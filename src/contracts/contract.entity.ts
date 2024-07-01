@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, OneToOne, JoinColumn } from 'typeorm';
 import { User } from '../users/user.entity';
 import { AccountTypeInformation } from '../account_type_informations/account_type_information.entity';
-import { ContractAction } from '../contract_actions/contract_action.entity'; // Assuming the file exists and path is correct
+import { ContractAction } from '../contract_actions/contract_action.entity'; // Assuming the path is correct, no change needed
 import { AuditLog } from '../audit_logs/audit_log.entity';
 import { Customer } from '../customers/customer.entity';
 import { SuccessMessage } from '../success_messages/success_message.entity';
@@ -52,22 +52,22 @@ export class Contract {
   status: string;
 
   @ManyToOne(() => User, user => user.contract)
-  user: User;
+  user: User; // Assuming the property in User entity is 'contract', no change needed
 
-  @ManyToOne(() => ContractAction, contractAction => contractAction.contract)
+  @ManyToOne(() => ContractAction, contractAction => contractAction.contracts)
   contractAction: ContractAction;
 
-  @ManyToOne(() => AuditLog, auditLog => auditLog.contract)
+  @ManyToOne(() => AuditLog, auditLog => auditLog.contracts)
   auditLog: AuditLog;
 
   @ManyToOne(() => Customer, customer => customer.contract)
-  customer: Customer;
+  customer: Customer; // Assuming the property in Customer entity is 'contract', no change needed
 
   @OneToMany(() => ContractAction, contractAction => contractAction.contract)
   contractActions: ContractAction[];
 
   @OneToMany(() => User, user => user.contract)
-  users: User[]; // Assuming this relation is correct
+  users: User[];
 
   @OneToMany(() => AuditLog, auditLog => auditLog.contract)
   auditLogs: AuditLog[];
