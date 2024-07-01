@@ -1,3 +1,9 @@
-It appears there is a misunderstanding. The "Current Code" section you've provided is empty, and the "Patch" section only contains a Git diff command indicating a file rename without any changes to the actual code content. Since there is no code provided to patch or modify, I cannot generate a complete and correct code for you.
-
-If you have the actual code that needs to be patched, please provide it, and I can apply the patch accordingly. Otherwise, with the information given, there is no code to respond with.
+export class ReportResponseDto {
+  // Define the properties of the DTO with appropriate types
+  // Example:
+  // id: number;
+  // title: string;
+  // description: string;
+  // createdAt: Date;
+  // updatedAt: Date;
+}

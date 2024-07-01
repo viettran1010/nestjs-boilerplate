@@ -26,8 +26,7 @@ export class SuccessMessage {
   closed_at?: Date;
 
   @ManyToOne(() => User, user => user.successMessages)
-  @JoinColumn({ name: 'user_id' })
-  user_id: number;
+  @JoinColumn({ name: 'user_id' }) user: User;
 
   @ManyToOne(() => Contract, contract => contract.successMessages)
   @JoinColumn({ name: 'contract_id' })

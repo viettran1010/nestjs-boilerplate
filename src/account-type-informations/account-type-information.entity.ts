@@ -18,7 +18,7 @@ export class AccountTypeInformation {
   currencyDeposited: string;
 
   @ManyToOne(() => User, user => user.accountTypeInformations)
-  @JoinColumn({ name: 'user_id' })
+  @JoinColumn({ name: 'user_id' }) // This line remains unchanged
   user: User;
 
   @ManyToOne(() => Contract)
@@ -26,7 +26,7 @@ export class AccountTypeInformation {
   contractId: Contract;
 
   @OneToMany(() => ScheduledDeposit, scheduledDeposit => scheduledDeposit.accountTypeInformation)
-  scheduledDeposits: ScheduledDeposit[];
+  scheduledDeposits: ScheduledDeposit[]; // This line remains unchanged
 
   @CreateDateColumn()
   created_at: Date;
@@ -41,7 +41,7 @@ export class AccountTypeInformation {
   deposit_date: Date;
 
   static async validateAndCreate(deposit_amount: number, deposit_date: string, user_id: number) {
-    const user = await this.usersRepository.findOneBy({ id: user_id });
+    const user = await this.usersRepository.findOneBy({ id: user_id }); // This line remains unchanged
 
     if (!user) {
       throw new BadRequestException('Invalid user_id, user does not exist.');
@@ -51,7 +51,7 @@ export class AccountTypeInformation {
       throw new BadRequestException('The deposit amount must be positive.');
     }
 
-    const depositDate = new Date(deposit_date);
+    const depositDate = new Date(deposit_date); // This line remains unchanged
     if (isNaN(depositDate.getTime()) || depositDate < new Date()) {
       throw new BadRequestException('The deposit date is invalid or formatted incorrectly.');
     }
@@ -60,7 +60,7 @@ export class AccountTypeInformation {
     accountTypeInformation.deposit_amount = deposit_amount;
     accountTypeInformation.deposit_date = depositDate;
     accountTypeInformation.user = user; // Assign the found user to the new account type information
-
+    
     // Here you would typically save the entity using the repository
     // For this example, we'll assume it's saved and return the instance
 
