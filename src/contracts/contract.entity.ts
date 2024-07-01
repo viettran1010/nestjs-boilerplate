@@ -32,10 +32,9 @@ export class Contract {
   @Column()
   account_number: string;
 
-  @Column()
-  opening_date: Date;
+  @Column({ nullable: true })
+  opening_date?: Date;
 
-  // Merged nullable fields from new code and kept the non-nullable fields from current code
   @Column({ nullable: true })
   remarks?: string;
 
@@ -48,15 +47,11 @@ export class Contract {
   @Column({ type: 'decimal', precision: 5, scale: 2, nullable: true })
   interest_rate?: number;
 
-  @Column()
   @OneToMany(() => SuccessMessage, successMessage => successMessage.contract)
   successMessages: SuccessMessage[];
 
   @OneToMany(() => ErrorMessage, errorMessage => errorMessage.contract)
   errorMessages: ErrorMessage[];
-
-  @Column({ nullable: true })
-  currency_deposited?: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
   deposit_amount?: number;
@@ -64,13 +59,11 @@ export class Contract {
   @Column({ type: 'date', nullable: true })
   deposit_date?: Date;
 
+  @Column()
   status: string;
 
   @ManyToOne(() => User, user => user.contracts)
   user: User;
-
-  @ManyToOne(() => ContractAction, contractAction => contractAction.contracts)
-  contractAction: ContractAction;
 
   @ManyToOne(() => AuditLog, auditLog => auditLog.contracts)
   auditLog: AuditLog;
@@ -81,13 +74,9 @@ export class Contract {
   @OneToMany(() => ContractAction, contractAction => contractAction.contract)
   contractActions: ContractAction[];
 
-  @OneToMany(() => User, user => user.contract)
-  users: User[];
-
   @OneToMany(() => AuditLog, auditLog => auditLog.contract)
   auditLogs: AuditLog[];
 
-  // Added nullable foreign key columns from new code
   @Column({ nullable: true })
   user_id?: number;
 
@@ -100,7 +89,6 @@ export class Contract {
   @Column({ nullable: true })
   audit_log_id?: number;
 
-  // Retained the OneToOne relationship from the current code
   @OneToOne(() => Customer, customer => customer.contract)
   customerContract: Customer;
 }

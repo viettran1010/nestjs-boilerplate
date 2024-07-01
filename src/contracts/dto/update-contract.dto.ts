@@ -61,6 +61,6 @@ export class UpdateContractDto {
   @IsString()
   remarks?: string;
 
-- @IsInt()
-- user_id: number;
+  @IsInt()
+  user_id: number;
 }
