@@ -2,12 +2,16 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
+import { UpdateUserDto } from './dtos/update-user.dto';
+import { Customer } from '../customers/customer.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    @InjectRepository(Customer)
+    private customersRepository: Repository<Customer>,
   ) {}
 
   async create(email: string, password: string) {
@@ -44,5 +48,14 @@ export class UsersService {
       throw new NotFoundException('user not found');
     }
     return await this.usersRepository.remove(user);
+  }
+
+  async updateCustomer(id: number, updateUserDto: UpdateUserDto) {
+    const customer = await this.customersRepository.findOneBy({ id });
+    if (!customer) {
+      throw new NotFoundException('Customer not found');
+    }
+    Object.assign(customer, updateUserDto);
+    return await this.customersRepository.save(customer);
   }
 }
