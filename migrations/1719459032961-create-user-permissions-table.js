@@ -1,6 +1,6 @@
 module.exports = {
   up: async (queryRunner) => {
-    await queryRunner.createTable('user_permissions', {
+    await queryRunner.createTable('user_permissions', { // Ensure the table name matches the entity name
       id: {
         type: 'int',
         isPrimary: true,
@@ -27,13 +27,13 @@ module.exports = {
       },
     });
 
-    await queryRunner.createForeignKey('user_permissions', {
+    await queryRunner.createForeignKey('user_permissions', { // Ensure the foreign key references are correct
       columnNames: ['user_id'],
       referencedTableName: 'users',
       referencedColumnNames: ['id'],
     });
 
-    await queryRunner.createForeignKey('user_permissions', {
+    await queryRunner.createForeignKey('user_permissions', { // Ensure the foreign key references are correct
       columnNames: ['menu_option_id'],
       referencedTableName: 'menu_options',
       referencedColumnNames: ['id'],
