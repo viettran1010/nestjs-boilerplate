@@ -12,7 +12,7 @@ export class AccountTypeInformation {
   currencyDeposited: string;
 
   @ManyToOne(() => User, user => user.accountTypeInformations)
-  @JoinColumn({ name: 'user_id' })
+  @JoinColumn({ name: 'user_id' }) // This line remains unchanged
   user: User;
 
   @ManyToOne(() => Contract)
@@ -20,7 +20,7 @@ export class AccountTypeInformation {
   contractId: Contract;
 
   @OneToMany(() => ScheduledDeposit, scheduledDeposit => scheduledDeposit.account_type_information)
-  accountTypeInformations: ScheduledDeposit[];
+  accountTypeInformation: ScheduledDeposit[]; // Correct the property name
 
   @CreateDateColumn()
   created_at: Date;
