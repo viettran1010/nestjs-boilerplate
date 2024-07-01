@@ -1,7 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
+import { Contract, ContractAction } from '../contracts/contract.entity';
 import { User } from '../users/user.entity';
-import { Contract } from '../contracts/contract.entity';
-import { AddressUpdate } from '../address_updates/address_update.entity';
 
 @Entity()
 export class Customer {
@@ -37,6 +36,9 @@ export class Customer {
 
   @Column({ type: 'timestamp', nullable: true })
   contact_date?: Date;
+
+  @OneToMany(() => Contract, contract => contract.customer)
+  contracts: Contract[];
 
   @Column({ type: 'text', nullable: true })
   remarks?: string;

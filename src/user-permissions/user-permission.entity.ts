@@ -26,7 +26,7 @@ export class UserPermission {
   @Column()
   user_id: number;
 
-  @Column()
+  @Column({ name: 'menu_option_id' })
   menu_option_id: number;
 
   @ManyToOne(() => User, (user) => user.userPermissions)
