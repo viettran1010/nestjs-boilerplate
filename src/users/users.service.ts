@@ -9,40 +9,37 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    @InjectRepository(SuccessMessage)
+    private successMessagesRepository: Repository<SuccessMessage>
   ) {}
 
   async create(email: string, password: string) {
-    // to make sure user is valid before saving
-    // also hooks are called
     const user = this.usersRepository.create({ email, password });
     return await this.usersRepository.save(user);
   }
 
-  async findOne(id: number) {
-  async recordSuccessMessage(user_id: number, message: string, detail: string): Promise<SuccessMessage> {
-    const user = await this.usersRepository.findOneBy({ id: user_id });
+  async findOne(id: number): Promise<User | null> {
+    if (!id) {
+      return null;
+    }
+    return await this.usersRepository.findOneBy({ id });
+  }
+
+  async recordSuccessMessage(userId: number, message: string, detail: string): Promise<SuccessMessage> {
+    const user = await this.usersRepository.findOneBy({ id: userId });
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
     const successMessage = new SuccessMessage();
-    successMessage.user = user;
+    successMessage.user_id = user.id;
     successMessage.message = message;
     successMessage.detail = detail;
     successMessage.displayed_at = new Date();
 
-    // Assuming there's a repository injected for SuccessMessage
-    // If not, it should be added to the constructor and injected as done with usersRepository
-    const successMessagesRepository = this.moduleRef.get('SuccessMessageRepository', { strict: false });
-    await successMessagesRepository.save(successMessage);
+    await this.successMessagesRepository.save(successMessage);
 
     return successMessage;
-  }
-
-    if (!id) {
-      return null;
-    }
-    return await this.usersRepository.findOneBy({ id });
   }
 
   async find(email: string) {
