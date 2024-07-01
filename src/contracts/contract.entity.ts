@@ -1,11 +1,11 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, OneToOne, JoinColumn } from 'typeorm';
 import { User } from '../users/user.entity';
-import { AccountTypeInformation } from '../account-type-informations/account-type-information.entity';
-import { ContractAction } from '../contract-actions/contract-action.entity';
-import { AuditLog } from '../audit-logs/audit-log.entity';
+import { AccountTypeInformation } from '../account_type_informations/account_type_information.entity';
+import { ContractAction } from '../contract_actions/contract_action.entity';
+import { AuditLog } from '../audit_logs/audit_log.entity';
 import { Customer } from '../customers/customer.entity';
 import { SuccessMessage } from '../success_messages/success_message.entity';
-import { ErrorMessage } from '../error-messages/error-message.entity';
+import { ErrorMessage } from '../error_messages/error_message.entity';
 
 @Entity()
 export class Contract {
@@ -69,7 +69,7 @@ export class Contract {
   @OneToMany(() => User, user => user.contract)
   userContracts: User[];
 
-  @OneToMany(() => AuditLog, auditLog => auditLog.contract)
+  @OneToMany(() => AuditLog, auditLog => auditLog.contracts)
   auditLogs: AuditLog[];
 
   @Column({ nullable: true })
@@ -105,6 +105,7 @@ export class Contract {
   successMessage: SuccessMessage;
 
   @ManyToOne(() => ErrorMessage, errorMessage => errorMessage.contracts)
+  @JoinColumn({ name: 'error_message_id' })
   errorMessage: ErrorMessage;
 
   @OneToOne(() => Customer, customer => customer.contract)
