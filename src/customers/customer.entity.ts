@@ -44,8 +44,8 @@ export class Customer {
   @ManyToOne(() => User, user => user.customers)
   user: User;
 
-  @ManyToOne(() => Contract, contract => contract.customers)
-  contract: Contract;
+  @OneToMany(() => Contract, contract => contract.customer)
+  contracts: Contract[];
 
   @OneToMany(() => AddressUpdate, addressUpdate => addressUpdate.customer)
   addressUpdates: AddressUpdate[];

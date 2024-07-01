@@ -19,7 +19,7 @@ export class AccountTypeInformation {
   @JoinColumn({ name: 'contract_id' })
   contractId: Contract;
 
-  @OneToMany(() => ScheduledDeposit, scheduledDeposit => scheduledDeposit.accountTypeInformation)
+  @OneToMany(() => ScheduledDeposit, scheduledDeposit => scheduledDeposit.account_type_information)
   scheduledDeposits: ScheduledDeposit[];
 
   @CreateDateColumn()
