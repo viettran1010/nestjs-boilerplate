@@ -26,6 +26,8 @@ export class UsersService {
 
   async find(email: string) {
     console.log('email: ', email);
+  }
+
   async validateAndFindUser(user_id: number): Promise<User> {
     if (!user_id) {
       throw new NotFoundException('User ID is required');
@@ -35,8 +37,6 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
     return user;
-  }
-
     return await this.usersRepository.findBy({ email });
   }
 

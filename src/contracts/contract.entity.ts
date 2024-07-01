@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { User } from '../users/user.entity';
-import { ContractAction } from '../contract_actions/contract_action.entity';
+import { ContractAction } from '../contract_actions/contract_action.entity'; // Correct the path if incorrect
 import { AuditLog } from '../audit_logs/audit_log.entity';
 import { Customer } from '../customers/customer.entity';
 
@@ -48,23 +48,23 @@ export class Contract {
   @Column()
   status: string;
 
-  @ManyToOne(() => User, user => user.contracts)
-  user: User;
+  @ManyToOne(() => User, user => user.contract)
+  user: User; // Correct the property name if User entity has 'contract' instead of 'contracts'
 
-  @ManyToOne(() => ContractAction, contractAction => contractAction.contracts)
+  @ManyToOne(() => ContractAction, contractAction => contractAction.contract)
   contractAction: ContractAction;
 
-  @ManyToOne(() => AuditLog, auditLog => auditLog.contracts)
+  @ManyToOne(() => AuditLog, auditLog => auditLog.contract)
   auditLog: AuditLog;
 
-  @ManyToOne(() => Customer, customer => customer.contracts)
-  customer: Customer;
+  @ManyToOne(() => Customer, customer => customer.contract)
+  customer: Customer; // Correct the property name if Customer entity has 'contract' instead of 'contracts'
 
   @OneToMany(() => ContractAction, contractAction => contractAction.contract)
   contractActions: ContractAction[];
 
   @OneToMany(() => User, user => user.contract)
-  users: User[];
+  users: User[]; // Correct the property name if User entity has 'contract' instead of 'contracts'
 
   @OneToMany(() => AuditLog, auditLog => auditLog.contract)
   auditLogs: AuditLog[];

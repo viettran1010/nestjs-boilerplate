@@ -1,5 +1,6 @@
 import { Body, Controller, Post, NotFoundException } from '@nestjs/common';
 import { AuditLog } from './audit_log.entity';
+import { AuditAction } from './audit_log.entity';
 import { AuditLogsService } from './audit_logs.service';
 import { UsersService } from '../users/users.service';
 import { ContractsService } from '../contracts/contracts.service';
@@ -22,12 +23,12 @@ export class AuditLogsController {
     const contract = await this.contractsService.validateAndFindContract(body.contract_id);
 
     const auditLog = new AuditLog();
-    auditLog.action = body.action;
+    auditLog.action = AuditAction[body.action as keyof typeof AuditAction];
     auditLog.timestamp = body.timestamp;
     auditLog.contract_id = contract.id;
     auditLog.user_id = user.id;
 
-    await this.auditLogsService.create(auditLog);
+    await this.auditLogsService.createAuditLog(auditLog.action, auditLog.timestamp, auditLog.contract_id, auditLog.user_id);
 
     return { status: 'success', message: 'Audit log created successfully' };
   }
