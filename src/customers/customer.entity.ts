@@ -1,10 +1,15 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
 import { User } from '../users/user.entity';
+import { Contract } from '../contracts/contract.entity';
+import { AddressUpdate } from '../address_updates/address_update.entity';
 
 @Entity()
 export class Customer {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column({ nullable: true })
+  contract_id?: number;
 
   @Column()
   created_at: Date;
@@ -15,36 +20,36 @@ export class Customer {
   @Column()
   name: string;
 
-  @Column()
-  name_katakana: string;
+  @Column({ nullable: true })
+  name_katakana?: string;
 
-  @Column()
-  company_name: string;
+  @Column({ nullable: true })
+  zip_code?: string;
 
-  @Column()
-  zip_code: string;
+  @Column({ nullable: true })
+  address?: string;
 
-  @Column()
-  address: string;
+  @Column({ nullable: true })
+  phone_number?: string;
 
-  @Column()
-  phone_number: string;
+  @Column({ nullable: true })
+  email_address?: string;
 
-  @Column()
-  email_address: string;
+  @Column({ type: 'timestamp', nullable: true })
+  contact_date?: Date;
 
-  @Column()
-  date_of_birth: Date;
+  @Column({ type: 'text', nullable: true })
+  remarks?: string;
 
-  @Column()
-  contact_date: Date;
-
-  @Column()
-  remarks: string;
-
-  @ManyToOne(() => User, (user) => user.customers)
+  @ManyToOne(() => User, user => user.customers)
   user: User;
 
-  @Column()
-  katakana: string;
+  @ManyToOne(() => Contract, contract => contract.customers)
+  contract: Contract;
+
+  @OneToMany(() => AddressUpdate, addressUpdate => addressUpdate.customer)
+  addressUpdates: AddressUpdate[];
+
+  @OneToMany(() => Contract, contract => contract.customer)
+  contracts: Contract[];
 }
