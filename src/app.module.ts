@@ -1,6 +1,7 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { UserPermission } from './user_permissions/user_permission.entity';
 import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
 import { join } from 'path';
 import { ReportsModule } from './reports/reports.module';
@@ -31,10 +32,10 @@ const cookieSession = require('cookie-session');
     UsersModule,
     ReportsModule,
     TypeOrmModule.forRootAsync({
-      entities: [User, Report, UserPermission],
-      useFactory: () => {
+      useFactory: () => ({
+        entities: [User, Report, UserPermission],
         return require('../ormconfig.js');
-      },
+      }),
     }),
     JanitorModule,
   ],

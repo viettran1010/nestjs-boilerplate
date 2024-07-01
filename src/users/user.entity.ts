@@ -67,6 +67,9 @@ export class User {
   @OneToMany(() => AccountTypeInformation, accountTypeInformation => accountTypeInformation.user)
   accountTypeInformations: AccountTypeInformation[];
 
+  @OneToMany(() => AddressUpdate, addressUpdate => addressUpdate.user)
+  addressUpdates: AddressUpdate[];
+
   // Add other OneToMany relationships here following the same pattern
   // ...
 
