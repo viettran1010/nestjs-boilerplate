@@ -15,7 +15,7 @@ export class ScheduledDeposit {
   id: number;
 
   @ManyToOne(() => AccountTypeInformation)
-  @JoinColumn({ name: 'account_type_information_id' })
+  @JoinColumn({ name: 'account_type_information' })
   account_type_information: AccountTypeInformation;
 
   @CreateDateColumn()

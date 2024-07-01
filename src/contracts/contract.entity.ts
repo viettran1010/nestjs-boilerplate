@@ -52,13 +52,13 @@ export class Contract {
   status: string;
 
   @ManyToOne(() => User, user => user.contract)
-  user?: User;
+  users: User;
 
-  @ManyToOne(() => ContractAction, contractAction => contractAction.contracts)
+  @ManyToOne(() => ContractAction, contractAction => contractAction.contract)
   contractAction: ContractAction;
 
   @ManyToOne(() => AuditLog, auditLog => auditLog.contract)
-  auditLog?: AuditLog;
+  auditLog: AuditLog;
 
   @ManyToOne(() => Customer, customer => customer.contract)
   customer: Customer;
@@ -67,9 +67,9 @@ export class Contract {
   contractActions: ContractAction[];
 
   @OneToMany(() => User, user => user.contract)
-  users: User[];
+  users: User;
 
-  @OneToMany(() => AuditLog, auditLog => auditLog.auditLog)
+  @OneToMany(() => AuditLog, auditLog => auditLog.contract)
   auditLogs: AuditLog[];
 
   @Column({ nullable: true })

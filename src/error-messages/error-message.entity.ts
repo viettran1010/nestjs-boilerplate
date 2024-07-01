@@ -28,7 +28,7 @@ export class ErrorMessage {
   @Column({ type: 'text', nullable: true })
   action_taken: string;
 
-  @ManyToOne(() => User, user => user.errorMessages, { nullable: true })
+  @ManyToOne(() => User, user => user.errorMessage)
   @JoinColumn({ name: 'user_id' })
   user_id: number;
 
