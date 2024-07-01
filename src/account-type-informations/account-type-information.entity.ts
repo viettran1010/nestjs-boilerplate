@@ -11,15 +11,15 @@ export class AccountTypeInformation {
   @Column({ type: 'varchar', nullable: true })
   currencyDeposited: string;
 
-  @ManyToOne(() => User, user => user.accountTypeInformations)
-  @JoinColumn({ name: 'user_id' }) user: User;
+  @ManyToOne(() => User, user => user.accountTypeInformation)
+  @JoinColumn({ name: 'user_id' })
+  user: User;
 
   @ManyToOne(() => Contract)
   @JoinColumn({ name: 'contract_id' })
   contractId: Contract;
 
-  @OneToMany(() => ScheduledDeposit, scheduledDeposit => scheduledDeposit.accountTypeInformation)
-  @JoinColumn({ name: 'scheduled_deposit_id' })
+  @OneToMany(() => ScheduledDeposit, scheduledDeposit => scheduledDeposit.account_type_information)
   scheduledDeposits: ScheduledDeposit[];
 
   @CreateDateColumn()

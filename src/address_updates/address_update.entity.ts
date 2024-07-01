@@ -49,8 +49,8 @@ export class AddressUpdate {
   address_update_file: string;
 
   // Assuming the new relationships are to be added here
-  @OneToMany(() => User, user => user.addressUpdate)
-  users: User[]; // This line remains unchanged as it's not the source of error
+  @OneToMany(() => User, user => user.addressUpdates)
+  users: User[];
 
   @OneToMany(() => Customer, customer => customer.addressUpdates)
   customers: Customer[];
