@@ -13,8 +13,11 @@ export class AuditLog {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({
+    type: "enum",
+    enum: AuditAction,
+  })
   action: AuditAction;
-  action: string;
 
   @Column('timestamp')
   timestamp: Date;
@@ -23,7 +26,7 @@ export class AuditLog {
   @Column({ nullable: true })
   contract_id?: number;
 
-  @ManyToOne(() => User, user => user.auditLogs)
+  @ManyToOne(() => User, user => user.auditLog)
   @Column({ nullable: true })
   user_id?: number;
 

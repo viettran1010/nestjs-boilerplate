@@ -21,16 +21,17 @@ export class AuditLogService {
 
   async logAddressUpdate(userId: number, action: string, timestamp: Date, addressUpdateId: number): Promise<AuditLog> {
     try {
-      const auditLog = this.auditLogRepository.create({
-        user_id: userId,
-        action,
+      const user = await this.userRepository.findOne(userId);
+      const auditLog: DeepPartial<AuditLog> = {
+        user: user,
+        action: AuditAction.ADDRESS_UPDATE_INITIATED,
         timestamp,
         address_update_id: addressUpdateId,
         created_at: new Date(),
         updated_at: new Date(),
       });
 
-      return await this.auditLogRepository.save(auditLog);
+      return await this.auditLogRepository.save(auditLog as AuditLog);
     } catch (error) {
       // Error handling logic here
       throw error;

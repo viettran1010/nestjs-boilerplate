@@ -1,6 +1,6 @@
 import { Body, Controller, Post, UsePipes, ValidationPipe } from '@nestjs/common';
 import { AuditLogService } from './audit_logs.service';
-import { CreateAuditLogDto } from './dtos/create-audit-log.dto';
+import { CreateAuditLogDto } from './dtos/create-audit-log.dto.ts';
 
 @Controller('audit-logs')
 export class AuditLogsController {
