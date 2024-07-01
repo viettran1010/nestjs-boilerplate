@@ -39,7 +39,7 @@ const cookieSession = require('cookie-session');
   providers: [
     AppService,
     {
-      provide: APP_PIPE,
+      provide: APP_PIPE, // Ensure APP_PIPE is imported from '@nestjs/core'
       useValue: new ValidationPipe({
         whitelist: true,
         forbidNonWhitelisted: true,

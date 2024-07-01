@@ -1,7 +1,8 @@
 import { UseFilters } from '@nestjs/common';
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { JanitorService } from './janitor.service';
-import { CustomExceptionFilter } from '../common/filters/custom-exception.filter';
+// The following line has been updated to fix the import path
+import { CustomExceptionFilter } from '../../common/filters/custom-exception.filter';
 import { CreateJanitorDto } from './dto/create-janitor.dto';
 import { UpdateJanitorDto } from './dto/update-janitor.dto';
 

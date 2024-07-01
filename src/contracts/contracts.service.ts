@@ -27,7 +27,7 @@ export class ContractsService {
     return contract;
   }
 
-  async updateContract(contractId: number, userId: number, updateData: any): Promise<Contract> {
+  async update(contractId: number, updateData: any): Promise<Contract> {
     const contract = await this.contractsRepository.findOneBy({ id: contractId });
     if (!contract) {
       throw new NotFoundException('Contract not found');

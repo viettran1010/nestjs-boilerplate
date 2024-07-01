@@ -1,9 +1,8 @@
 import { Body, Controller, Get, Param, Patch, Post, Query, Session, UseGuards, UseInterceptors, UseFilters } from '@nestjs/common';
 import { ContractsService } from './contracts.service';
 import { AuthGuard } from '../guards/auth.guard';
-import { UpdateContractDto } from './dtos/update-contract.dto';
-import { Contract } from './contract.entity';
-import { I18nService } from '@nestjs-modules/i18n';
+import { UpdateContractRemarksDto as UpdateContractDto } from './dtos/update-contract.dto';
+import { I18nService } from 'nestjs-i18n';
 
 @Controller('contracts')
 export class ContractsController {

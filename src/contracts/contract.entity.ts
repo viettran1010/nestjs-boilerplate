@@ -60,7 +60,7 @@ export class Contract {
   @ManyToOne(() => Customer, customer => customer.contract)
   customer: Customer;
 
-  @OneToMany(() => ContractAction, contractAction => contractAction.contract)
+  @OneToMany(() => ContractAction, contractAction => contractAction.contract) // Ensure ContractAction entity has a 'contract' property
   contractActions: ContractAction[];
 
   @OneToMany(() => User, user => user.contract)
@@ -90,12 +90,6 @@ export class Contract {
 
   @Column({ type: 'varchar', length: 3, nullable: true })
   currency_deposited?: string;
-
-  @Column({ type: 'decimal', precision: 15, scale: 2, nullable: true })
-  deposit_amount?: number;
-
-  @Column({ type: 'date', nullable: true })
-  deposit_date?: Date;
 
   @ManyToOne(() => SuccessMessage, successMessage => successMessage.contract)
   @JoinColumn({ name: 'success_message_id' })

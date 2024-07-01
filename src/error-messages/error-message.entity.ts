@@ -32,7 +32,7 @@ export class ErrorMessage {
   @JoinColumn({ name: 'user_id' })
   user_id: number;
 
-  @ManyToOne(() => Contract, contract => contract.errorMessages)
+  @ManyToOne(() => Contract, contract => contract.errorMessage)
   @JoinColumn({ name: 'contract_id' })
   contract_id: number;
 }

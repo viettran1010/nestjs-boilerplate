@@ -6,7 +6,9 @@ import { User } from '../users/user.entity';
 export enum AuditActionType {
   CREATE = 'CREATE',
   UPDATE = 'UPDATE',
+  UPDATE_REMARKS = 'UPDATE_REMARKS',
   DELETE = 'DELETE',
+  // other actions...
 }
 
 @Entity()
