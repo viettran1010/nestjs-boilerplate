@@ -23,7 +23,7 @@ import {
   OneToOne
 } from 'typeorm';
 
-@Entity()
+@Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -51,6 +51,9 @@ export class User {
 
   @OneToMany(() => Report, (report) => report.user)
   reports: Report[];
+
+  @OneToMany(() => Contract, contract => contract.user)
+  contracts: Contract[];
 
   @OneToMany(() => UserRole, (userRole) => userRole.user)
   userRoles: UserRole[];

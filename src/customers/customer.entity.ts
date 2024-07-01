@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
 import { User } from '../users/user.entity';
-import { Contract } from '../contracts/contract.entity';
 import { AddressUpdate } from '../address_updates/address_update.entity';
+import { Contract } from '../contracts/contract.entity';
 
 @Entity()
 export class Customer {
@@ -41,9 +41,12 @@ export class Customer {
   @Column({ type: 'text', nullable: true })
   remarks?: string;
 
-  @ManyToOne(() => User, user => user.customer)
-  user?: User;
+  @OneToMany(() => AddressUpdate, addressUpdate => addressUpdate.customer)
+  addressUpdates: AddressUpdate[];
 
-  @ManyToOne(() => Contract, contract => contract.customer)
-  contract?: Contract;
+  @ManyToOne(() => User, user => user.customers)
+  user: User;
+
+  @ManyToOne(() => Contract, contract => contract.customers)
+  contract: Contract;
 }

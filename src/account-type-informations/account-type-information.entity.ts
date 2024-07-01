@@ -18,15 +18,15 @@ export class AccountTypeInformation {
   currencyDeposited: string;
 
   @ManyToOne(() => User, user => user.accountTypeInformations)
-  @JoinColumn({ name: 'account_type_information' })
+  @JoinColumn({ name: 'user_id' })
   user: User;
-
+  
   @ManyToOne(() => Contract)
   @JoinColumn({ name: 'contract_id' })
   contractId: Contract;
 
-  @OneToMany(() => ScheduledDeposit, scheduledDeposit => scheduledDeposit.accountTypeInformation)
-  scheduledDeposits: ScheduledDeposit[]; // This line remains unchanged
+  @OneToMany(() => ScheduledDeposit, scheduledDeposit => scheduledDeposit.account_type_information)
+  scheduledDeposits: ScheduledDeposit[];
 
   @CreateDateColumn()
   created_at: Date;

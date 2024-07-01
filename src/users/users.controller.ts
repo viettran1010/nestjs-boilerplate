@@ -15,6 +15,7 @@ import {
   Session,
   UseGuards,
   UseInterceptors,
+  Inject,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { AccountTypeInformation } from '../account-type-informations/account-type-information.entity';
@@ -29,7 +30,7 @@ import { ScheduledDeposit } from '../scheduled-deposits/scheduled-deposit.entity
 import { UsersService } from './users.service';
 import { IsNumber, IsDateString, Min } from 'class-validator';
 import { Type } from '@nestjs/common';
-import { parseISO, isFuture } from 'date-fns';
+import { parseISO, isFuture, formatISO } from 'date-fns';
 
 class CreateAccountTypeInformationDto {
   @IsNumber()
@@ -113,10 +114,10 @@ export class UsersController {
       const { deposit_amount, deposit_date, user_id } = createAccountTypeInformationDto;
 
       // Additional validation for deposit_date
-      validateDepositDate(deposit_date);
+      const validatedDepositDate = validateDepositDate(deposit_date);
 
-      const accountTypeInformation = await AccountTypeInformation.validateAndCreate(deposit_amount, deposit_date, user_id);
-      const scheduledDeposit = await ScheduledDeposit.scheduleDeposit(accountTypeInformation, new Date(deposit_date));
+      const accountTypeInformation = await AccountTypeInformation.validateAndCreate(deposit_amount, validatedDepositDate, user_id);
+      const scheduledDeposit = await ScheduledDeposit.scheduleDeposit(accountTypeInformation, new Date(validatedDepositDate));
 
       return {
         message: 'Account type information and scheduled deposit have been saved successfully.',

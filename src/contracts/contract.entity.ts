@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, OneToOne, JoinColumn } from 'typeorm';
 import { User } from '../users/user.entity';
-import { AccountTypeInformation } from '../account-type-informations/account-type-information.entity';
-import { ContractAction } from '../contract-actions/contract-action.entity';
+import { AccountTypeInformation } from '../account_type_informations/account_type_information.entity';
+import { ContractAction } from '../contract_actions/contract_action.entity';
 import { AuditLog } from '../audit_logs/audit_log.entity';
 import { Customer } from '../customers/customer.entity';
 import { SuccessMessage } from '../success_messages/success_message.entity';
@@ -51,26 +51,26 @@ export class Contract {
   @Column()
   status: string;
 
-  @ManyToOne(() => User, user => user.contract)
-  users: User;
+  @ManyToOne(() => User, user => user.contracts)
+  user: User;
 
-  @ManyToOne(() => ContractAction, contractAction => contractAction.contract)
+  @ManyToOne(() => ContractAction, contractAction => contractAction.contracts)
   contractAction: ContractAction;
 
-  @ManyToOne(() => AuditLog, auditLog => auditLog.contract)
+  @ManyToOne(() => AuditLog, auditLog => auditLog.contracts)
   auditLog: AuditLog;
 
-  @ManyToOne(() => Customer, customer => customer.contract)
+  @ManyToOne(() => Customer, customer => customer.contracts)
   customer: Customer;
 
   @OneToMany(() => ContractAction, contractAction => contractAction.contract)
   contractActions: ContractAction[];
 
   @OneToMany(() => User, user => user.contract)
-  users: User;
+  users: User[];
 
-  @OneToMany(() => AuditLog, auditLog => auditLog.contract)
-  auditLogs: AuditLog[];
+  @OneToMany(() => ErrorMessage, errorMessage => errorMessage.contract)
+  errorMessages: ErrorMessage[];
 
   @Column({ nullable: true })
   user_id?: number;
