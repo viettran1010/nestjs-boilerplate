@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository, Repository } from '@nestjs/typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { Contract } from './contract.entity';
 import { AuditLog } from '../audit_logs/audit_log.entity';
 

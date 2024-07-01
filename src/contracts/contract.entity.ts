@@ -58,7 +58,7 @@ export class Contract {
   status: string;
 
   @ManyToOne(() => User, user => user.contracts)
-  user: User;
+  user: User; // This line should be updated
 
   @ManyToOne(() => ContractAction, contractAction => contractAction.contracts)
   contractAction: ContractAction;

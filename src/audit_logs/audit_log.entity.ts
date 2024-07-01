@@ -17,7 +17,7 @@ export class AuditLog {
   @ManyToOne(() => Contract, contract => contract.auditLogs)
   contract_id?: number;
 
-  @ManyToOne(() => User, user => user.auditLogs)
+  @ManyToOne(() => User, user => user.auditLog)
   user_id?: number;
 
   @Column('timestamp')
