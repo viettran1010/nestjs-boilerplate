@@ -8,7 +8,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/user.entity';
 import { Report } from './reports/report.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { HttpExceptionFilter } from './filters/http-exception.filter';
+import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
 import { JanitorModule } from './janitor/janitor.module';
 const cookieSession = require('cookie-session');
