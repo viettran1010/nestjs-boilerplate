@@ -1,6 +1,7 @@
 import {
   Entity,
   PrimaryGeneratedColumn,
+  JoinColumn,
   Column,
   ManyToOne,
   CreateDateColumn,
@@ -30,8 +31,10 @@ export class UserPermission {
   menu_option_id: number;
 
   @ManyToOne(() => User, (user) => user.userPermissions)
+  @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @ManyToOne(() => MenuOption, (menuOption) => menuOption.userPermissions)
+  @ManyToOne(() => MenuOption, (menuOption) => menuOption.user_permissions)
+  @JoinColumn({ name: 'menu_option_id' })
   menuOption: MenuOption;
 }

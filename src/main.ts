@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { AllExceptionsFilter } from './filters/all-exceptions.filter';
+import { AllExceptionsFilter } from './filters/all-exceptions.filter.ts';
 import { AppModule } from './app.module';
 
 async function bootstrap() {

@@ -1,7 +1,7 @@
 import {
   Body,
   Controller,
-  Delete,
+  Delete, 
   Get,
   Param,
   Patch,
@@ -17,7 +17,7 @@ import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { AuthService } from './auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
-import { AddressUpdateDto } from './dtos/address-update.dto';
+import { AddressUpdateDto } from './dtos/address-update.dto'; // Ensure this file exists or create it
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserResponseDto } from './dtos/user.response.dto';
@@ -25,8 +25,9 @@ import { User } from './user.entity';
 import { UsersService } from './users.service';
 import { AddressUpdate } from '../address_updates/address_update.entity';
 import { AuditLog } from '../audit_logs/audit_log.entity';
-import { AddressUpdateService } from '../address_updates/address_update.service'; // This service should be created to handle address updates
-import { AuditLogService } from '../audit_logs/audit_log.service'; // This service should be created to handle audit logs
+import { AddressUpdateService } from '../address_updates/address_update.service'; // Ensure this file exists or create it
+import { AuditLogService } from '../audit_logs/audit_log.service'; // Ensure this file exists or create it
+import { AuditAction } from '../audit_logs/audit-action.enum'; // Ensure this enum exists or create it
 
 @Controller('auth')
 @Serialize(UserResponseDto)
@@ -56,9 +57,9 @@ export class UsersController {
 
     // Log the action in AuditLog
     const auditLog = new AuditLog();
-    auditLog.action = 'address_update_initiated';
+    auditLog.action = AuditAction.ADDRESS_UPDATE_INITIATED;
     auditLog.timestamp = new Date();
-    auditLog.user = user;
+    auditLog.user_id = user.id;
     await this.auditLogService.create(auditLog);
 
     return { message: 'Address update process initiated successfully' };
