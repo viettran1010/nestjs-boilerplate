@@ -15,7 +15,7 @@ export class AddressUpdateService {
 
   async validateAddressUpdateDates(userId: number, dateToStartConverting: Date, dateOfEndConverting: Date): Promise<{ status: number; message: string }> {
     // Check if the user exists
-    const user = await this.userRepository.findOne(userId);
+    const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) {
       throw new NotFoundException('User not found.');
     }

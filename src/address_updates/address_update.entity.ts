@@ -50,12 +50,12 @@ export class AddressUpdate {
 
   // Assuming the new relationships are to be added here
   @OneToMany(() => User, user => user.addressUpdate)
-  users: User[];
+  users: User[]; // This line remains unchanged as it's not the source of error
 
-  @OneToMany(() => Customer, customer => customer.addressUpdate)
+  @OneToMany(() => Customer, customer => customer.addressUpdates)
   customers: Customer[];
 
-  @OneToMany(() => AuditLog, auditLog => auditLog.addressUpdate)
+  @OneToMany(() => AuditLog, auditLog => auditLog.addressUpdates)
   auditLogs: AuditLog[];
 
   // Assuming there are no new columns to add, as the task description does not specify any.
