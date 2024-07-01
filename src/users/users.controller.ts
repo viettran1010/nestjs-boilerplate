@@ -1,5 +1,6 @@
 import {
   Body,
+  NotFoundException,
   Controller,
   Delete,
   Get,
@@ -14,12 +15,12 @@ import {
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { AuthService } from './auth.service';
+import { UsersService } from './users.service';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserResponseDto } from './dtos/user.response.dto';
 import { User } from './user.entity';
-import { UsersService } from './users.service';
 
 @Controller('auth')
 @Serialize(UserResponseDto)
@@ -73,4 +74,21 @@ export class UsersController {
   async updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return await this.usersService.update(parseInt(id), body);
   }
+
+  @Get('/users/:userId/add-contract')
+  async navigateToAddContractScreen(@Param('userId') userId: string) {
+    const user_id = parseInt(userId);
+    const customerDetails = await this.usersService.getRecentCustomerDetails(user_id);
+    if (!customerDetails) {
+      throw new NotFoundException('Customer information needs to be confirmed before proceeding.');
+    }
+    // Assuming there is a method to navigate to the "Add Contract" screen
+    // This is a placeholder response to simulate the navigation
+    return {
+      status: 200,
+      message: "Navigate to the Add Contract screen.",
+      customer: customerDetails
+    };
+  }
+
 }
