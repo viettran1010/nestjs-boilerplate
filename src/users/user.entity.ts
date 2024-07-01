@@ -1,5 +1,5 @@
 import { Report } from '../reports/report.entity';
-import { Student } from '../students/student.entity';
+import { Student } from '../student/student.entity';
 import { Customer } from '../customers/customer.entity';
 import { UserRole } from '../user_roles/user_role.entity';
 import { LoginAttempt } from '../login_attempts/login_attempt.entity';
