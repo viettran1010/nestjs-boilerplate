@@ -1,6 +1,8 @@
 # compiled output
 /dist
+/build
 /node_modules
+*.lock
 
 # Logs
 logs
@@ -10,6 +12,9 @@ pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
+
+# Schema
+schema/
 
 # OS
 .DS_Store
@@ -31,10 +36,6 @@ lerna-debug.log*
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
-.vscode/launch.json
-.vscode/extensions.json
-.env*
-package-lock.json
 !.vscode/launch.json
 !.vscode/extensions.json
 
