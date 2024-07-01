@@ -48,6 +48,9 @@ export class User {
   @JoinColumn({ name: 'audit_log_id' })
   auditLog?: AuditLog;
 
+  @OneToMany(() => AuditLog, auditLog => auditLog.user)
+  auditLogs: AuditLog[];
+
   @OneToMany(() => Report, (report) => report.user)
   reports: Report[];
 

@@ -1,5 +1,6 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
+import { APP_PIPE } from '@nestjs/core';
 import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
 import { ContractsModule } from './contracts.module';
 import path from 'path';

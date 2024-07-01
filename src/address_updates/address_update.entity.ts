@@ -48,12 +48,6 @@ export class AddressUpdate {
   @Column({ nullable: true })
   address_update_file: string;
 
-  @OneToMany(() => User, user => user.addressUpdates)
-  addressUpdates: AddressUpdate[];
-
-  @OneToMany(() => Customer, customer => customer.addressUpdates)
-  addressUpdates: AddressUpdate[];
-
   @OneToMany(() => AuditLog, auditLog => auditLog.addressUpdates)
   auditLogs: AuditLog[];
 }
