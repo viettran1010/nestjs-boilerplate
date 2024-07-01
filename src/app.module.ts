@@ -66,7 +66,7 @@ const cookieSession = require('cookie-session');
     //   }),
     // }),
   ],
-  controllers: [AppController], // This line remains unchanged
+  controllers: [AppController],
   providers: [
     AppService,
     {
@@ -75,7 +75,7 @@ const cookieSession = require('cookie-session');
         whitelist: true,
       }),
     },
-    { // This line remains unchanged
+    {
       provide: APP_INTERCEPTOR,
       useClass: CurrentUserInterceptor,
     },
@@ -91,5 +91,5 @@ export class AppModule {
           keys: [this.configService.get('COOKIE_KEY')], // for encryption
         }),
       )
-      .forRoutes('*'); // This line remains unchanged
+      .forRoutes('*');
 }
