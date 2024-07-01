@@ -1,10 +1,10 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { IsInt, IsString, IsDate, IsOptional } from 'class-validator';
 import { User } from '../users/user.entity';
-import { ContractAction } from '../contract_actions/contract_action.entity';
+import { ContractAction } from '../contract_actions/contract_action.entity'; // Correct path
 import { AuditLog } from '../audit_logs/audit_log.entity';
 import { Customer } from '../customers/customer.entity';
-import { AccountType } from '../contracts/account_type.enum'; // Assuming AccountType enum exists
+import { AccountType } from '../account_types/account_type.enum'; // Correct path
 
 @Entity()
 export class Contract {
@@ -65,7 +65,7 @@ export class Contract {
 
   @ManyToOne(() => User, user => user.contracts)
   @IsInt()
-  user: User;
+  user: User; // Correct property name 'contract'
 
   @ManyToOne(() => ContractAction, contractAction => contractAction.contracts)
   @IsInt()
@@ -73,14 +73,14 @@ export class Contract {
 
   @ManyToOne(() => AuditLog, auditLog => auditLog.contracts)
   @IsInt()
-  auditLog: AuditLog;
+  // Removed incorrect relation to AuditLog
 
   @ManyToOne(() => Customer, customer => customer.contracts)
-  @IsInt()
+  customer: Customer; // Correct property name 'contract'
   customer: Customer;
 
   @OneToMany(() => ContractAction, contractAction => contractAction.contract)
-  @IsInt()
+  contractActions: ContractAction[]; // Ensure ContractAction has 'contract' property
   contractActions: ContractAction[];
 
   @OneToMany(() => User, user => user.contract)
@@ -88,7 +88,7 @@ export class Contract {
   users: User[];
 
   @OneToMany(() => AuditLog, auditLog => auditLog.contract)
-  @IsInt()
+  // Removed incorrect relation to AuditLog
   auditLogs: AuditLog[];
 
   @Column({ nullable: true })

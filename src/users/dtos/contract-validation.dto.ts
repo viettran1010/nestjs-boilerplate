@@ -11,7 +11,7 @@ import {
   Min,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { AccountType } from '../enums/account-type.enum';
+import { AccountType } from '../../enums/account-type.enum';
 
 export class ContractValidationDto {
   @IsInt({ message: 'Contract ID is required and must be an integer.' })
