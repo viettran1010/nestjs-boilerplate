@@ -1,33 +1,55 @@
 import {
   Body,
+  BadRequestException,
   Controller,
   Delete,
   Get,
   Param,
   Patch,
   Post,
+  UsePipes,
   Query,
   Session,
   UseGuards,
   UseInterceptors,
+  ValidationPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { AuthService } from './auth.service';
+import { I18nService } from '@nestjs-modules/i18n';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserResponseDto } from './dtos/user.response.dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
+import { ContractValidationDto } from './dtos/contract-validation.dto';
 
 @Controller('auth')
+@UsePipes(new ValidationPipe())
 @Serialize(UserResponseDto)
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
     private authService: AuthService,
+    private i18n: I18nService,
   ) {}
+
+  @Post('/contracts/validate')
+  async validateContractInformation(@Body() contractValidationDto: ContractValidationDto) {
+    // The actual validation logic will be handled by the service using the DTO
+    // Here we just call the service method and pass the DTO
+    try {
+      await this.usersService.validateContract(contractValidationDto);
+      return {
+        status: 200,
+        message: await this.i18n.translate('contract.validation.success', { lang: 'en' }),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
 
   @Get('/whoami')
   @UseGuards(AuthGuard)
