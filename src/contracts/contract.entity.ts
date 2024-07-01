@@ -51,9 +51,8 @@ export class Contract {
   @Column()
   status: string;
 
-  // Fix the incorrect property name for the relationship with User entity
-  @ManyToOne(() => User, user => user.contract)
-  user: User;
+  @ManyToOne(() => User, user => user.contracts)
+  users: User[];
 
   @ManyToOne(() => ContractAction, contractAction => contractAction.contracts)
   contractAction: ContractAction;
@@ -62,7 +61,7 @@ export class Contract {
   auditLog: AuditLog;
 
   @ManyToOne(() => Customer, customer => customer.contracts)
-  customer: Customer;
+  customers: Customer[];
 
   @OneToMany(() => ContractAction, contractAction => contractAction.contract)
   contractActions: ContractAction[];
@@ -110,6 +109,6 @@ export class Contract {
   errorMessage: ErrorMessage;
 
   @OneToOne(() => Customer, customer => customer.contract)
-  @JoinColumn()
+  @JoinColumn({ name: 'customer_id' })
   customerContract: Customer;
 }

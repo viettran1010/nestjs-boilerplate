@@ -1,5 +1,5 @@
 import { Report } from '../reports/report.entity';
-import { Student } from '../students/student.entity'; // Verify this path exists
+import { Student } from '../students/student.entity';
 import { Customer } from '../customers/customer.entity';
 import { UserRole } from '../user_roles/user_role.entity';
 import { LoginAttempt } from '../login_attempts/login_attempt.entity';
@@ -49,7 +49,7 @@ export class User {
   auditLog?: AuditLog;
 
   @OneToMany(() => Report, (report) => report.user)
-  reports: Report[];
+  contracts: Contract[];
 
   @OneToMany(() => Student, (student) => student.user)
   students: Student[];
