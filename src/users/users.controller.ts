@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
   Patch,
@@ -9,10 +8,9 @@ import {
   Query,
   Session,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
-import { Serialize } from '../interceptors/serialize.interceptor';
+import { Serialize } from '../interceptors/serialize.interceptor'; // Correct import of Serialize
 import { AuthService } from './auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { CreateUserDto } from './dtos/create-user.dto';
@@ -62,11 +60,6 @@ export class UsersController {
   @Get()
   async findUsers(@Query('email') email: string) {
     return await this.usersService.find(email);
-  }
-
-  @Delete('/:id')
-  async removeUser(@Param('id') id: string) {
-    return await this.usersService.remove(parseInt(id));
   }
 
   @Patch('/:id')
