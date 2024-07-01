@@ -89,7 +89,7 @@ export class AppModule {
       .apply(
         cookieSession({
           keys: [this.configService.get('COOKIE_KEY')], // for encryption
-        }),
-      )
+        })
       .forRoutes('*');
+  }
 }

@@ -17,7 +17,7 @@ export class AuditLog {
   @ManyToOne(() => Contract, contract => contract.auditLogs)
   contract: Contract;
 
-  @ManyToOne(() => User, user => user.auditLogs)
+  @ManyToOne(() => User, user => user.auditLog)
   user: User;
 
   @ManyToOne(() => AddressUpdate, addressUpdate => addressUpdate.auditLogs)
