@@ -14,7 +14,7 @@ export class ScheduledDeposit {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => AccountTypeInformation)
+  @ManyToOne(() => AccountTypeInformation, accountTypeInformation => accountTypeInformation.scheduledDeposits)
   @JoinColumn({ name: 'account_type_information_id' })
   account_type_information: AccountTypeInformation;
 

@@ -60,6 +60,10 @@ export class User {
   @OneToMany(() => LoginAttempt, loginAttempt => loginAttempt.user)
   loginAttempts: LoginAttempt[];
 
+  @OneToMany(() => AccountTypeInformation, accountTypeInformation => accountTypeInformation.user)
+  @JoinColumn({ name: 'account_type_information_id' })
+  accountTypeInformations: AccountTypeInformation[];
+
   @OneToMany(() => UserPermission, userPermission => userPermission.user)
   userPermissions: UserPermission[];
 

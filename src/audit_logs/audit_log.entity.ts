@@ -17,13 +17,13 @@ export class AuditLog {
   @ManyToOne(() => Contract, contract => contract.auditLogs)
   contract: Contract;
 
-  @ManyToOne(() => User, user => user.auditLogs)
+  @ManyToOne(() => User, user => user.auditLog)
   user: User;
 
-  @ManyToOne(() => AddressUpdate, addressUpdate => addressUpdate.auditLogs)
+  @ManyToOne(() => AddressUpdate, addressUpdate => addressUpdate.auditLog)
   addressUpdate: AddressUpdate;
 
-  @OneToMany(() => AddressUpdate, addressUpdate => addressUpdate.auditLogs)
+  @OneToMany(() => AddressUpdate, addressUpdate => addressUpdate.auditLog)
   addressUpdates: AddressUpdate[];
 
   @Column('timestamp')
