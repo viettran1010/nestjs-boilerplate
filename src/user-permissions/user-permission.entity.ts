@@ -29,9 +29,9 @@ export class UserPermission {
   @Column()
   menu_option_id: number;
 
-  @ManyToOne(() => User, (user) => user.userPermissions)
+  @ManyToOne(() => User, (user) => user.userPermissions, { eager: false })
   user: User;
 
-  @ManyToOne(() => MenuOption, (menuOption) => menuOption.userPermissions)
+  @ManyToOne(() => MenuOption, (menuOption) => menuOption.user_permissions)
   menuOption: MenuOption;
 }

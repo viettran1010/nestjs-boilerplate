@@ -1,4 +1,4 @@
-import { AllExceptionsFilter } from './filters/all-exceptions.filter';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
