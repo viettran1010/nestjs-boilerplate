@@ -1,4 +1,13 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateJanitorDto } from './create-janitor.dto';
+import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 
-export class UpdateJanitorDto extends PartialType(CreateJanitorDto) {}
+export class UpdateJanitorDto {
+  @IsString()
+  @IsNotEmpty()
+  @IsOptional()
+  readonly name?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsOptional()
+  readonly department?: string;
+}
