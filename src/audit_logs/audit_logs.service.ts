@@ -24,7 +24,7 @@ export class AuditLogsService {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
 
-    const contract = await this.contractsService.findOne(contractId);
+    const contract = await this.contractsService.findOneBy({ id: contractId });
     if (!contract) {
       throw new NotFoundException(`Contract with ID ${contractId} not found`);
     }
