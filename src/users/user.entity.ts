@@ -1,5 +1,5 @@
 import { Report } from '../reports/report.entity';
-import { Student } from '../students/student.entity';
+import { Profile } from '../profiles/profile.entity';
 import { Customer } from '../customers/customer.entity';
 import { UserRole } from '../user_roles/user_role.entity';
 import { LoginAttempt } from '../login_attempts/login_attempt.entity';
@@ -20,6 +20,7 @@ import {
   OneToMany,
   ManyToOne,
   JoinColumn,
+  OneToOne
 } from 'typeorm';
 
 @Entity()
@@ -31,7 +32,7 @@ export class User {
   email: string;
 
   @Column({ default: true })
-  admin: boolean;
+  isActive: boolean;
 
   @Column()
   password: string;
@@ -51,24 +52,22 @@ export class User {
   @OneToMany(() => Report, (report) => report.user)
   reports: Report[];
 
-  @OneToMany(() => Student, (student) => student.user)
-  students: Student[];
-
-  @OneToMany(() => UserRole, userRole => userRole.user)
+  @OneToMany(() => UserRole, (userRole) => userRole.user)
   userRoles: UserRole[];
 
-  @OneToMany(() => LoginAttempt, loginAttempt => loginAttempt.user)
+  @OneToMany(() => LoginAttempt, (loginAttempt) => loginAttempt.user)
   loginAttempts: LoginAttempt[];
 
-  @OneToMany(() => UserPermission, userPermission => userPermission.user)
+  @OneToMany(() => UserPermission, (userPermission) => userPermission.user)
   userPermissions: UserPermission[];
 
   @ManyToOne(() => Customer, customer => customer.user, { nullable: true })
   @JoinColumn({ name: 'customer_id' })
   customer?: Customer;
 
-  // Add other OneToMany relationships here following the same pattern
-  // ...
+  @OneToOne(() => Profile, (profile) => profile.user, { cascade: true })
+  @JoinColumn({ name: 'profile_id' })
+  profile: Profile;
 
   @Column({ nullable: true })
   age?: number;

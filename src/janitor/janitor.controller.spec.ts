@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { JanitorController } from './janitor.controller';
+import { JanitorController } from './janitor.controller.ts';
 import { JanitorService } from './janitor.service';
 
 describe('JanitorController', () => {
