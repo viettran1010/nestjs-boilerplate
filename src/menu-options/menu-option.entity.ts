@@ -21,6 +21,6 @@ export class MenuOption {
   @Column({ type: 'boolean' })
   requires_permission: boolean;
 
-  @OneToMany(() => UserPermission, userPermission => userPermission.menu_option)
-  user_permissions: UserPermission[];
+  @OneToMany(() => UserPermission, userPermission => userPermission.menuOption)
+  userPermissions: UserPermission[];
 }

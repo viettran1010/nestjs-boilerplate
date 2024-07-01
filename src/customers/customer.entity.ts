@@ -41,9 +41,9 @@ export class Customer {
   @Column({ type: 'text', nullable: true })
   remarks?: string;
 
-  @ManyToOne(() => User, user => user.customers)
-  user: User;
+  @ManyToOne(() => User, user => user.customer)
+  customer: User;
 
-  @ManyToOne(() => Contract, contract => contract.customers)
-  contract: Contract;
+  @ManyToOne(() => Contract, contract => contract.customer)
+  customerContract: Contract;
 }

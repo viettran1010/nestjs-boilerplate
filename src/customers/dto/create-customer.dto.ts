@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsEmail, IsDate, ValidateIf, isDateString, isFuture } from 'class-validator';
+import { IsString, IsNotEmpty, IsEmail, IsDate, ValidateIf, isDateString } from 'class-validator';
 
 export class CreateCustomerDto {
   @IsNotEmpty({ message: 'Name is required.' })
@@ -30,7 +30,7 @@ export class CreateCustomerDto {
   email_address: string;
 
   @IsNotEmpty({ message: 'Date of birth is required and must be a valid date not in the future.' })
-  @IsDate()
+  @ValidateIf((o) => !isDateString(o.date_of_birth) || new Date(o.date_of_birth) > new Date())
   @ValidateIf((o) => !isDateString(o.date_of_birth) || isFuture(o.date_of_birth))
   date_of_birth: Date;
 }

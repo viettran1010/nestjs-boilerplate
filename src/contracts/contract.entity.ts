@@ -1,11 +1,11 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, OneToOne, JoinColumn } from 'typeorm';
 import { User } from '../users/user.entity';
-import { AccountTypeInformation } from '../account_type_informations/account_type_information.entity';
-import { ContractAction } from '../contract_actions/contract_action.entity';
+import { AccountTypeInformation } from '../account-type-informations/account-type-information.entity';
+import { ContractAction } from '../contract-actions/contract-action.entity';
 import { AuditLog } from '../audit_logs/audit_log.entity';
 import { Customer } from '../customers/customer.entity';
-import { SuccessMessage } from '../success_messages/success_message.entity';
-import { ErrorMessage } from '../error_messages/error_message.entity';
+import { SuccessMessage } from '../success-messages/success-message.entity';
+import { ErrorMessage } from '../error-messages/error-message.entity';
 
 @Entity()
 export class Contract {
@@ -51,19 +51,16 @@ export class Contract {
   @Column()
   status: string;
 
-  @ManyToOne(() => User, user => user.contracts)
+  @ManyToOne(() => User, user => user.contract)
   user: User;
 
-  @ManyToOne(() => ContractAction, contractAction => contractAction.contracts)
-  contractAction: ContractAction;
-
-  @ManyToOne(() => AuditLog, auditLog => auditLog.contracts)
+  @ManyToOne(() => AuditLog, auditLog => auditLog.contract)
   auditLog: AuditLog;
 
-  @ManyToOne(() => Customer, customer => customer.contracts)
+  @ManyToOne(() => Customer, customer => customer.contract)
   customer: Customer;
 
-  @OneToMany(() => ContractAction, contractAction => contractAction.contract)
+  @OneToMany(() => ContractAction, contractAction => contractAction.contracts)
   contractActions: ContractAction[];
 
   @OneToMany(() => User, user => user.contract)
@@ -84,7 +81,7 @@ export class Contract {
   @Column({ nullable: true })
   audit_log_id?: number;
 
-  @ManyToOne(() => AccountTypeInformation, accountTypeInformation => accountTypeInformation.contracts)
+  @ManyToOne(() => AccountTypeInformation, accountTypeInformation => accountTypeInformation.contract)
   @JoinColumn({ name: 'account_type_information_id' })
   accountTypeInformation: AccountTypeInformation;
 
@@ -108,18 +105,7 @@ export class Contract {
   @JoinColumn({ name: 'error_message_id' })
   errorMessage: ErrorMessage;
 
-  @OneToMany(() => SuccessMessage, successMessage => successMessage.contract)
-  successMessages: SuccessMessage[];
-
-  @OneToMany(() => ErrorMessage, errorMessage => errorMessage.contract)
-  errorMessages: ErrorMessage[];
-
-  @Column({ nullable: true })
-  success_message_id?: number;
-
-  @Column({ nullable: true })
-  error_message_id?: number;
-
   @OneToOne(() => Customer, customer => customer.contract)
+  @JoinColumn()
   customerContract: Customer;
 }
