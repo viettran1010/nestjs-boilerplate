@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
-import { User } from '../users/user.entity';
+import { User } from '../users/user.entity'; // Ensure this path is correct
 import { Contract } from '../contracts/contract.entity';
 import { AddressUpdate } from '../address_updates/address_update.entity';
 
@@ -11,7 +11,7 @@ export class Customer {
   @Column({ nullable: true })
   contract_id?: number;
 
-  @Column() // Ensure this is the correct type and format for the created_at field
+  @Column() // Ensure other properties are correctly defined
   created_at: Date;
 
   @Column()
@@ -20,19 +20,19 @@ export class Customer {
   @Column()
   name: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true }) // Ensure other properties are correctly defined
   name_katakana?: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true }) // Ensure other properties are correctly defined
   zip_code?: string;
 
   @Column({ nullable: true })
   address?: string;
 
-  @Column({ nullable: true }) // Ensure this is the correct type and format for the phone_number field
+  @Column({ nullable: true }) // Ensure other properties are correctly defined
   phone_number?: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true }) // Ensure other properties are correctly defined
   email_address?: string;
 
   @Column({ type: 'timestamp', nullable: true })
@@ -41,9 +41,11 @@ export class Customer {
   @Column({ type: 'text', nullable: true })
   remarks?: string;
 
-  @ManyToOne(() => User, user => user.customers)
+  @ManyToOne(() => User, user => user.customers) // Ensure this relationship is correct
   user: User;
 
   @OneToMany(() => Contract, contract => contract.customer)
-  contract: Contract;
+  contracts: Contract[];
+
+  // Other relationships will be defined here when the corresponding entities are available
 }

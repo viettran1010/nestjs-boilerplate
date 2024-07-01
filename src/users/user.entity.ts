@@ -1,15 +1,15 @@
 import { Report } from '../reports/report.entity';
-import { Student } from './student.entity';
+import { Student } from '../students/student.entity';
 import { Customer } from '../customers/customer.entity';
-import { UserRole } from './user_role.entity';
-import { LoginAttempt } from './login_attempt.entity';
-import { Contract } from './contract.entity';
-import { ContractAction } from './contract_action.entity';
-import { AuditLog } from './audit_log.entity';
+import { UserRole } from '../user_roles/user_role.entity';
+import { LoginAttempt } from '../login_attempts/login_attempt.entity';
 import { UserPermission } from '../user_permissions/user_permission.entity';
 import { AddressUpdate } from '../address_updates/address_update.entity';
 import { SuccessMessage } from '../success_messages/success_message.entity';
 import { ErrorMessage } from '../error_messages/error_message.entity';
+import { Contract } from '../contracts/contract.entity'; // Ensure this path is correct
+import { ContractAction } from '../contract_actions/contract_action.entity';
+import { AuditLog } from '../audit_logs/audit_log.entity';
 import {
   Entity,
   Column,
@@ -36,9 +36,9 @@ export class User {
   @Column()
   password: string;
 
-  @ManyToOne(() => Contract, contract => contract.user, { nullable: true })
+  @OneToMany(() => Contract, contract => contract.user, { nullable: true })
   @JoinColumn({ name: 'contract_id' })
-  contract?: Contract;
+  contracts: Contract[]; // Change to a collection of contracts
 
   @ManyToOne(() => ContractAction, contractAction => contractAction.user, { nullable: true })
   @JoinColumn({ name: 'contract_action_id' })
@@ -57,7 +57,7 @@ export class User {
   @OneToMany(() => UserRole, userRole => userRole.user)
   userRoles: UserRole[];
 
-  @OneToMany(() => LoginAttempt, loginAttempt => loginAttempt.user)
+  @OneToMany(() => LoginAttempt, loginAttempt => loginAttempt.user) // Ensure this relationship is correct
   loginAttempts: LoginAttempt[];
 
   @OneToMany(() => UserPermission, userPermission => userPermission.user)

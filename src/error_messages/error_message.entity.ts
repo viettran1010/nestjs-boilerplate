@@ -1,16 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { AuditLog } from '../audit_logs/audit_log.entity';
 
-@Entity({ name: 'error_messages' })
+@Entity()
 export class ErrorMessage {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 255 })
-  message: string;
+  // ... other columns
 
-  @Column({ type: 'varchar', length: 255 })
-  description: string;
-
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  createdAt: Date;
+  @ManyToOne(() => AuditLog, auditLog => auditLog.errorMessages)
+  auditLog: AuditLog;
 }

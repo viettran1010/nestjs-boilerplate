@@ -65,7 +65,7 @@ const cookieSession = require('cookie-session');
   ],
   controllers: [AppController],
   providers: [
-    AppService, // Ensure ConfigService is provided in the module
+    AppService, ConfigService, // Add ConfigService to the providers array if it's not provided elsewhere
     {
       provide: APP_PIPE,
       useClass: ValidationPipe,
