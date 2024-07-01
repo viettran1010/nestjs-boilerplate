@@ -10,7 +10,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
 import { JanitorModule } from './janitor/janitor.module';
-import { AllExceptionsFilter } from './filters/all-exceptions.filter';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 const cookieSession = require('cookie-session');
 

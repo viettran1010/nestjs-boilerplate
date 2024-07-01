@@ -1,7 +1,7 @@
 import {
   Body,
+  ParseEnumPipe,
   Controller,
-  Get,
   Param,
   Put,
   UseGuards,
@@ -11,8 +11,8 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { ContractsService } from './contracts.service';
-import { UpdateContractDto } from './dto/update-contract.dto';
 import { ContractDetailsDto } from './dto/contract-details.dto';
+import { UpdateContractDto } from './dto/update-contract.dto';
 
 @Controller('contracts')
 export class ContractsController {
@@ -25,17 +25,16 @@ export class ContractsController {
     @Body() updateContractDto: UpdateContractDto,
     @Session() session: any
   ) {
-    const userId = session.userId;
-    if (!userId) {
-      throw new BadRequestException('User ID is required');
-    }
+    // Retrieve the "userId" from the session object
+    const userId: number = session.userId;
+    // Validate that the "userId" is present
+    if (!userId) throw new BadRequestException('User ID is required');
 
-    if (+id !== updateContractDto.id) {
-      throw new BadRequestException('Contract ID in the URL and body must match');
-    }
+    // Validate that the "id" parameter matches the "id" field in "updateContractDto"
+    if (+id !== updateContractDto.id) throw new BadRequestException('Contract ID in the URL and body must match');
 
     try {
-      const updatedContract = await this.contractsService.updateContract(updateContractDto, userId);
+      const updatedContract: ContractDetailsDto = await this.contractsService.updateContract(updateContractDto, userId);
       return updatedContract;
     } catch (error) {
       if (error instanceof NotFoundException) {
@@ -43,21 +42,5 @@ export class ContractsController {
       }
       throw new BadRequestException(error.message);
     }
-  }
-
-  @Get('/:id')
-  @UseGuards(AuthGuard)
-  async getContractDetails(@Param('id') id: string): Promise<ContractDetailsDto> {
-    const contractId = parseInt(id);
-    if (isNaN(contractId)) {
-      throw new BadRequestException('Invalid contract ID');
-    }
-
-    const contract = await this.contractsService.findContractById(contractId);
-    if (!contract) {
-      throw new NotFoundException('Contract not found');
-    }
-
-    return contract; // Assuming that Contract entity is compatible with ContractDetailsDto
   }
 }

@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, OneToOne 
 import { User } from '../users/user.entity';
 import { SuccessMessage } from '../success_messages/success_message.entity';
 import { ErrorMessage } from '../error_messages/error_message.entity';
-import { ContractAction } from '../contract_actions/contract_action.entity';
+import { ContractAction } from '../contract_actions/contract_action.entity'; // Correct the import path if necessary
 import { AuditLog } from '../audit_logs/audit_log.entity';
 import { Customer } from '../customers/customer.entity';
 
@@ -32,8 +32,8 @@ export class Contract {
   @Column()
   account_number: string;
 
-  @Column({ nullable: true })
-  opening_date?: Date;
+  @Column()
+  opening_date: Date;
 
   @Column({ nullable: true })
   remarks?: string;
@@ -53,6 +53,9 @@ export class Contract {
   @OneToMany(() => ErrorMessage, errorMessage => errorMessage.contract)
   errorMessages: ErrorMessage[];
 
+  @Column({ nullable: true })
+  currency_deposited?: string;
+
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
   deposit_amount?: number;
 
@@ -62,19 +65,25 @@ export class Contract {
   @Column()
   status: string;
 
-  @ManyToOne(() => User, user => user.contracts)
+  @ManyToOne(() => User, user => user.contract)
   user: User;
 
-  @ManyToOne(() => AuditLog, auditLog => auditLog.contracts)
+  @ManyToOne(() => ContractAction, contractAction => contractAction.contracts)
+  contractAction: ContractAction;
+
+  @ManyToOne(() => AuditLog, auditLog => auditLog.contract)
   auditLog: AuditLog;
 
-  @ManyToOne(() => Customer, customer => customer.contracts)
+  @ManyToOne(() => Customer, customer => customer.contract)
   customer: Customer;
 
   @OneToMany(() => ContractAction, contractAction => contractAction.contract)
   contractActions: ContractAction[];
 
-  @OneToMany(() => AuditLog, auditLog => auditLog.contract)
+  @OneToMany(() => User, user => user.contracts)
+  users: User[];
+
+  @OneToMany(() => AuditLog, auditLog => auditLog.contracts)
   auditLogs: AuditLog[];
 
   @Column({ nullable: true })
@@ -89,6 +98,6 @@ export class Contract {
   @Column({ nullable: true })
   audit_log_id?: number;
 
-  @OneToOne(() => Customer, customer => customer.contract)
+  @OneToOne(() => Customer, customer => customer.contracts)
   customerContract: Customer;
 }
