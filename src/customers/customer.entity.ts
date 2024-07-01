@@ -42,8 +42,8 @@ export class Customer {
   remarks?: string;
 
   @ManyToOne(() => User, user => user.customers)
-  user: User;
+  user: User[];
 
   @ManyToOne(() => Contract, contract => contract.customers)
-  contract: Contract;
+  contract: Contract[];
 }

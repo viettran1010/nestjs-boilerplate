@@ -49,11 +49,11 @@ export class AddressUpdate {
   address_update_file: string;
 
   @OneToMany(() => User, user => user.addressUpdates)
-  users: User[];
+  users: AddressUpdate[];
 
   @OneToMany(() => Customer, customer => customer.addressUpdates)
-  customers: Customer[];
+  customers: AddressUpdate[];
 
   @OneToMany(() => AuditLog, auditLog => auditLog.addressUpdates)
-  auditLogs: AuditLog[];
+  auditLogs: AddressUpdate[];
 }
