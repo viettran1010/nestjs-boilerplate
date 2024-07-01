@@ -1,13 +1,14 @@
 import { Report } from '../reports/report.entity';
-import { Student } from '../students/student.entity';
-import { UserRole } from '../user_roles/user_role.entity';
-import { LoginAttempt } from '../login_attempts/login_attempt.entity';
-import { UserPermission } from '../user_permissions/user_permission.entity';
+import { Student } from '../student/student.entity';
+import { Customer } from '../customers/customer.entity';
+import { UserRole } from '../user_role/user_role.entity';
+import { LoginAttempt } from '../login_attempt/login_attempt.entity';
+import { UserPermission } from '../user_permission/user_permission.entity';
 import { AddressUpdate } from '../address_updates/address_update.entity';
 import { SuccessMessage } from '../success_messages/success_message.entity';
 import { ErrorMessage } from '../error_messages/error_message.entity';
 import { Contract } from '../contracts/contract.entity';
-import { ContractAction } from '../contract_actions/contract_action.entity';
+import { ContractAction } from '../contract_action/contract_action.entity';
 import { AuditLog } from '../audit_logs/audit_log.entity';
 import {
   Entity,
@@ -61,6 +62,10 @@ export class User {
 
   @OneToMany(() => UserPermission, userPermission => userPermission.user)
   userPermissions: UserPermission[];
+
+  @ManyToOne(() => Customer, customer => customer.user, { nullable: true })
+  @JoinColumn({ name: 'customer_id' })
+  customer?: Customer;
 
   // Add other OneToMany relationships here following the same pattern
   // ...

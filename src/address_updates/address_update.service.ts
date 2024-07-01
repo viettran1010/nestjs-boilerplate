@@ -37,7 +37,7 @@ export class AddressUpdateService {
 
       // Create a new AddressUpdate entry
       const addressUpdate = this.addressUpdateRepository.create({
-        user_id: userId,
+        user: { id: userId } as User,
         date_to_start_converting: startDate,
         date_of_end_converting: endDate,
         status: 'pending', // Assuming 'pending' is a valid status

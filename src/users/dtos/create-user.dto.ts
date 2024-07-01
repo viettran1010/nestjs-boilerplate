@@ -16,4 +16,8 @@ export class CreateUserDto {
   @IsNumber()
   @IsNotEmpty()
   readonly age: number;
+
+  @IsString()
+  @IsNotEmpty()
+  readonly password: string;
 }
