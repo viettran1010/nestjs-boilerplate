@@ -12,8 +12,7 @@ export class AccountTypeInformation {
   currencyDeposited: string;
 
   @ManyToOne(() => User, user => user.accountTypeInformation)
-  @JoinColumn({ name: 'user_id' })
-  user: User;
+  @JoinColumn({ name: 'user_id' }) user: User;
 
   @ManyToOne(() => Contract)
   @JoinColumn({ name: 'contract_id' })

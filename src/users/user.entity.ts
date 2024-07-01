@@ -67,6 +67,9 @@ export class User {
   @JoinColumn({ name: 'customer_id' })
   customer?: Customer;
 
+  @OneToMany(() => SuccessMessage, successMessage => successMessage.user)
+  successMessages: SuccessMessage[];
+
   // Add other OneToMany relationships here following the same pattern
   // ...
 

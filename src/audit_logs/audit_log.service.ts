@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { AuditLog } from './audit_log.entity';
-import { ActionType } from './audit_log.entity'; // This import is now correct
+import { AuditLog, ActionType } from './audit_log.entity'; // Combined import
 
 @Injectable()
 export class AuditLogService {
@@ -14,7 +13,7 @@ export class AuditLogService {
   async logUpdateAction(action: ActionType, timestamp: Date, contract_id: number, user_id: number): Promise<AuditLog> {
     const auditLog = this.auditLogRepository.create({
       action,
-      timestamp: timestamp,
+      timestamp,
       contract: { id: contract_id },
       user: { id: user_id },
       created_at: new Date(),

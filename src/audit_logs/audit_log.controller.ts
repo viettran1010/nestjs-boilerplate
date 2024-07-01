@@ -1,6 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuditLogService } from './audit_log.service';
-import { CreateAuditLogDto } from './dto/create-audit-log.dto';
+import { CreateAuditLogDto } from './dtos/create-audit-log.dto';
 
 @Controller('audit-logs')
 export class AuditLogController {
