@@ -10,16 +10,23 @@ import {
   Session,
   UseGuards,
   UseInterceptors,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { AuthService } from './auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
+import { AddressUpdateDto } from '../dtos/address-update.dto';
 import { CreateUserDto } from './dtos/create-user.dto';
-import { UpdateUserDto } from './dtos/update-user.dto';
+import { UpdateUserDto } from '../dtos/update-user.dto';
 import { UserResponseDto } from './dtos/user.response.dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
+import { AddressUpdate } from '../address_updates/address_update.entity';
+import { AuditLog } from '../audit_logs/audit_log.entity';
+import { AddressUpdateService } from '../address_updates/address_update.service'; // This service should be created to handle address updates
+import { AuditLogService } from '../audit_logs/audit_log.service'; // This service should be created to handle audit logs
 
 @Controller('auth')
 @Serialize(UserResponseDto)
@@ -27,7 +34,35 @@ export class UsersController {
   constructor(
     private readonly usersService: UsersService,
     private authService: AuthService,
+    private addressUpdateService: AddressUpdateService,
+    private auditLogService: AuditLogService,
   ) {}
+
+  @Post('/address-update/process')
+  async initiateAddressUpdate(@Body() body: AddressUpdateDto, @CurrentUser() user: User) {
+    // Validate user permission
+    const hasPermission = await this.usersService.validateUserPermission(user.id, 'address_update');
+    if (!hasPermission) {
+      throw new HttpException('User does not have permission to initiate address update', HttpStatus.FORBIDDEN);
+    }
+
+    // Create and save the AddressUpdate entity
+    const addressUpdate = new AddressUpdate();
+    addressUpdate.user = user;
+    addressUpdate.file_attachment = body.address_update_file;
+    addressUpdate.date_to_start_converting = body.date_to_start_converting;
+    addressUpdate.date_of_end_converting = body.date_of_end_converting;
+    await this.addressUpdateService.create(addressUpdate);
+
+    // Log the action in AuditLog
+    const auditLog = new AuditLog();
+    auditLog.action = AuditAction.ADDRESS_UPDATE_INITIATED;
+    auditLog.timestamp = new Date();
+    auditLog.user_id = user.id;
+    await this.auditLogService.create(auditLog);
+
+    return { message: 'Address update process initiated successfully' };
+  }
 
   @Get('/whoami')
   @UseGuards(AuthGuard)
