@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsEmail, IsNumber, IsDate } from 'class-validator';
+import { IsString, IsNotEmpty, IsEmail, IsNumber, IsDate, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class UpdateCustomerDto {

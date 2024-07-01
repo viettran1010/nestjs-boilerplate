@@ -49,13 +49,13 @@ export class AddressUpdate {
   address_update_file: string;
 
   // Assuming the new relationships are to be added here
-  @OneToMany(() => User, user => user.addressUpdate)
+  @OneToMany(() => User, user => user.addressUpdates)
   users: User[];
 
-  @OneToMany(() => Customer, customer => customer.addressUpdate)
+  @OneToMany(() => Customer, customer => customer.addressUpdates)
   customers: Customer[];
 
-  @OneToMany(() => AuditLog, auditLog => auditLog.addressUpdate)
+  @OneToMany(() => AuditLog, auditLog => auditLog.addressUpdates)
   auditLogs: AuditLog[];
 
   // Assuming there are no new columns to add, as the task description does not specify any.

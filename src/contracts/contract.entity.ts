@@ -1,11 +1,11 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, OneToOne, JoinColumn } from 'typeorm';
 import { User } from '../users/user.entity';
-import { AccountTypeInformation } from '../account_type_informations/account_type_information.entity';
-import { ContractAction } from '../contract_actions/contract_action.entity';
+import { AccountTypeInformation } from '../account-type-informations/account-type-information.entity';
+import { ContractAction } from '../contract-actions/contract-action.entity';
 import { AuditLog } from '../audit_logs/audit_log.entity';
 import { Customer } from '../customers/customer.entity';
-import { SuccessMessage } from '../success_messages/success_message.entity';
-import { ErrorMessage } from '../error_messages/error_message.entity';
+import { SuccessMessage } from '../success-messages/success-message.entity';
+import { ErrorMessage } from '../error-messages/error-message.entity';
 
 @Entity()
 export class Contract {
@@ -52,7 +52,7 @@ export class Contract {
   status: string;
 
   @ManyToOne(() => User, user => user.contracts)
-  user: User;
+  user: User[];
 
   @ManyToOne(() => ContractAction, contractAction => contractAction.contracts)
   contractAction: ContractAction;
@@ -69,7 +69,7 @@ export class Contract {
   @OneToMany(() => User, user => user.contract)
   users: User[];
 
-  @OneToMany(() => AuditLog, auditLog => auditLog.contract)
+  @OneToMany(() => AuditLog, auditLog => auditLog.contracts)
   auditLogs: AuditLog[];
 
   @Column({ nullable: true })
@@ -95,31 +95,20 @@ export class Contract {
   currency_deposited?: string;
 
   @Column({ type: 'decimal', precision: 15, scale: 2, nullable: true })
-  deposit_amount?: number;
+  depositAmount?: number;
 
   @Column({ type: 'date', nullable: true })
-  deposit_date?: Date;
+  depositDate?: Date;
 
-  @ManyToOne(() => SuccessMessage, successMessage => successMessage.contract)
+  @ManyToOne(() => SuccessMessage, successMessage => successMessage.contracts)
   @JoinColumn({ name: 'success_message_id' })
   successMessage: SuccessMessage;
 
-  @ManyToOne(() => ErrorMessage, errorMessage => errorMessage.contract)
+  @ManyToOne(() => ErrorMessage, errorMessage => errorMessage.contracts)
   @JoinColumn({ name: 'error_message_id' })
   errorMessage: ErrorMessage;
 
-  @OneToMany(() => SuccessMessage, successMessage => successMessage.contract)
-  successMessages: SuccessMessage[];
-
-  @OneToMany(() => ErrorMessage, errorMessage => errorMessage.contract)
-  errorMessages: ErrorMessage[];
-
-  @Column({ nullable: true })
-  success_message_id?: number;
-
-  @Column({ nullable: true })
-  error_message_id?: number;
-
   @OneToOne(() => Customer, customer => customer.contract)
+  @JoinColumn()
   customerContract: Customer;
 }

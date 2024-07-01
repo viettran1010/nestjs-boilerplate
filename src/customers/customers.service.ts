@@ -12,19 +12,6 @@ export class CustomersService {
   ) {}
 
   async updateCustomer(updateData: UpdateCustomerDto): Promise<Customer> {
-    id: number;
-    name?: string;
-    name_katakana?: string;
-    company_name?: string;
-    zip_code?: string;
-    address?: string;
-    phone_number?: string;
-    email_address?: string;
-    date_of_birth?: Date;
-    contact_date?: Date;
-    remarks?: string;
-    user_id?: number;
-  }): Promise<Customer> {
     const customer = await this.customersRepository.findOneBy({ id: updateData.id });
     if (!customer) {
       throw new NotFoundException(`Customer with ID ${updateData.id} not found`);
