@@ -1,15 +1,15 @@
 import { Report } from '../reports/report.entity';
-import { Student } from '../students/entities/student.entity';
+import { Student } from '../students/student.entity'; // Ensure this file exists
 import { Customer } from '../customers/customer.entity';
-import { UserRole } from '../user_roles/entities/user_role.entity';
-import { LoginAttempt } from '../login_attempts/entities/login_attempt.entity';
+import { UserRole } from '../user_roles/user_role.entity'; // Ensure this file exists
+import { LoginAttempt } from '../login_attempts/login_attempt.entity'; // Ensure this file exists
 import { UserPermission } from '../user_permissions/user_permission.entity';
 import { AddressUpdate } from '../address_updates/address_update.entity';
 import { SuccessMessage } from '../success_messages/success_message.entity';
 import { ErrorMessage } from '../error_messages/error_message.entity';
 import { Contract } from '../contracts/contract.entity';
-import { ContractAction } from '../contract_actions/entities/contract_action.entity';
-import { AuditLog } from '../audit_logs/audit_log.entity';
+import { ContractAction } from '../contract_actions/contract_action.entity'; // Ensure this file exists
+import { AuditLog } from '../audit_logs/audit_log.entity'; // Ensure this file exists
 import {
   Entity,
   Column,
@@ -40,11 +40,11 @@ export class User {
   @JoinColumn({ name: 'contract_id' })
   contract?: Contract;
 
-  @ManyToOne(() => ContractAction, contractAction => contractAction.user, { nullable: true })
+  @ManyToOne(() => ContractAction, contractAction => contractAction.contracts)
   @JoinColumn({ name: 'contract_action_id' })
   contractAction?: ContractAction;
 
-  @ManyToOne(() => AuditLog, auditLog => auditLog.user, { nullable: true })
+  @ManyToOne(() => AuditLog, auditLog => auditLog.auditLogs)
   @JoinColumn({ name: 'audit_log_id' })
   auditLog?: AuditLog;
 
@@ -54,13 +54,13 @@ export class User {
   @OneToMany(() => Student, (student) => student.user)
   students: Student[];
 
-  @OneToMany(() => UserRole, userRole => userRole.user)
+  @OneToMany(() => UserRole, userRole => userRole.userRoles)
   userRoles: UserRole[];
 
-  @OneToMany(() => LoginAttempt, loginAttempt => loginAttempt.user, { nullable: true })
+  @OneToMany(() => LoginAttempt, loginAttempt => loginAttempt.loginAttempts)
   loginAttempts: LoginAttempt[];
 
-  @OneToMany(() => UserPermission, userPermission => userPermission.user)
+  @OneToMany(() => UserPermission, userPermission => userPermission.userPermissions)
   userPermissions: UserPermission[];
 
   @ManyToOne(() => Customer, customer => customer.user, { nullable: true })

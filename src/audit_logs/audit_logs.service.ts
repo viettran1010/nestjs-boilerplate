@@ -1,14 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AuditAction } from './audit_log.entity';
+import { DeepPartial } from 'typeorm';
 import { Repository } from 'typeorm';
 import { AuditLog } from './audit_log.entity';
+import { User } from '../users/user.entity';
 
 @Injectable()
 export class AuditLogService {
   constructor(
     @InjectRepository(AuditLog)
     private auditLogRepository: Repository<AuditLog>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
   ) {}
 
   async create(auditLog: AuditLog): Promise<AuditLog> {
@@ -22,11 +25,12 @@ export class AuditLogService {
 
   async logAddressUpdate(userId: number, action: string, timestamp: Date, addressUpdateId: number): Promise<AuditLog> {
     try {
+      const user = await this.userRepository.findOne(userId);
       const auditLog = this.auditLogRepository.create({
-        user: { id: userId },
-        action: AuditAction[action as keyof typeof AuditAction],
+        user: user,
+        action: AuditAction.ADDRESS_UPDATE_INITIATED,
         timestamp,
-        addressUpdates: [{ id: addressUpdateId }],
+        address_update_id: addressUpdateId,
         created_at: new Date(),
         updated_at: new Date(),
       });

@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
-import { Contract } from '../contracts/contract.entity';
+// Other imports...
 import { AddressUpdate } from '../address_updates/address_update.entity';
 import { User } from '../users/user.entity';
 
@@ -13,15 +13,14 @@ export class AuditLog {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'enum', enum: AuditAction })
+  @Column({
+    type: "enum",
+    enum: AuditAction,
+  })
   action: AuditAction;
 
   @Column('timestamp')
   timestamp: Date;
-
-  @ManyToOne(() => Contract, contract => contract.auditLogs)
-  @Column({ nullable: true })
-  contract_id?: number;
 
   @ManyToOne(() => User, user => user.auditLogs)
   @Column({ nullable: true })

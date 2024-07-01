@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, OneToOne, JoinColumn } from 'typeorm';
 import { User } from '../users/user.entity';
 import { AccountTypeInformation } from '../account_type_informations/account_type_information.entity';
-import { ContractAction } from '../contract_actions/contract_action.entity'; // Correct the path if necessary
+import { ContractAction } from '../contracts/contract_actions/contract_action.entity';
 import { AuditLog } from '../audit_logs/audit_log.entity';
 import { Customer } from '../customers/customer.entity';
 import { SuccessMessage } from '../success_messages/success_message.entity';
@@ -51,26 +51,26 @@ export class Contract {
   @Column()
   status: string;
 
-  @ManyToOne(() => User, user => user.contracts)
-  user: User; // Change 'contracts' to 'contract'
+  @ManyToOne(() => User, user => user.contract)
+  user: User;
 
   @ManyToOne(() => ContractAction, contractAction => contractAction.contracts)
   contractAction: ContractAction;
 
-  @ManyToOne(() => AuditLog, auditLog => auditLog.contracts)
-  auditLog: AuditLog; // Change 'contracts' to 'contract'
+  @ManyToOne(() => AuditLog, auditLog => auditLog.contract)
+  auditLog: AuditLog;
 
-  @ManyToOne(() => Customer, customer => customer.contracts)
-  customer: Customer; // Change 'contracts' to 'contract'
+  @ManyToOne(() => Customer, customer => customer.contract)
+  customer: Customer;
 
-  @OneToMany(() => ContractAction, contractAction => contractAction.contract)
+  @OneToMany(() => ContractAction, contractAction => contractAction.contracts)
   contractActions: ContractAction[];
 
   @OneToMany(() => User, user => user.contract)
-  users: User[]; // Ensure this is the correct relationship
+  users: User[];
 
-  @OneToMany(() => AuditLog, auditLog => auditLog.contract)
-  auditLogs: AuditLog[]; // Ensure this is the correct relationship
+  @OneToMany(() => AuditLog, auditLog => auditLog.contracts)
+  auditLogs: AuditLog[];
 
   @Column({ nullable: true })
   user_id?: number;

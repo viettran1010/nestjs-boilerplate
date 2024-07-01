@@ -1,11 +1,11 @@
 import {
   Entity,
   PrimaryGeneratedColumn,
-  JoinColumn,
   Column,
   ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
+  JoinColumn,
 } from 'typeorm';
 import { User } from '../users/user.entity';
 import { MenuOption } from '../menu-options/menu-option.entity';
@@ -30,11 +30,11 @@ export class UserPermission {
   @Column()
   menu_option_id: number;
 
-  @ManyToOne(() => User, (user) => user.userPermissions)
-  @JoinColumn({ name: 'user_id' })
-  user: User;
-
   @ManyToOne(() => MenuOption, (menuOption) => menuOption.user_permissions)
   @JoinColumn({ name: 'menu_option_id' })
   menuOption: MenuOption;
+
+  @ManyToOne(() => User, (user) => user.user_permissions)
+  @JoinColumn({ name: 'user_id' })
+  user: User;
 }
