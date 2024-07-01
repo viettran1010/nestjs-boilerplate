@@ -17,9 +17,13 @@ export class AuditLog {
   @Column({ nullable: true })
   contract_id?: number;
 
-  @ManyToOne(() => User, user => user.auditLogs)
+  @ManyToOne(() => User, user => user.auditLog)
   @Column({ nullable: true })
   user_id?: number;
+
+  @ManyToOne(() => AddressUpdate, addressUpdate => addressUpdate.auditLogs)
+  @Column({ nullable: true })
+  address_update_id?: number;
 
   @Column('timestamp')
   created_at: Date;
@@ -27,7 +31,7 @@ export class AuditLog {
   @Column('timestamp')
   updated_at: Date;
 
-  // Relations with address_updates table will be defined when the AddressUpdate entity is available
-  // @OneToMany(() => AddressUpdate, addressUpdate => addressUpdate.auditLog)
-  // addressUpdates: AddressUpdate[];
+  // Relations with address_updates table are now defined
+  @OneToMany(() => AddressUpdate, addressUpdate => addressUpdate.auditLog)
+  addressUpdates: AddressUpdate[];
 }

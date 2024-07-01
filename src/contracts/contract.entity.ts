@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { User } from '../users/user.entity';
 import { IsString, IsCurrency } from 'class-validator';
-import { ContractAction } from '../contract_actions/contract_action.entity';
+import { ContractAction } from '../actions/contract_action.entity';
 import { AuditLog } from '../audit_logs/audit_log.entity';
 import { Customer } from '../customers/customer.entity';
 
@@ -34,7 +34,6 @@ export class Contract {
   @Column()
   opening_date: Date;
 
-  // Merged nullable fields from new code and kept the non-nullable fields from current code
   @Column({ nullable: true })
   remarks?: string;
 
@@ -56,15 +55,10 @@ export class Contract {
   @Column({ type: 'varchar', length: 3 })
   currency_deposited: string;
 
+  @ManyToOne(() => User, user => user.contract)
   user: User;
 
-  @ManyToOne(() => ContractAction, contractAction => contractAction.contracts)
-  contractAction: ContractAction;
-
-  @ManyToOne(() => AuditLog, auditLog => auditLog.contracts)
-  auditLog: AuditLog;
-
-  @ManyToOne(() => Customer, customer => customer.contracts)
+  @ManyToOne(() => Customer, customer => customer.contract)
   customer: Customer;
 
   @OneToMany(() => ContractAction, contractAction => contractAction.contract)
@@ -73,10 +67,6 @@ export class Contract {
   @OneToMany(() => User, user => user.contract)
   users: User[];
 
-  @OneToMany(() => AuditLog, auditLog => auditLog.contract)
-  auditLogs: AuditLog[];
-
-  // Added nullable foreign key columns from new code
   @Column({ nullable: true })
   user_id?: number;
 
@@ -89,7 +79,6 @@ export class Contract {
   @Column({ nullable: true })
   audit_log_id?: number;
 
-  // Retained the OneToOne relationship from the current code
   @OneToOne(() => Customer, customer => customer.contract)
   customerContract: Customer;
 }

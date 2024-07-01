@@ -3,10 +3,10 @@ import {
   Patch,
   Param,
   Body,
-  UseInterceptors,
+  UseInterceptors
 } from '@nestjs/common';
 import { ContractsService } from './contracts.service';
-import { SerializeInterceptor } from '../interceptors/serialize.interceptor';
+import { SerializerInterceptor } from '../interceptors/serialize.interceptor';
 import { UpdateCurrencyDepositedDto } from './dto/update-currency-deposited.dto';
 
 @Controller('contracts')
@@ -14,7 +14,7 @@ export class ContractsController {
   constructor(private contractsService: ContractsService) {}
 
   @Patch('/:id/currency')
-  @UseInterceptors(SerializeInterceptor)
+  @UseInterceptors(SerializerInterceptor)
   async updateCurrencyDeposited(
     @Param('id') id: string,
     @Body() updateCurrencyDepositedDto: UpdateCurrencyDepositedDto
