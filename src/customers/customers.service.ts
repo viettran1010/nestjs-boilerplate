@@ -7,8 +7,7 @@ import { Customer } from './customer.entity';
 @Injectable()
 export class CustomersService {
   constructor(
-    @InjectRepository(Customer)
-    private customersRepository: Repository<Customer>,
+    @InjectRepository(Customer) private customersRepository: Repository<Customer>,
   ) {}
 
   async updateCustomer(updateData: UpdateCustomerDto): Promise<Customer> {

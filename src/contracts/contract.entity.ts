@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, OneToOne, JoinColumn } from 'typeorm';
 import { User } from '../users/user.entity';
-import { AccountTypeInformation } from '../account-type-informations/account-type-information.entity';
-import { ContractAction } from '../contract-actions/contract-action.entity';
+import { AccountTypeInformation } from '../account_type_informations/account_type_information.entity';
+import { ContractAction } from '../contract_actions/contract_action.entity';
 import { AuditLog } from '../audit_logs/audit_log.entity';
 import { Customer } from '../customers/customer.entity';
 import { SuccessMessage } from '../success-messages/success-message.entity';

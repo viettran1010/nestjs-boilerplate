@@ -63,12 +63,16 @@ export class User {
   @OneToMany(() => UserPermission, userPermission => userPermission.user)
   userPermissions: UserPermission[];
 
-  @ManyToOne(() => Customer, customer => customer.user, { nullable: true })
-  @JoinColumn({ name: 'customer_id' })
-  customer?: Customer;
+  @OneToMany(() => AddressUpdate, addressUpdate => addressUpdate.user)
+  @JoinColumn({ name: 'address_update_id' })
+  addressUpdates: AddressUpdate[];
 
   // Add other OneToMany relationships here following the same pattern
   // ...
+
+  @ManyToOne(() => Customer, customer => customer.user, { nullable: true })
+  @JoinColumn({ name: 'customer_id' })
+  customer?: Customer;
 
   @Column({ nullable: true })
   age?: number;

@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 import { User } from '../users/user.entity';
 import { Contract } from '../contracts/contract.entity';
 import { AddressUpdate } from '../address_updates/address_update.entity';
@@ -46,4 +46,10 @@ export class Customer {
 
   @ManyToOne(() => Contract, contract => contract.customers)
   contract: Contract;
+
+  @OneToMany(() => AddressUpdate, addressUpdate => addressUpdate.customer)
+  @JoinColumn({ name: 'address_update_id' })
+  addressUpdates: AddressUpdate[];
+
+  // Other properties and decorators
 }
