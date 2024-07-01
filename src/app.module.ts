@@ -65,9 +65,8 @@ const cookieSession = require('cookie-session');
         whitelist: true,
       }),
     },
-    {
       provide: APP_INTERCEPTOR,
-      useClass: CurrentyUserInterceptor,
+      useClass: CurrentUserInterceptor,
     },
   ],
 })
