@@ -1,6 +1,7 @@
 {
   "name": "your-package-name",
   "version": "1.0.0",
+  "license": "MIT",
   "description": "Your package description",
   "main": "index.js",
   "scripts": {
@@ -9,7 +10,7 @@
   "dependencies": {
     "@nestjs/common": "^7.0.0",
     "@nestjs/core": "^7.0.0",
-    "@nestjs-modules/i18n": "^1.0.0",
+    "@nestjs-modules/i18n": "^8.0.0",
     "@nestjs/typeorm": "^7.0.0",
     "typeorm": "^0.2.24",
     "pg": "^8.0.0"
