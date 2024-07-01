@@ -1,6 +1,5 @@
 import {
   Body,
-  Catch,
   UseFilters,
   Controller,
   Get,
@@ -11,7 +10,6 @@ import {
   UseGuards,
   ExceptionFilter,
   HttpException,
-  HttpStatus,
   ArgumentsHost,
 } from '@nestjs/common';
 import { AdminGuard } from '../guards/admin.guard';
@@ -20,7 +18,6 @@ import { Serialize } from '../interceptors/serialize.interceptor';
 import { CurrentUser } from '../users/decorators/current-user.decorator';
 import { User } from '../users/user.entity';
 import { ApproveReportDto } from './dtos/approve-report.dto';
-import { CreateReportDto } from './dtos/create-report.dto';
 import { CustomExceptionFilter } from '../filters/custom-exception.filter';
 import { GetEstimateDto } from './dtos/get-estimate.dto';
 import { ReportResponseDto } from './dtos/report.response.dto';
@@ -53,7 +50,7 @@ export class ReportsController {
   @Post()
   @UseGuards(AuthGuard)
   @Serialize(ReportResponseDto)
-  createReport(@Body() body: CreateReportDto, @CurrentUser() user: User) {
+  createReport(@Body() body: any, @CurrentUser() user: User) {
     return this.reportsService.create(body, user);
   }
 

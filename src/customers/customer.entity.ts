@@ -42,11 +42,8 @@ export class Customer {
   remarks?: string;
 
   @ManyToOne(() => User, user => user.customers)
-  user: User;
+  user: User; // Assuming the correct property in User entity is 'customers'
 
-  @ManyToOne(() => Contract, contract => contract.customers)
-  contract: Contract;
-
-  @OneToMany(() => AddressUpdate, addressUpdate => addressUpdate.customer)
-  addressUpdates: AddressUpdate[];
+  @ManyToOne(() => Contract, contract => contract.customerContract)
+  contract: Contract; // Assuming the correct property in Contract entity is 'customerContract'
 }

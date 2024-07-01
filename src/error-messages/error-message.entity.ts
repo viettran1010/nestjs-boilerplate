@@ -28,11 +28,11 @@ export class ErrorMessage {
   @Column({ type: 'text', nullable: true })
   action_taken: string;
 
-  @ManyToOne(() => User, user => user.errorMessages)
+  @ManyToOne(() => User, user => user.errorMessages) // Assuming errorMessages is the correct property name in User entity
   @JoinColumn({ name: 'user_id' })
   user_id: number;
 
-  @ManyToOne(() => Contract, contract => contract.errorMessages)
+  @ManyToOne(() => Contract, contract => contract.errorMessage) // Assuming errorMessage is the correct property name in Contract entity
   @JoinColumn({ name: 'contract_id' })
   contract_id: number;
 }

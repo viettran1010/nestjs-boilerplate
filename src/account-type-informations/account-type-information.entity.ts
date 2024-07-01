@@ -11,7 +11,7 @@ export class AccountTypeInformation {
   @Column({ type: 'varchar', nullable: true })
   currencyDeposited: string;
 
-  @ManyToOne(() => User, user => user.accountTypeInformations)
+  @ManyToOne(() => User, user => user.accountTypeInformation)
   @JoinColumn({ name: 'user_id' })
   user: User;
 

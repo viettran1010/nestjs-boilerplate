@@ -52,7 +52,7 @@ export class Contract {
   status: string;
 
   @ManyToOne(() => User, user => user.contracts)
-  user: User;
+  user: User[];
 
   @ManyToOne(() => ContractAction, contractAction => contractAction.contracts)
   contractAction: ContractAction;
@@ -66,14 +66,14 @@ export class Contract {
   @OneToMany(() => ContractAction, contractAction => contractAction.contract)
   contractActions: ContractAction[];
 
-  @OneToMany(() => User, user => user.contract)
+  @OneToMany(() => User, user => user.contracts)
   users: User[];
 
   @OneToMany(() => AuditLog, auditLog => auditLog.contract)
   auditLogs: AuditLog[];
 
   @Column({ nullable: true })
-  user_id?: number;
+  user_id?: number[];
 
   @Column({ nullable: true })
   contract_action_id?: number;
@@ -100,26 +100,15 @@ export class Contract {
   @Column({ type: 'date', nullable: true })
   deposit_date?: Date;
 
-  @ManyToOne(() => SuccessMessage, successMessage => successMessage.contract)
+  @ManyToOne(() => SuccessMessage, successMessage => successMessage.contracts)
   @JoinColumn({ name: 'success_message_id' })
   successMessage: SuccessMessage;
 
-  @ManyToOne(() => ErrorMessage, errorMessage => errorMessage.contract)
+  @ManyToOne(() => ErrorMessage, errorMessage => errorMessage.contracts)
   @JoinColumn({ name: 'error_message_id' })
   errorMessage: ErrorMessage;
 
-  @OneToMany(() => SuccessMessage, successMessage => successMessage.contract)
-  successMessages: SuccessMessage[];
-
-  @OneToMany(() => ErrorMessage, errorMessage => errorMessage.contract)
-  errorMessages: ErrorMessage[];
-
-  @Column({ nullable: true })
-  success_message_id?: number;
-
-  @Column({ nullable: true })
-  error_message_id?: number;
-
   @OneToOne(() => Customer, customer => customer.contract)
+  @JoinColumn()
   customerContract: Customer;
 }

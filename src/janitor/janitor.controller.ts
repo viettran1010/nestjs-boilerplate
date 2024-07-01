@@ -2,11 +2,11 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseFilters, UseGuard
 import { JanitorService } from './janitor.service';
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
-import { HttpExceptionFilter } from '../common/filters/http-exception.filter';
-import { QueryFailedExceptionFilter } from '../common/filters/query-failed-exception.filter';
+import { HttpExceptionFilter } from '../../common/filters/http-exception.filter';
+import { QueryFailedExceptionFilter } from '../../common/filters/query-failed-exception.filter';
 import { CreateJanitorDto } from './dto/create-janitor.dto';
 import { UpdateJanitorDto } from './dto/update-janitor.dto';
-import { JanitorDto } from './dto/janitor.dto'; // Assuming JanitorDto is correctly imported
+import { JanitorDto } from '../dto/janitor.dto'; // Assuming JanitorDto is correctly imported
 
 @Controller('janitor')
 @UseFilters(HttpExceptionFilter, QueryFailedExceptionFilter)
