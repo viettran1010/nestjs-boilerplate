@@ -60,7 +60,7 @@ export class Contract {
   @ManyToOne(() => AuditLog, auditLog => auditLog.contract)
   auditLog: AuditLog;
 
-  @ManyToOne(() => Customer, customer => customer.contracts)
+  @OneToOne(() => Customer, customer => customer.contract)
   customer: Customer;
 
   @OneToMany(() => ContractAction, contractAction => contractAction.contract)
