@@ -32,7 +32,6 @@ export class AuditLog {
   @Column('timestamp')
   updated_at: Date;
 
-  // Relations with address_updates table are now defined
-  @OneToMany(() => AddressUpdate, addressUpdate => addressUpdate.auditLogs)
+  @OneToMany(() => AddressUpdate, addressUpdate => addressUpdate.auditLog)
   addressUpdates: AddressUpdate[];
 }

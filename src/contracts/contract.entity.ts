@@ -101,9 +101,9 @@ export class Contract {
   @JoinColumn({ name: 'success_message_id' })
   successMessage: SuccessMessage;
 
-  @ManyToOne(() => ErrorMessage, errorMessage => errorMessage.contracts)
+  @OneToMany(() => ErrorMessage, errorMessage => errorMessage.contract)
   @JoinColumn({ name: 'error_message_id' })
-  errorMessage: ErrorMessage;
+  errorMessages: ErrorMessage[];
 
   @OneToOne(() => Customer, customer => customer.contract)
   @JoinColumn()

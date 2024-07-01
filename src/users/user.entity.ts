@@ -10,6 +10,7 @@ import { ErrorMessage } from '../error_messages/error_message.entity';
 import { Contract } from '../contracts/contract.entity';
 import { ContractAction } from '../contract_actions/contract_action.entity';
 import { AuditLog } from '../audit_logs/audit_log.entity';
+import { AccountTypeInformation } from '../account_type_informations/account_type_information.entity'; // Import the missing entity
 import {
   Entity,
   Column,
@@ -66,6 +67,9 @@ export class User {
   @ManyToOne(() => Customer, customer => customer.user, { nullable: true })
   @JoinColumn({ name: 'customer_id' })
   customer?: Customer;
+
+  @OneToMany(() => AccountTypeInformation, accountTypeInformation => accountTypeInformation.user)
+  accountTypeInformations: AccountTypeInformation[];
 
   // Add other OneToMany relationships here following the same pattern
   // ...

@@ -18,8 +18,8 @@ export enum AddressUpdateStatus {
   CANCELLED = 'cancelled',
 }
 
-@Entity()
-export class AddressUpdate {
+@Entity('address_updates')
+export class AddressUpdateEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
