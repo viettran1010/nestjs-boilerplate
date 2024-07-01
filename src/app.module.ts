@@ -1,6 +1,6 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { AppService } from './app.service'; // Keep existing imports
 import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
 import { join } from 'path';
 import { UserPermission } from './user_permissions/user_permission.entity';
@@ -14,9 +14,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
 import { JanitorModule } from './janitor/janitor.module';
 const cookieSession = require('cookie-session');
+const i18nPath = join(__dirname, '/i18n/');
 
 @Module({
-const i18nPath = join(__dirname, '/i18n/');
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
@@ -24,7 +24,6 @@ const i18nPath = join(__dirname, '/i18n/');
     }),
     UsersModule,
     ReportsModule,
-    TypeOrmModule.forRootAsync({
     I18nModule.forRoot({
       fallbackLanguage: 'en',
       parser: I18nJsonParser,
@@ -33,10 +32,19 @@ const i18nPath = join(__dirname, '/i18n/');
         watch: true,
       },
     }),
-      entities: [User, Report, UserPermission],
-      useFactory: () => {
-        return require('../ormconfig.js');
-      },
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get('DB_HOST'),
+        port: configService.get('DB_PORT'),
+        username: configService.get('DB_USERNAME'),
+        password: configService.get('DB_PASSWORD'),
+        database: configService.get('DB_DATABASE'),
+        entities: [User, Report, UserPermission],
+        synchronize: configService.get('DB_SYNCHRONIZE') === 'true', // Use config service to get environment variables
+      }),
+      inject: [ConfigService],
     }),
     JanitorModule,
   ],
