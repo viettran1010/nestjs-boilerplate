@@ -22,5 +22,5 @@ export class MenuOption {
   requires_permission: boolean;
 
   @OneToMany(() => UserPermission, userPermission => userPermission.menuOption)
-  userPermissions: UserPermission[];
+  user_permissions: UserPermission[];
 }

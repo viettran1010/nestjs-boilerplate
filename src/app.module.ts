@@ -1,5 +1,5 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
-import { AppController } from './app.controller';
+import { AppController } from './app.controller'; // No change here, just for context
 import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
 import { join } from 'path';
 import { AppService } from './app.service';

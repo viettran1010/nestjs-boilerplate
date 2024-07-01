@@ -30,7 +30,7 @@ export class ErrorMessage {
 
   @ManyToOne(() => User, user => user.errorMessages, { eager: false })
   @JoinColumn({ name: 'user_id' })
-  user_id: number;
+  user: User;
 
   @ManyToOne(() => Contract, contract => contract.errorMessages)
   @JoinColumn({ name: 'contract_id' })
