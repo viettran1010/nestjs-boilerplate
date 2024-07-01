@@ -29,7 +29,7 @@ export class ErrorMessage {
   action_taken: string;
 
   @ManyToOne(() => User, user => user.errorMessages)
-  @JoinColumn({ name: 'user_id' })
+  @JoinColumn({ name: 'user_id' }) // Assuming the User entity has a property errorMessages
   user_id: number;
 
   @ManyToOne(() => Contract, contract => contract.errorMessages)

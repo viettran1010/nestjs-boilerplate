@@ -32,6 +32,6 @@ export class UserPermission {
   @ManyToOne(() => User, (user) => user.userPermissions)
   user: User;
 
-  @ManyToOne(() => MenuOption, (menuOption) => menuOption.userPermissions)
+  @ManyToOne(() => MenuOption, (menuOption) => menuOption.user_permissions)
   menuOption: MenuOption;
 }

@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, OneToOne, JoinColumn } from 'typeorm';
 import { User } from '../users/user.entity';
-import { AccountTypeInformation } from './account_type_information.entity';
-import { ContractAction } from './contract_action.entity';
+import { AccountTypeInformation } from '../account-type-informations/account-type-information.entity';
+import { ContractAction } from '../contract-actions/contract-action.entity';
 import { AuditLog } from '../audit_logs/audit_log.entity';
 import { Customer } from '../customers/customer.entity';
 import { SuccessMessage } from '../success_messages/success_message.entity';
@@ -51,26 +51,26 @@ export class Contract {
   @Column()
   status: string;
 
-  @ManyToOne(() => User, user => user.contracts)
-  user: User;
+  @ManyToOne(() => User, user => user.contract)
+  user: User; // Assuming 'contract' is the correct property name in User entity
 
-  @ManyToOne(() => ContractAction, contractAction => contractAction.contracts)
+  @ManyToOne(() => ContractAction, contractAction => contractAction.contract)
   contractAction: ContractAction;
 
-  @ManyToOne(() => AuditLog, auditLog => auditLog.contracts)
-  auditLog: AuditLog;
+  @ManyToOne(() => AuditLog, auditLog => auditLog.contract)
+  auditLog: AuditLog; // Assuming 'contract' is the correct property name in AuditLog entity
 
-  @ManyToOne(() => Customer, customer => customer.contracts)
-  customer: Customer;
+  @ManyToOne(() => Customer, customer => customer.contract)
+  customer: Customer; // Assuming 'contract' is the correct property name in Customer entity
 
   @OneToMany(() => ContractAction, contractAction => contractAction.contract)
   contractActions: ContractAction[];
 
   @OneToMany(() => User, user => user.contract)
-  users: User[];
+  users: User[]; // Assuming 'contract' is the correct property name in User entity
 
   @OneToMany(() => AuditLog, auditLog => auditLog.contract)
-  auditLogs: AuditLog[];
+  auditLogs: AuditLog[]; // Assuming 'contract' is the correct property name in AuditLog entity
 
   @Column({ nullable: true })
   user_id?: number;
