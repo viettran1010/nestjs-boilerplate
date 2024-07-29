@@ -2,13 +2,33 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
+import { AuditLog } from '../audit_logs/audit_log.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
+    @InjectRepository(AuditLog)
+    private auditLogRepository: Repository<AuditLog>,
+
     @InjectRepository(User)
     private usersRepository: Repository<User>,
   ) {}
+
+  async logEntryAction(action: string, timestamp: Date, contract_id: number, user_id: number) {
+    try {
+      const auditLog = this.auditLogRepository.create({
+        action,
+        timestamp,
+        contract_id,
+        user_id,
+      });
+
+      await this.auditLogRepository.save(auditLog);
+      return { message: 'Log entry action successfully recorded.' };
+    } catch (error) {
+      throw new Error('Failed to log entry action.');
+    }
+  }
 
   async create(email: string, password: string) {
     // to make sure user is valid before saving
