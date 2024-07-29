@@ -2,22 +2,18 @@ import {
   CallHandler,
   ExecutionContext,
   NestInterceptor,
-  UseInterceptors,
+  Injectable,
 } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { map, Observable } from 'rxjs';
 
 interface ClassConstructor {
-  // so input must be a class
   new (...args: any[]): {};
 }
 
-export function Serialize(dto: ClassConstructor) {
-  return UseInterceptors(new SerializerInterceptor(dto));
-}
-
+@Injectable()
 export class SerializerInterceptor implements NestInterceptor {
-  constructor(private dto: any) {}
+  constructor(private dto: ClassConstructor) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     // Run something before a request is handled by the request handler
@@ -29,4 +25,8 @@ export class SerializerInterceptor implements NestInterceptor {
       }),
     );
   }
+}
+
+export function Serialize(dto: ClassConstructor) {
+  return UseInterceptors(new SerializerInterceptor(dto));
 }
