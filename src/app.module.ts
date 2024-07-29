@@ -1,7 +1,10 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
+import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { join } from 'path';
 import { ReportsModule } from './reports/reports.module';
+import { CustomersModule } from './customers/customers.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/user.entity';
@@ -18,13 +21,22 @@ const cookieSession = require('cookie-session');
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
-    UsersModule,
-    ReportsModule,
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      parser: I18nJsonParser,
+      parserOptions: {
+        path: join(__dirname, '/i18n/'),
+        watch: true,
+      },
+    }),
     TypeOrmModule.forRootAsync({
       useFactory: () => {
         return require('../ormconfig.js');
       },
     }),
+    UsersModule,
+    ReportsModule,
+    CustomersModule,
     JanitorModule,
     // TypeOrmModule.forRootAsync({
     //   inject: [ConfigService],
