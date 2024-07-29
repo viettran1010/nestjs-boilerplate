@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
+import { MiddlewareConsumer, Module, ValidationPipe, BadRequestException } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ReportsModule } from './reports/reports.module';
@@ -9,6 +9,8 @@ import { Report } from './reports/report.entity';
 import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
+import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
+import { join } from 'path';
 import { JanitorModule } from './janitor/janitor.module';
 const cookieSession = require('cookie-session');
 
@@ -17,6 +19,14 @@ const cookieSession = require('cookie-session');
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
+    }),
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      parser: I18nJsonParser,
+      parserOptions: {
+        path: join(__dirname, '/i18n/'),
+        watch: true,
+      },
     }),
     UsersModule,
     ReportsModule,
@@ -56,6 +66,9 @@ const cookieSession = require('cookie-session');
       provide: APP_PIPE,
       useValue: new ValidationPipe({
         whitelist: true,
+        transform: true,
+        forbidNonWhitelisted: true,
+        exceptionFactory: (errors) => new BadRequestException(errors),
       }),
     },
     {
@@ -71,9 +84,9 @@ export class AppModule {
     consumer
       .apply(
         cookieSession({
-          keys: [this.configService.get('COOKIE_KEY')], // for encryption
+          keys: [this.configService.get('COOKIE_KEY')],
         }),
       )
-      .forRoutes('*'); // for all routes
+      .forRoutes('*');
   }
 }
