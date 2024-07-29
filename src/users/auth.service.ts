@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { promisify } from 'util';
+import { MailerService } from '@nestjs-modules/mailer';
 import { UsersService } from './users.service';
 import { randomBytes, scrypt as _scrypt } from 'crypto';
 
@@ -7,7 +8,10 @@ const scrypt = promisify(_scrypt);
 
 @Injectable()
 export class AuthService {
-  constructor(private usersService: UsersService) {}
+  constructor(
+    private usersService: UsersService,
+    private mailerService: MailerService,
+  ) {}
 
   async signup(email: string, password: string) {
     // validate user email doesn't exist
@@ -24,8 +28,29 @@ export class AuthService {
 
     const result = salt + '.' + hash.toString('hex'); // separator to split salt and hash
 
+    // generate a confirmation token
+    const confirmationToken = randomBytes(32).toString('hex');
+
     // create user and save
-    const user = await this.usersService.create(email, result);
+    const user = await this.usersService.create({
+      email,
+      password: result,
+      confirmation_token: confirmationToken,
+      confirmed_at: null,
+    });
+
+    // send confirmation email
+    await this.mailerService.sendMail({
+      to: email,
+      subject: 'Welcome to Our App! Confirm Your Email',
+      template: './email_confirmation', // path to the email template
+      context: { // data to be sent to template engine
+        email,
+        token: confirmationToken,
+        url: `http://myapp.com/confirm?token=${confirmationToken}`, // URL to be used in the email
+      },
+    });
+
     return user;
   }
 
