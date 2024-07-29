@@ -10,6 +10,11 @@ export class UsersService {
     private usersRepository: Repository<User>,
   ) {}
 
+  async validateUserExistence(userId: number): Promise<boolean> {
+    const user = await this.usersRepository.findOneBy({ id: userId });
+    return !!user;
+  }
+
   async create(email: string, password: string) {
     // to make sure user is valid before saving
     // also hooks are called

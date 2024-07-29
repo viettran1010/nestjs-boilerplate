@@ -10,6 +10,7 @@ import {
   Session,
   UseGuards,
   UseInterceptors,
+  NotFoundException,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
@@ -73,4 +74,20 @@ export class UsersController {
   async updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return await this.usersService.update(parseInt(id), body);
   }
+
+  @Post('/log-error')
+  async logInvalidFileFormatError(
+    @Body('user_id') userId: number,
+    @Body('timestamp') timestamp: Date,
+    @Body('file_attachment') fileAttachment: any
+  ) {
+    const userExists = await this.usersService.validateUserExistence(userId);
+    if (!userExists) {
+      throw new NotFoundException('User not found');
+    }
+    // Additional logic to create an entry in the audit_logs table will be implemented here
+    // For now, we just return a placeholder response
+    return { message: 'Invalid file format error logged successfully' };
+  }
+
 }
