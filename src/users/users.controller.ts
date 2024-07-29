@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  NotFoundException,
   Delete,
   Get,
   Param,
@@ -9,7 +10,8 @@ import {
   Query,
   Session,
   UseGuards,
-  UseInterceptors,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
@@ -73,4 +75,24 @@ export class UsersController {
   async updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return await this.usersService.update(parseInt(id), body);
   }
+
+  @Get('/search')
+  @UseGuards(AuthGuard)
+  async searchCustomers(
+    @Query('name') name: string,
+    @Query('katakana') katakana: string,
+    @Query('email_address') email_address: string,
+  ) {
+    try {
+      const results = await this.usersService.searchCustomers({ name, katakana, email_address });
+      return results;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new HttpException('No customers found with the provided criteria.', HttpStatus.NOT_FOUND);
+      }
+      throw error;
+    }
+  }
 }
+
+export default UsersController;
