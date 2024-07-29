@@ -4,12 +4,12 @@ import { AppService } from './app.service';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './users/user.entity';
-import { Report } from './reports/report.entity';
 import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
-import { JanitorModule } from './janitor/janitor.module';
+import { I18nModule, I18nJsonParser } from 'nestjs-i18n';
+import { JwtModule } from '@nestjs/jwt';
+import * as path from 'path';
 const cookieSession = require('cookie-session');
 
 @Module({
@@ -20,12 +20,26 @@ const cookieSession = require('cookie-session');
     }),
     UsersModule,
     ReportsModule,
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      parser: I18nJsonParser,
+      parserOptions: {
+        path: path.join(__dirname, '/i18n/'),
+      },
+    }),
     TypeOrmModule.forRootAsync({
       useFactory: () => {
         return require('../ormconfig.js');
       },
     }),
-    JanitorModule,
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get('JWT_SECRET'),
+        signOptions: { expiresIn: '24h' },
+      }),
+      inject: [ConfigService],
+    }),
     // TypeOrmModule.forRootAsync({
     //   inject: [ConfigService],
     //   useFactory: (configService: ConfigService) => ({
@@ -53,9 +67,11 @@ const cookieSession = require('cookie-session');
   providers: [
     AppService,
     {
-      provide: APP_PIPE,
-      useValue: new ValidationPipe({
+      provide: APP_PIPE, // Global validation pipe
+      useFactory: () => new ValidationPipe({
         whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
       }),
     },
     {

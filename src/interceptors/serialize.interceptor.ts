@@ -6,9 +6,39 @@ import {
 } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { map, Observable } from 'rxjs';
+import { Expose } from 'class-transformer';
+
+// DTO class for the login response
+export class LoginResponseDto {
+  @Expose()
+  access_token: string;
+
+  @Expose()
+  refresh_token: string;
+
+  @Expose()
+  resource_owner: string;
+
+  @Expose()
+  resource_id: number;
+
+  @Expose()
+  expires_in: number;
+
+  @Expose()
+  token_type: string;
+
+  @Expose()
+  scope: string;
+
+  @Expose()
+  created_at: number;
+
+  @Expose()
+  refresh_token_expires_in: number | null;
+}
 
 interface ClassConstructor {
-  // so input must be a class
   new (...args: any[]): {};
 }
 
