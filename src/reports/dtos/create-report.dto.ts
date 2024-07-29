@@ -5,6 +5,9 @@ import {
   IsString,
   Max,
   Min,
+  IsEmail,
+  Length,
+  Matches,
 } from 'class-validator';
 
 export class CreateReportDto {
@@ -19,6 +22,7 @@ export class CreateReportDto {
   @IsString()
   model: string;
 
+  @IsNumber()
   @Min(1930)
   year: number;
 
@@ -32,4 +36,16 @@ export class CreateReportDto {
   @Min(0)
   @Max(1000000)
   mileage: number;
+
+  @IsEmail()
+  email: string;
+
+  @Length(8)
+  @Matches(/^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[#?!@$%^&*-]).{8,}$/)
+  password: string;
+}
+
+export class ResetPasswordRequestDto {
+  @IsEmail()
+  email: string;
 }
