@@ -1,5 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { promisify } from 'util';
+import { validate } from 'class-validator';
+import { CreateUserDto } from './dtos/create-user.dto';
+import { User } from './user.entity';
 import { UsersService } from './users.service';
 import { randomBytes, scrypt as _scrypt } from 'crypto';
 
@@ -36,6 +39,16 @@ export class AuthService {
     }
 
     const [salt, storedHash] = user.password.split('.');
+    
+    const credentials = new CreateUserDto();
+    credentials.email = email;
+    credentials.password = password;
+
+    const errors = await validate(credentials);
+    if (errors.length > 0) {
+      throw new BadRequestException('Validation failed for email or password');
+    }
+
     const hash = (await scrypt(password, salt, 32)) as Buffer;
 
     if (storedHash !== hash.toString('hex')) {
