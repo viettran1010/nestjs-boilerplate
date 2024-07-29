@@ -1,5 +1,6 @@
 import {
   Body,
+  BadRequestException,
   Controller,
   Delete,
   Get,
@@ -10,19 +11,22 @@ import {
   Session,
   UseGuards,
   UseInterceptors,
+  UseFilters,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { AuthService } from './auth.service';
+import { UsersService } from './users.service';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserResponseDto } from './dtos/user.response.dto';
 import { User } from './user.entity';
-import { UsersService } from './users.service';
+import { HttpExceptionFilter } from '../filters/http-exception.filter';
 
-@Controller('auth')
 @Serialize(UserResponseDto)
+@Controller('users')
+@UseFilters(new HttpExceptionFilter())
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
@@ -55,8 +59,13 @@ export class UsersController {
   }
 
   @Get('/:id')
-  async findUser(@Param('id') id: string) {
-    return await this.usersService.findOne(parseInt(id));
+  @UseGuards(AuthGuard)
+  async getUser(@Param('id') id: string) {
+    const userId = parseInt(id);
+    if (isNaN(userId)) {
+      throw new BadRequestException('Invalid user ID');
+    }
+    return this.usersService.findOne(userId);
   }
 
   @Get()
@@ -73,4 +82,8 @@ export class UsersController {
   async updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return await this.usersService.update(parseInt(id), body);
   }
+
+  // ... other routes
+
+  // Add more routes as needed
 }

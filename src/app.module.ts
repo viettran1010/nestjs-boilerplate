@@ -1,6 +1,9 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
+import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
+import i18next from 'i18next';
 import { AppService } from './app.service';
+import { ContractsModule } from './contracts/contracts.module';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -10,26 +13,35 @@ import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
 import { JanitorModule } from './janitor/janitor.module';
+import * as path from 'path';
 const cookieSession = require('cookie-session');
 
 @Module({
-  imports: [
+  imports: [ 
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
     UsersModule,
     ReportsModule,
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      parser: I18nJsonParser, 
+      parserOptions: {
+        path: path.join(__dirname, '/i18n/'),
+      },
+    }),
+    ContractsModule,
     TypeOrmModule.forRootAsync({
       useFactory: () => {
         return require('../ormconfig.js');
       },
     }),
     JanitorModule,
-    // TypeOrmModule.forRootAsync({
+    // TypeOrmModule.forRootAsync({ 
     //   inject: [ConfigService],
     //   useFactory: (configService: ConfigService) => ({
-    //     type: 'postgres',
+    //     type: 'postgres', 
     //     host: configService.get('DB_HOST'),
     //     port: configService.get('DB_PORT'),
     //     username: configService.get('DB_USERNAME'),
@@ -39,7 +51,7 @@ const cookieSession = require('cookie-session');
     //     synchronize: true,
     //   }),
     // }),
-    // TypeOrmModule.forRootAsync({
+    // TypeOrmModule.forRootAsync({ 
     //   inject: [ConfigService],
     //   useFactory: (configService: ConfigService) => ({
     //     type: 'sqlite',
@@ -48,18 +60,16 @@ const cookieSession = require('cookie-session');
     //     synchronize: true,
     //   }),
     // }),
-  ],
+  ], 
   controllers: [AppController],
   providers: [
     AppService,
     {
       provide: APP_PIPE,
-      useValue: new ValidationPipe({
-        whitelist: true,
-      }),
+      useClass: ValidationPipe,
     },
     {
-      provide: APP_INTERCEPTOR,
+      provide: APP_INTERCEPTOR, 
       useClass: CurrentUserInterceptor,
     },
   ],
@@ -67,13 +77,17 @@ const cookieSession = require('cookie-session');
 export class AppModule {
   constructor(private configService: ConfigService) {}
 
-  configure(consumer: MiddlewareConsumer) {
+  configure(consumer: MiddlewareConsumer) { 
     consumer
       .apply(
         cookieSession({
           keys: [this.configService.get('COOKIE_KEY')], // for encryption
         }),
+        i18nextHttpMiddleware({
+          i18n: i18next,
+          order: ['querystring', 'cookie', 'header'],
+        }),
       )
-      .forRoutes('*'); // for all routes
+      .forRoutes('*'); // for all routes 
   }
 }
