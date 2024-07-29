@@ -1,10 +1,9 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
 export const CurrentUser = createParamDecorator(
-  (data: never, context: ExecutionContext) => {
-    // ExecutionContext can work with other protocols, not just HTTP
+  (_data: unknown, context: ExecutionContext) => {
     const request = context.switchToHttp().getRequest();
-    // currentUser is assigned in the CurrentUserInterceptor
-    return request.currentUser;
+    // user is assigned in the AuthGuard
+    return request.user;
   },
 );

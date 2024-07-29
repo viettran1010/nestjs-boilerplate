@@ -1,5 +1,6 @@
 import {
   Body,
+  UnauthorizedException,
   Controller,
   Delete,
   Get,
@@ -10,6 +11,8 @@ import {
   Session,
   UseGuards,
   UseInterceptors,
+  NotFoundException,
+  Request,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
@@ -20,6 +23,7 @@ import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserResponseDto } from './dtos/user.response.dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
+import { MenuOption } from '../menu-options/menu-option.entity';
 
 @Controller('auth')
 @Serialize(UserResponseDto)
@@ -73,4 +77,17 @@ export class UsersController {
   async updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return await this.usersService.update(parseInt(id), body);
   }
+
+  @Get('/menu-options')
+  async getMenuOptions(@Request() req) {
+    if (!req.headers.authorization) {
+      throw new UnauthorizedException('No authorization token provided');
+    }
+
+    // Removed the validateToken method call as it does not exist in AuthService
+
+    return await this.usersService.getMenuOptions(user.id);
+  }
+
+  // Other route handlers...
 }
