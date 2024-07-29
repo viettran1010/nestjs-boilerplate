@@ -1,19 +1,29 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
+import { I18nModule, I18nJsonParser } from '@nestjs/i18n';
 import { AppService } from './app.service';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/user.entity';
 import { Report } from './reports/report.entity';
-import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { APP_INTERCEPTOR, APP_PIPE, I18nLanguageInterceptor } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
 import { JanitorModule } from './janitor/janitor.module';
+import { CustomersModule } from './customers/customers.module';
+import * as path from 'path';
 const cookieSession = require('cookie-session');
 
 @Module({
   imports: [
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      parserOptions: {
+        path: path.join(__dirname, '/i18n/'),
+        parser: I18nJsonParser,
+      },
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
@@ -23,9 +33,11 @@ const cookieSession = require('cookie-session');
     TypeOrmModule.forRootAsync({
       useFactory: () => {
         return require('../ormconfig.js');
+        // Other TypeOrmModule.forRootAsync configurations are commented out
       },
     }),
     JanitorModule,
+    CustomersModule,
     // TypeOrmModule.forRootAsync({
     //   inject: [ConfigService],
     //   useFactory: (configService: ConfigService) => ({
@@ -49,12 +61,10 @@ const cookieSession = require('cookie-session');
     //   }),
     // }),
   ],
-  controllers: [AppController],
   providers: [
-    AppService,
     {
       provide: APP_PIPE,
-      useValue: new ValidationPipe({
+      useClass: new ValidationPipe({
         whitelist: true,
       }),
     },

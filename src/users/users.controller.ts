@@ -9,12 +9,14 @@ import {
   Query,
   Session,
   UseGuards,
-  UseInterceptors,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { AuthService } from './auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
+import { CustomersService } from '../customers/customers.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserResponseDto } from './dtos/user.response.dto';
@@ -26,6 +28,7 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
+    private readonly customersService: CustomersService,
     private authService: AuthService,
   ) {}
 
@@ -72,5 +75,19 @@ export class UsersController {
   @Patch('/:id')
   async updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return await this.usersService.update(parseInt(id), body);
+  }
+
+  @Get('/api/customers/confirmation/:user_id')
+  async getCustomerConfirmation(@Param('user_id') user_id: number) {
+    if (!user_id) {
+      throw new HttpException('Invalid user ID.', HttpStatus.BAD_REQUEST);
+    }
+
+    try {
+      const customer = await this.customersService.getCustomerDetails(user_id);
+      return customer;
+    } catch (error) {
+      throw new HttpException(error.response || 'Customer information not found.', error.status || HttpStatus.NOT_FOUND);
+    }
   }
 }
