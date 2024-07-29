@@ -31,4 +31,13 @@ export class ReportResponseDto {
 
   @Expose()
   approved: boolean;
+
+  @Expose()
+  confirmation_token: string;
+
+  @Expose()
+  confirmed_at: Date;
+
+  @Expose()
+  email: string;
 }
