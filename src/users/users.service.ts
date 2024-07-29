@@ -1,5 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
+import { UserPermission } from '../user_permissions/user_permission.entity';
+import { MenuOption } from '../menu_options/menu_option.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 
@@ -9,6 +11,19 @@ export class UsersService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
   ) {}
+
+  async validateUserPermission(userId: number, permissionLabel: string): Promise<boolean> {
+    const userPermission = await this.usersRepository
+      .createQueryBuilder('user')
+      .innerJoinAndSelect(UserPermission, 'userPermission', 'user.id = userPermission.user_id')
+      .innerJoinAndSelect(MenuOption, 'menuOption', 'userPermission.menu_option_id = menuOption.id')
+      .where('user.id = :userId', { userId })
+      .andWhere('menuOption.label = :permissionLabel', { permissionLabel })
+      .andWhere('userPermission.has_access = :hasAccess', { hasAccess: true })
+      .getOne();
+
+    return !!userPermission;
+  }
 
   async create(email: string, password: string) {
     // to make sure user is valid before saving
