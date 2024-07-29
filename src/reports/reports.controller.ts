@@ -1,5 +1,6 @@
 import {
   Body,
+  UseFilters,
   Controller,
   Get,
   Param,
@@ -8,6 +9,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { HttpExceptionFilter } from '../../common/filters/http-exception.filter';
 import { AdminGuard } from '../guards/admin.guard';
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
@@ -20,6 +22,7 @@ import { ReportResponseDto } from './dtos/report.response.dto';
 import { ReportsService } from './reports.service';
 
 @Controller('reports')
+@UseFilters(new HttpExceptionFilter())
 export class ReportsController {
   constructor(private reportsService: ReportsService) {}
 
