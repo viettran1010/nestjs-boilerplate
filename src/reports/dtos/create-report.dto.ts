@@ -1,35 +1,19 @@
-import {
-  IsLatitude,
-  IsLongitude,
-  IsNumber,
-  IsString,
-  Max,
-  Min,
-} from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, IsDate } from 'class-validator';
 
 export class CreateReportDto {
-  @IsNumber()
-  @Min(0)
-  @Max(1000000)
-  price: number;
+  @IsString()
+  @IsNotEmpty()
+  readonly title: string;
 
   @IsString()
-  maker: string;
-
-  @IsString()
-  model: string;
-
-  @Min(1930)
-  year: number;
-
-  @IsLatitude()
-  lat: number;
-
-  @IsLongitude()
-  lng: number;
+  @IsNotEmpty()
+  readonly content: string;
 
   @IsNumber()
-  @Min(0)
-  @Max(1000000)
-  mileage: number;
+  @IsNotEmpty()
+  readonly authorId: number;
+
+  @IsDate()
+  @IsNotEmpty()
+  readonly date: Date;
 }

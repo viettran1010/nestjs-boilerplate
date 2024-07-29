@@ -1,0 +1,3 @@
+The information provided does not include the actual code content from the file `user_permission.entity.ts`. The patch indicates a file rename operation from `src/user_permissions/user_permission.entity.ts` to `src/user-permissions/user-permission.entity.ts`, but without the original file content, it is not possible to provide the complete and correct code.
+
+To apply the patch and provide the complete code, the original content of the file `user_permission.entity.ts` is required. If you can provide the content of this file, I can then apply the patch and give you the complete code after the rename operation. Without the original code, I cannot fulfill your request. Please provide the content of the file, and I will be happy to assist you further.
