@@ -41,6 +41,9 @@ export class JanitorController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
+    if (!isNaN(Number(id))) {
+      throw new Error('ID must be a number');
+    }
     return this.janitorService.remove(+id);
   }
 
@@ -49,6 +52,7 @@ export class JanitorController {
     if (!isNaN(Number(name))) {
       throw new Error('Name must be a string');
     }
+
     return this.janitorService.searchByName(name);
   }
 }
