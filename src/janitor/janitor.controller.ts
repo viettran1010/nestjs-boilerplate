@@ -1,4 +1,12 @@
-awdawdawdadwđâawdawdawdawdawdawawwaawwaawdawimport { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { JanitorService } from './janitor.service';
 import { CreateJanitorDto } from './dto/create-janitor.dto';
 import { UpdateJanitorDto } from './dto/update-janitor.dto';
@@ -19,6 +27,10 @@ export class JanitorController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
+    if (!isNaN(Number(id))) {
+      throw new Error('ID must be a number');
+    }
+
     return this.janitorService.findOne(+id);
   }
 
