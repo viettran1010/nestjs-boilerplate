@@ -43,4 +43,12 @@ export class JanitorController {
   remove(@Param('id') id: string) {
     return this.janitorService.remove(+id);
   }
+
+  @Get('/search/:name')
+  searchByName(@Param('name') name: string) {
+    if (!isNaN(Number(name))) {
+      throw new Error('Name must be a string');
+    }
+    return this.janitorService.searchByName(name);
+  }
 }
