@@ -1,5 +1,8 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
+import { AddressUpdateModule } from './address_updates/address_update.module';
+import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
+import * as path from 'path';
 import { AppService } from './app.service';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
@@ -18,8 +21,17 @@ const cookieSession = require('cookie-session');
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      parser: I18nJsonParser,
+      parserOptions: {
+        path: path.join(__dirname, '/i18n/'),
+        watch: true,
+      },
+    }),
     UsersModule,
     ReportsModule,
+    AddressUpdateModule,
     TypeOrmModule.forRootAsync({
       useFactory: () => {
         return require('../ormconfig.js');
@@ -28,7 +40,7 @@ const cookieSession = require('cookie-session');
     JanitorModule,
     // TypeOrmModule.forRootAsync({
     //   inject: [ConfigService],
-    //   useFactory: (configService: ConfigService) => ({
+    //   useFactory: (configService: ConfigService) => ({ 
     //     type: 'postgres',
     //     host: configService.get('DB_HOST'),
     //     port: configService.get('DB_PORT'),
@@ -51,12 +63,16 @@ const cookieSession = require('cookie-session');
   ],
   controllers: [AppController],
   providers: [
-    AppService,
+    AppService, 
     {
       provide: APP_PIPE,
-      useValue: new ValidationPipe({
-        whitelist: true,
-      }),
+      useClass: ValidationPipe,
+      useFactory: () => {
+        return new ValidationPipe({
+          whitelist: true,
+          forbidNonWhitelisted: true,
+        });
+      },
     },
     {
       provide: APP_INTERCEPTOR,
