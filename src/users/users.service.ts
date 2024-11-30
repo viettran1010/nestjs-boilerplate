@@ -2,12 +2,15 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
+import { Contract } from '../contracts/contract.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    @InjectRepository(Contract)
+    private contractsRepository: Repository<Contract>,
   ) {}
 
   async create(email: string, password: string) {
@@ -45,4 +48,21 @@ export class UsersService {
     }
     return await this.usersRepository.remove(user);
   }
+
+  async displayContractDetails(id: number) {
+    if (!id) {
+      throw new NotFoundException('Contract ID must be provided');
+    }
+    const contract = await this.contractsRepository.findOneBy({ id });
+    if (!contract) {
+      throw new NotFoundException('Contract not found');
+    }
+    return {
+      customer_id: contract.customer_id,
+      customer_name_katakana: contract.customer_name_katakana,
+      // ... other required fields
+    };
+  }
+
+  // Other methods...
 }
