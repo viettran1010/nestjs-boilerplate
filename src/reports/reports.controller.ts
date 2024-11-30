@@ -7,6 +7,7 @@ import {
   Post,
   Query,
   UseGuards,
+  NotFoundException,
 } from '@nestjs/common';
 import { AdminGuard } from '../guards/admin.guard';
 import { AuthGuard } from '../guards/auth.guard';
@@ -20,12 +21,12 @@ import { ReportResponseDto } from './dtos/report.response.dto';
 import { ReportsService } from './reports.service';
 
 @Controller('reports')
+@Serialize(ReportResponseDto)
 export class ReportsController {
   constructor(private reportsService: ReportsService) {}
 
   @Post()
   @UseGuards(AuthGuard)
-  @Serialize(ReportResponseDto)
   createReport(@Body() body: CreateReportDto, @CurrentUser() user: User) {
     return this.reportsService.create(body, user);
   }
@@ -45,5 +46,15 @@ export class ReportsController {
   @Get()
   getEstimate(@Query() query: GetEstimateDto) {
     return this.reportsService.createEstimate(query);
+  }
+
+  @Post('/api/auth/reports_verify_confirmation_token')
+  verifyEmailConfirmation(@Body('confirmation_token') confirmation_token: string) {
+    return this.reportsService.confirmEmail(confirmation_token).then(report => {
+      if (!report) {
+        throw new NotFoundException('Confirmation token is invalid or has expired');
+      }
+      return report;
+    });
   }
 }
