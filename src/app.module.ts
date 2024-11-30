@@ -1,15 +1,14 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './users/user.entity';
-import { Report } from './reports/report.entity';
 import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
-import { JanitorModule } from './janitor/janitor.module';
+import { ReportsAuthModule } from './reports-auth/reports-auth.module';
 const cookieSession = require('cookie-session');
 
 @Module({
@@ -18,6 +17,13 @@ const cookieSession = require('cookie-session');
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
+    JwtModule.registerAsync({
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get('JWT_SECRET'),
+        signOptions: { expiresIn: '60m' }, // Token expires in 60 minutes
+      }),
+      inject: [ConfigService],
+    }),
     UsersModule,
     ReportsModule,
     TypeOrmModule.forRootAsync({
@@ -25,6 +31,7 @@ const cookieSession = require('cookie-session');
         return require('../ormconfig.js');
       },
     }),
+    ReportsAuthModule,
     JanitorModule,
     // TypeOrmModule.forRootAsync({
     //   inject: [ConfigService],
@@ -49,6 +56,7 @@ const cookieSession = require('cookie-session');
     //   }),
     // }),
   ],
+  exports: [JwtModule, JwtService],
   controllers: [AppController],
   providers: [
     AppService,

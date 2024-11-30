@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { TokenNotFoundException } from 'src/exceptions/token-not-found.exception'; // Added import for TokenNotFoundException
 import { User } from 'src/users/user.entity';
 import { Repository } from 'typeorm';
 import { CreateReportDto } from './dtos/create-report.dto';
@@ -15,7 +16,7 @@ export class ReportsService {
 
   create(body: CreateReportDto, user: User) {
     const report = this.reportsRepository.create(body);
-    report.user = user;
+    report.user = user; // Ensured that the user is set on the report
     return this.reportsRepository.save(report);
   }
 
@@ -24,8 +25,20 @@ export class ReportsService {
     if (!report) {
       throw new NotFoundException('report not found');
     }
-    report.approved = approved;
+    report.approved = approved; // Ensured that the approval status is set on the report
     return await this.reportsRepository.save(report);
+  }
+
+  async removeToken(token: string, token_type_hint: string) {
+    // Logic to remove or blacklist the token
+    // This is a placeholder implementation
+    if (token_type_hint === 'access_token') {
+      // Remove or blacklist the access token
+    } else if (token_type_hint === 'refresh_token') {
+      // Remove or blacklist the refresh token
+    } else {
+      throw new TokenNotFoundException('Token type hint is invalid');
+    }
   }
 
   createEstimate(query: GetEstimateDto) {
