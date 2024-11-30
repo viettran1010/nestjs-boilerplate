@@ -1,8 +1,12 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
+import path from 'path';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
+import { AccountTypeInformation } from './account-type-informations/account-type-information.entity';
+import { ScheduledDeposit } from './scheduled-deposits/scheduled-deposit.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/user.entity';
 import { Report } from './reports/report.entity';
@@ -18,6 +22,14 @@ const cookieSession = require('cookie-session');
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      parser: I18nJsonParser,
+      parserOptions: {
+        path: path.join(__dirname, '/i18n/'),
+        watch: true,
+      },
+    }),
     UsersModule,
     ReportsModule,
     TypeOrmModule.forRootAsync({
@@ -26,6 +38,7 @@ const cookieSession = require('cookie-session');
       },
     }),
     JanitorModule,
+    TypeOrmModule.forFeature([AccountTypeInformation, ScheduledDeposit]),
     // TypeOrmModule.forRootAsync({
     //   inject: [ConfigService],
     //   useFactory: (configService: ConfigService) => ({
@@ -49,7 +62,7 @@ const cookieSession = require('cookie-session');
     //   }),
     // }),
   ],
-  controllers: [AppController],
+  controllers: [AppController], // Keep existing controllers
   providers: [
     AppService,
     {
@@ -57,7 +70,7 @@ const cookieSession = require('cookie-session');
       useValue: new ValidationPipe({
         whitelist: true,
       }),
-    },
+    }, // Keep existing providers
     {
       provide: APP_INTERCEPTOR,
       useClass: CurrentUserInterceptor,
