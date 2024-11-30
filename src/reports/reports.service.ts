@@ -1,16 +1,24 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { randomBytes } from 'crypto';
+import { EmailService } from '../email/email.service';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import { User } from 'src/users/user.entity';
 import { Repository } from 'typeorm';
 import { CreateReportDto } from './dtos/create-report.dto';
 import { GetEstimateDto } from './dtos/get-estimate.dto';
 import { Report } from './report.entity';
+import { ReportsRepository } from './reports.repository'; // Assuming this exists and is correctly implemented
 
 @Injectable()
 export class ReportsService {
   constructor(
     @InjectRepository(Report)
     private readonly reportsRepository: Repository<Report>,
+    private jwtService: JwtService,
+    private configService: ConfigService,
+    private emailService: EmailService,
   ) {}
 
   create(body: CreateReportDto, user: User) {
@@ -41,5 +49,57 @@ export class ReportsService {
       .setParameters({ mileage: query.mileage })
       .limit(3)
       .getRawOne();
+  }
+
+  async refreshToken(refreshToken: string, scope: string) {
+    // This is a placeholder for actual refresh token validation logic
+    const isValid = this.validateRefreshToken(refreshToken, scope);
+    if (!isValid) {
+      throw new BadRequestException('Refresh token is not valid');
+    }
+
+    // Delete old refresh token logic (not implemented)
+
+    // Generate new access token and refresh token
+    const payload = { scope };
+    const accessToken = await this.jwtService.signAsync(payload, {
+      secret: this.configService.get('JWT_SECRET'),
+      expiresIn: '24h',
+    });
+    const newRefreshToken = await this.jwtService.signAsync(payload, {
+      secret: this.configService.get('JWT_SECRET'),
+      expiresIn: '24h',
+    });
+
+    // Return the new tokens and other required information
+    return { accessToken, refreshToken: newRefreshToken };
+  }
+
+  // Placeholder for refresh token validation logic
+  private validateRefreshToken(refreshToken: string, scope: string): boolean {
+    // Implement the actual logic to validate the refresh token
+    // This is just a placeholder and should be replaced with real validation
+    return true; // Assuming the token is valid for the example
+  }
+
+  async resetPasswordRequest(email: string) {
+    const report = await this.reportsRepository.findOne({ where: { email } });
+    if (!report) {
+      return;
+    }
+
+    const token = randomBytes(20).toString('hex');
+    report.reset_password_token = token;
+    report.reset_password_sent_at = new Date();
+
+    await this.reportsRepository.save(report);
+
+    const resetPasswordUrl = `http://yourfrontend.com/reset-password?token=${token}`;
+    await this.emailService.sendMail({
+      to: email,
+      subject: 'Reset your password',
+      template: 'email_reset_password',
+      context: { token, url: resetPasswordUrl },
+    });
   }
 }
