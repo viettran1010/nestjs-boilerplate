@@ -19,13 +19,16 @@ export class CreateReportDto {
   @IsString()
   model: string;
 
+  @IsNumber()
   @Min(1930)
   year: number;
 
   @IsLatitude()
+  @IsNumber()
   lat: number;
 
   @IsLongitude()
+  @IsNumber()
   lng: number;
 
   @IsNumber()
