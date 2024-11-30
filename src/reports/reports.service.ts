@@ -1,5 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { LessThan, MoreThan } from 'typeorm'; // Added LessThan import
 import { User } from 'src/users/user.entity';
 import { Repository } from 'typeorm';
 import { CreateReportDto } from './dtos/create-report.dto';
@@ -28,6 +29,26 @@ export class ReportsService {
     return await this.reportsRepository.save(report);
   }
 
+  async confirmEmail(confirmation_token: string) { // Parameter name changed to confirmation_token
+    const report = await this.reportsRepository.findOne({
+      where: {
+        confirmation_token: confirmation_token,
+        confirmed_at: null,
+        confirmation_sent_at: MoreThan(new Date(0)) // Assuming tokens never expire
+      }
+    });
+
+    if (!report) {
+      throw new BadRequestException('Confirmation token is not valid or has already been confirmed');
+    }
+
+    // Assuming there is no expiration time for the confirmation token
+    report.confirmed_at = new Date();
+    await this.reportsRepository.save(report);
+
+    return report;
+  }
+
   createEstimate(query: GetEstimateDto) {
     return this.reportsRepository
       .createQueryBuilder()
@@ -42,4 +63,6 @@ export class ReportsService {
       .limit(3)
       .getRawOne();
   }
+
+  // Other methods...
 }

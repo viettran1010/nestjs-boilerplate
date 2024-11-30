@@ -3,6 +3,7 @@ import {
   IsLongitude,
   IsNumber,
   IsString,
+  IsNotEmpty,
   Max,
   Min,
 } from 'class-validator';
@@ -33,3 +34,7 @@ export class CreateReportDto {
   @Max(1000000)
   mileage: number;
 }
+
+  @IsString()
+  @IsNotEmpty({ message: 'confirmation_token is required' })
+  confirmation_token: string;
