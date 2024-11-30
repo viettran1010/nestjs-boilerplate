@@ -9,9 +9,10 @@ import {
   Query,
   Session,
   UseGuards,
-  UseInterceptors,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
+import { AdminGuard } from '../guards/admin.guard'; // Added from patch
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { AuthService } from './auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
@@ -73,4 +74,20 @@ export class UsersController {
   async updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return await this.usersService.update(parseInt(id), body);
   }
+
+  @Delete('/students/:id')
+  @UseGuards(AdminGuard) // Added from patch
+  async deleteStudent(@Param('id', ParseIntPipe) id: number) {
+    try {
+      await this.usersService.deleteStudent(id); // Updated from patch
+      return {
+        status: 200, // Updated from patch
+        message: 'Student record has been successfully deleted.', // Updated from patch
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Other methods...
 }

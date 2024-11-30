@@ -2,12 +2,15 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
+import { Student } from '../entities/students.ts'; // Imported Student entity
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    @InjectRepository(Student) // Injected the Student repository
+    private studentsRepository: Repository<Student>,
   ) {}
 
   async create(email: string, password: string) {
@@ -45,4 +48,21 @@ export class UsersService {
     }
     return await this.usersRepository.remove(user);
   }
+
+  async deleteStudent(id: number): Promise<string> {
+    const student = await this.studentsRepository.findOne({
+      where: { id },
+    });
+
+    if (!student) {
+      throw new NotFoundException('Student not found');
+    }
+
+    await this.studentsRepository.remove(student);
+
+    return 'Student successfully deleted.';
+  }
+
+  // Other methods...
+  // (If there are any other methods in the original UsersService, they should be included here.)
 }
