@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
+import { SuccessMessage } from '../success_messages/success_message.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 
@@ -8,20 +9,37 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    @InjectRepository(SuccessMessage)
+    private successMessagesRepository: Repository<SuccessMessage>
   ) {}
 
   async create(email: string, password: string) {
-    // to make sure user is valid before saving
-    // also hooks are called
     const user = this.usersRepository.create({ email, password });
     return await this.usersRepository.save(user);
   }
 
-  async findOne(id: number) {
+  async findOne(id: number): Promise<User | null> {
     if (!id) {
       return null;
     }
     return await this.usersRepository.findOneBy({ id });
+  }
+
+  async recordSuccessMessage(userId: number, message: string, detail: string): Promise<SuccessMessage> {
+    const user = await this.usersRepository.findOneBy({ id: userId });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const successMessage = new SuccessMessage();
+    successMessage.user_id = user.id;
+    successMessage.message = message;
+    successMessage.detail = detail;
+    successMessage.displayed_at = new Date();
+
+    await this.successMessagesRepository.save(successMessage);
+
+    return successMessage;
   }
 
   async find(email: string) {

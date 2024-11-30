@@ -1,15 +1,14 @@
 import {
   Body,
   Controller,
+  Post,
   Delete,
   Get,
   Param,
   Patch,
-  Post,
   Query,
   Session,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
@@ -72,5 +71,13 @@ export class UsersController {
   @Patch('/:id')
   async updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return await this.usersService.update(parseInt(id), body);
+  }
+
+  // Other methods that might use recordSuccessMessage...
+
+  // Example method that might use recordSuccessMessage
+  async someMethodThatRecordsSuccess(@Param('userId') userId: number, @Body() messageDetails: any) {
+    // Correct method name is used here
+    return await this.usersService.recordSuccessMessage(userId, messageDetails.message, messageDetails.detail);
   }
 }
