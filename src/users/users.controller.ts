@@ -10,6 +10,8 @@ import {
   Session,
   UseGuards,
   UseInterceptors,
+  ClassSerializerInterceptor,
+  BadRequestException,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
@@ -47,11 +49,17 @@ export class UsersController {
     return user;
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Post('/signin')
   async signin(@Body() body: CreateUserDto, @Session() session: any) {
-    const user = await this.authService.signin(body.email, body.password);
-    session.userId = user.id;
-    return user;
+    try {
+      const { email, password } = body;
+      const user = await this.authService.signin(email, password);
+      session.userId = user.id;
+      return user;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   @Get('/:id')
