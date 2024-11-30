@@ -1,13 +1,16 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
+import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n'; // Ensure this package is installed
+import { ConfigService } from '@nestjs/config'; // Import ConfigService from the correct module
+import * as path from 'path';
 import { AppService } from './app.service';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
+import { ErrorMessagesModule } from './error_messages/error_messages.module';
+import { AuditLogsModule } from './audit_logs/audit_logs.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './users/user.entity';
-import { Report } from './reports/report.entity';
 import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { CurrentUserInterceptor } from './users/interceptors/current-user.interceptor';
 import { JanitorModule } from './janitor/janitor.module';
 const cookieSession = require('cookie-session');
@@ -18,6 +21,14 @@ const cookieSession = require('cookie-session');
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      parser: I18nJsonParser,
+      parserOptions: {
+        path: path.join(__dirname, '/i18n/'),
+        watch: true,
+      },
+    }),
     UsersModule,
     ReportsModule,
     TypeOrmModule.forRootAsync({
@@ -26,6 +37,9 @@ const cookieSession = require('cookie-session');
       },
     }),
     JanitorModule,
+    // Add new modules here
+    ErrorMessagesModule,
+    AuditLogsModule,
     // TypeOrmModule.forRootAsync({
     //   inject: [ConfigService],
     //   useFactory: (configService: ConfigService) => ({
@@ -51,12 +65,15 @@ const cookieSession = require('cookie-session');
   ],
   controllers: [AppController],
   providers: [
-    AppService,
+    AppService, ConfigService, // Add ConfigService to the providers array if it's not provided elsewhere
     {
       provide: APP_PIPE,
-      useValue: new ValidationPipe({
-        whitelist: true,
-      }),
+      useClass: ValidationPipe,
+      useFactory: () => {
+        return new ValidationPipe({
+          whitelist: true,
+        });
+      },
     },
     {
       provide: APP_INTERCEPTOR,
