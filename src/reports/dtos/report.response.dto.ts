@@ -32,3 +32,10 @@ export class ReportResponseDto {
   @Expose()
   approved: boolean;
 }
+
+import { IsNotEmpty } from 'class-validator';
+
+export class LogoutReportDto {
+  @IsNotEmpty({ message: 'token is required' })
+  token: string;
+}

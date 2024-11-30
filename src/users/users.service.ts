@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 
@@ -13,7 +14,8 @@ export class UsersService {
   async create(email: string, password: string) {
     // to make sure user is valid before saving
     // also hooks are called
-    const user = this.usersRepository.create({ email, password });
+    const hashedPassword = await bcrypt.hash(password, 12);
+    const user = this.usersRepository.create({ email, password: hashedPassword });
     return await this.usersRepository.save(user);
   }
 
@@ -34,6 +36,9 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException('user not found');
     }
+    if (attrs.password) {
+      attrs.password = await bcrypt.hash(attrs.password, 12);
+    }
     Object.assign(user, attrs);
     return await this.usersRepository.save(user);
   }
@@ -44,5 +49,22 @@ export class UsersService {
       throw new NotFoundException('user not found');
     }
     return await this.usersRepository.remove(user);
+  }
+
+  async validateUser(email: string, password: string): Promise<User | null> {
+    const user = await this.usersRepository.findOne({
+      where: { email },
+    });
+
+    if (!user) {
+      return null;
+    }
+
+    const passwordValid = await bcrypt.compare(password, user.password);
+    if (!passwordValid) {
+      return null;
+    }
+
+    return user;
   }
 }
