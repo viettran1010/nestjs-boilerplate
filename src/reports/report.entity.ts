@@ -30,6 +30,27 @@ export class Report {
   @Column()
   mileage: number;
 
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  encrypted_password: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  email: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  reset_password_token: string;
+
+  @Column({ type: 'timestamp', nullable: true })
+  reset_password_sent_at: Date;
+
+  @Column({ type: 'timestamp', nullable: true })
+  remember_created_at: Date;
+
+  @Column({ type: 'timestamp', nullable: true })
+  current_sign_in_at: Date;
+
+  @Column({ type: 'timestamp', nullable: true })
+  last_sign_in_at: Date;
+
   @ManyToOne(() => User, (user) => user.reports) // 1st arg to solve circular dependency
   user: User;
 }
