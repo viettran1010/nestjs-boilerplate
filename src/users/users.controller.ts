@@ -1,5 +1,6 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
@@ -15,6 +16,7 @@ import { AuthGuard } from '../guards/auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { AuthService } from './auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
+import { LogEntryDto } from './dtos/log-entry.dto';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserResponseDto } from './dtos/user.response.dto';
@@ -23,6 +25,8 @@ import { UsersService } from './users.service';
 
 @Controller('auth')
 @Serialize(UserResponseDto)
+@UseInterceptors(ClassSerializerInterceptor)
+@UseGuards(AuthGuard)
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
@@ -30,7 +34,6 @@ export class UsersController {
   ) {}
 
   @Get('/whoami')
-  @UseGuards(AuthGuard)
   whoAmI(@CurrentUser() user: User) {
     return user;
   }
@@ -73,4 +76,15 @@ export class UsersController {
   async updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return await this.usersService.update(parseInt(id), body);
   }
+
+  @Post('/log-entry')
+  async logEntry(@Body() body: LogEntryDto) {
+    return await this.usersService.logEntryAction(
+      body.action,
+      body.timestamp,
+      body.contract_id,
+      body.user_id,
+    );
+  }
+
 }
