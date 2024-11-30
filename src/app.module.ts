@@ -1,5 +1,9 @@
-import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod, ValidationPipe } from '@nestjs/common';
+import { I18nModule, I18nJsonParser } from 'nestjs-i18n';
 import { AppController } from './app.controller';
+import { join } from 'path';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
 import { AppService } from './app.service';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
@@ -12,11 +16,18 @@ import { CurrentUserInterceptor } from './users/interceptors/current-user.interc
 import { JanitorModule } from './janitor/janitor.module';
 const cookieSession = require('cookie-session');
 
+const i18nPath = join(__dirname, '/i18n');
+
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
+    }),
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      parser: I18nJsonParser,
+      parserOptions: { path: i18nPath },
     }),
     UsersModule,
     ReportsModule,
@@ -24,6 +35,11 @@ const cookieSession = require('cookie-session');
       useFactory: () => {
         return require('../ormconfig.js');
       },
+    }),
+    MailerModule.forRootAsync({
+      useFactory: () => ({
+        // Mailer configuration here
+      }),
     }),
     JanitorModule,
     // TypeOrmModule.forRootAsync({
@@ -51,16 +67,30 @@ const cookieSession = require('cookie-session');
   ],
   controllers: [AppController],
   providers: [
-    AppService,
+    AppService, // Keep existing providers
     {
       provide: APP_PIPE,
-      useValue: new ValidationPipe({
-        whitelist: true,
-      }),
+      useClass: ValidationPipe, // Change from useValue to useClass
+      useFactory: () => {
+        return new ValidationPipe({
+          whitelist: true, forbidNonWhitelisted: true, transform: true,
+        });
+      },
     },
     {
       provide: APP_INTERCEPTOR,
       useClass: CurrentUserInterceptor,
+    },
+    // Email service provider
+    {
+      provide: 'EmailService',
+      useFactory: () => {
+        return {
+          sendResetPasswordEmail: (report) => {
+            // Implementation of sending email using the "email_reset_password" template
+          },
+        };
+      },
     },
   ],
 })
