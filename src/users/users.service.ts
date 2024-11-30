@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
+import { randomBytes } from 'crypto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 
@@ -15,6 +16,11 @@ export class UsersService {
     // also hooks are called
     const user = this.usersRepository.create({ email, password });
     return await this.usersRepository.save(user);
+  }
+
+  async generateConfirmationToken(): Promise<string> {
+    const token = randomBytes(32).toString('hex');
+    return token;
   }
 
   async findOne(id: number) {

@@ -1,5 +1,6 @@
 import {
   Body,
+  BadRequestException,
   Controller,
   Delete,
   Get,
@@ -32,6 +33,27 @@ export class UsersController {
   @Get('/whoami')
   @UseGuards(AuthGuard)
   whoAmI(@CurrentUser() user: User) {
+    return user;
+  }
+
+  @Post('/signup-with-email')
+  async signupWithEmail(@Body() body: CreateUserDto) {
+    const users = await this.usersService.find(body.email);
+    if (users.length) {
+      throw new BadRequestException('Email is already taken');
+    }
+
+    const confirmation_token = await this.authService.generateConfirmationToken();
+    const user = await this.usersService.create(body.email, body.password, confirmation_token);
+
+    // Assuming confirmed_at is set to null by default in the create method
+    // If not, you should explicitly set it to null here
+
+    await this.authService.sendConfirmationEmail(body.email, confirmation_token);
+
+    // Assuming that the user object is returned from the create method
+    // If not, you should fetch the user from the database here
+
     return user;
   }
 
