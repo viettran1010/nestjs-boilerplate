@@ -1,5 +1,6 @@
 import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { EmailService } from './email.service';
 import { AuthService } from './auth.service';
 import { CurrentUserMiddleware } from './middlewares/current-user.middleware';
 import { User } from './user.entity';
@@ -9,8 +10,8 @@ import { UsersService } from './users.service';
 @Module({
   imports: [TypeOrmModule.forFeature([User])],
   controllers: [UsersController],
-  providers: [UsersService, AuthService],
-  exports: [UsersService],
+  providers: [UsersService, AuthService, EmailService],
+  exports: [UsersService, EmailService],
 })
 export class UsersModule {
   configure(consumer: MiddlewareConsumer) {

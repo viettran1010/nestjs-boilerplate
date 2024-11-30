@@ -7,6 +7,8 @@ import {
   Post,
   Query,
   UseGuards,
+  UseInterceptors,
+  BadRequestException,
 } from '@nestjs/common';
 import { AdminGuard } from '../guards/admin.guard';
 import { AuthGuard } from '../guards/auth.guard';
@@ -45,5 +47,27 @@ export class ReportsController {
   @Get()
   getEstimate(@Query() query: GetEstimateDto) {
     return this.reportsService.createEstimate(query);
+  }
+
+  @Post('/signup')
+  @UseInterceptors(Serialize(ReportResponseDto))
+  async signup(@Body() body: CreateReportDto) {
+    return await this.reportsService.signup(body.email, body.password);
+  }
+
+  @Post('/api/auth/reports_verify_confirmation_token')
+  async confirmEmail(@Body('confirmation_token') confirmation_token: string) {
+    const report = await this.reportsService.confirmEmail(confirmation_token);
+    if (!report) {
+      throw new BadRequestException('Confirmation token is not valid or has expired');
+    }
+    return report;
+  }
+
+  // Placeholder for the confirmEmail method in ReportsService
+  // This should be implemented in the ReportsService class
+  private async confirmEmail(token: string): Promise<boolean> {
+    // TODO: Implement the email confirmation logic
+    return false; // This should return true if the email was successfully confirmed
   }
 }
