@@ -1,5 +1,8 @@
-import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
+import { I18nModule, I18nJsonParser } from '@nestjs-modules/i18n';
+import path from 'path';
+import { AddressUpdateModule } from './address_updates/address_update.module';
 import { AppService } from './app.service';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
@@ -18,6 +21,14 @@ const cookieSession = require('cookie-session');
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      parser: I18nJsonParser,
+      parserOptions: {
+        path: path.join(__dirname, '/i18n/'),
+        watch: true,
+      },
+    }),
     UsersModule,
     ReportsModule,
     TypeOrmModule.forRootAsync({
@@ -25,6 +36,7 @@ const cookieSession = require('cookie-session');
         return require('../ormconfig.js');
       },
     }),
+    AddressUpdateModule,
     JanitorModule,
     // TypeOrmModule.forRootAsync({
     //   inject: [ConfigService],
@@ -54,9 +66,10 @@ const cookieSession = require('cookie-session');
     AppService,
     {
       provide: APP_PIPE,
-      useValue: new ValidationPipe({
+      useClass: ValidationPipe,
+      useValue: {
         whitelist: true,
-      }),
+      },
     },
     {
       provide: APP_INTERCEPTOR,
@@ -64,7 +77,7 @@ const cookieSession = require('cookie-session');
     },
   ],
 })
-export class AppModule {
+export class AppModule implements NestModule {
   constructor(private configService: ConfigService) {}
 
   configure(consumer: MiddlewareConsumer) {
