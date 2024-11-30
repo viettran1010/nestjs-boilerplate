@@ -1,0 +1,3 @@
+I'm sorry, but you have not provided the original code from the file `src/users/user.entity.ts` that the patch should be applied to. The patch you've provided indicates a file rename operation from `user.entity.ts` to `users.entity.ts`, but without the original code, I cannot provide you with the complete and correct code after applying the patch.
+
+Please provide the original code from `src/users/user.entity.ts`, and I will be able to apply the patch and give you the complete code as requested.

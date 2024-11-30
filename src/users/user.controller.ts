@@ -1,0 +1,3 @@
+I'm sorry, but you have not provided the current code that needs to be patched. The patch you've provided indicates a change in an import statement from `user.entity` to `users.entity` in a file named `user.controller.ts`. However, without the original code from the `user.controller.ts` file, I cannot apply the patch and provide you with the complete and correct code.
+
+Please provide the current code from the `user.controller.ts` file, and I will be able to apply the patch and give you the updated code.
