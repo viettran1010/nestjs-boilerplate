@@ -1,5 +1,9 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
+import { AuditLog } from './audit_logs/audit_log.entity';
+import { AddressUpdate } from './address_updates/address_update.entity';
+import { AuditLogService } from './audit_logs/audit_logs.service';
+import { AddressUpdateService } from './address_updates/address_updates.service';
 import { AppService } from './app.service';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
@@ -26,6 +30,7 @@ const cookieSession = require('cookie-session');
       },
     }),
     JanitorModule,
+    TypeOrmModule.forFeature([AuditLog, AddressUpdate]),
     // TypeOrmModule.forRootAsync({
     //   inject: [ConfigService],
     //   useFactory: (configService: ConfigService) => ({
@@ -52,6 +57,8 @@ const cookieSession = require('cookie-session');
   controllers: [AppController],
   providers: [
     AppService,
+    AuditLogService,
+    AddressUpdateService,
     {
       provide: APP_PIPE,
       useValue: new ValidationPipe({
