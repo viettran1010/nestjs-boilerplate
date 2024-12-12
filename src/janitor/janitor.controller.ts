@@ -17,6 +17,9 @@ export class JanitorController {
 
   @Post()
   create(@Body() createJanitorDto: CreateJanitorDto) {
+    if (!createJanitorDto) {
+      throw new Error('Create Janitor DTO is required');
+    }
     return this.janitorService.create(createJanitorDto);
   }
 
