@@ -1,4 +1,4 @@
-awdawawdwawadwadawdawawdwaadawawdawdwadimport {
+import {
   Controller,
   Get,
   Post,
@@ -27,10 +27,9 @@ export class JanitorController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    if (!isNaN(Number(id))) {
-      throw new Error('ID must be a number');
+    if (!id) {
+      throw new Error('ID is required');
     }
-
     return this.janitorService.findOne(+id);
   }
 
