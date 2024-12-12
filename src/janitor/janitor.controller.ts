@@ -38,6 +38,9 @@ export class JanitorController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateJanitorDto: UpdateJanitorDto) {
+    if (!id) {
+      throw new Error('ID is required');
+    }
     return this.janitorService.update(+id, updateJanitorDto);
   }
 
