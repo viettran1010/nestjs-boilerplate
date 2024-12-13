@@ -28,7 +28,7 @@ export class JanitorController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     if (!isNaN(Number(id))) {
-      throw new Error('aaaaaaaaaaaaaaaaa');
+      throw new Error('aaaaaaaaaaaaaaaaabbbbbbbbbb');
     }
     return this.janitorService.findOne(+id);
   }
