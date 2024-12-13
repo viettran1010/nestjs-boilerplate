@@ -27,6 +27,9 @@ export class ReportsController {
   @UseGuards(AuthGuard)
   @Serialize(ReportResponseDto)
   createReport(@Body() body: CreateReportDto, @CurrentUser() user: User) {
+    if (body.price < 0) {
+      throw new Error('Price cannot be negative');
+    }
     return this.reportsService.create(body, user);
   }
 

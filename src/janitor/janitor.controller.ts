@@ -1,4 +1,4 @@
-awdawawdwawadwadawdawawdwaadawawdawdwadimport {
+import {
   Controller,
   Get,
   Post,
@@ -17,6 +17,9 @@ export class JanitorController {
 
   @Post()
   create(@Body() createJanitorDto: CreateJanitorDto) {
+    if (!createJanitorDto) {
+      throw new Error('Create Janitor DTO is required');
+    }
     return this.janitorService.create(createJanitorDto);
   }
 
@@ -28,14 +31,16 @@ export class JanitorController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     if (!isNaN(Number(id))) {
-      throw new Error('ID must be a number');
+      throw new Error('testing if ID must be a number');
     }
-
     return this.janitorService.findOne(+id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateJanitorDto: UpdateJanitorDto) {
+    if (!id) {
+      throw new Error('ID is required');
+    }
     return this.janitorService.update(+id, updateJanitorDto);
   }
 
