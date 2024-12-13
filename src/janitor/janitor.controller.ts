@@ -27,33 +27,24 @@ export class JanitorController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    if (!isNaN(Number(id))) {
-      throw new Error('aaaaaaaaaaaaaaaaabbbbbbbbbb');
-    }
     return this.janitorService.findOne(+id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateJanitorDto: UpdateJanitorDto) {
-    if (!id) {
-      throw new Error('ID is required');
-    }
+    
     return this.janitorService.update(+id, updateJanitorDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    if (!isNaN(Number(id))) {
-      throw new Error('ID must be a number');
-    }
+    
     return this.janitorService.remove(+id);
   }
 
   @Get('/search/:name')
   searchByName(@Param('name') name: string) {
-    if (!isNaN(Number(name))) {
-      throw new Error('Name must be a string');
-    }
+    
 
     return this.janitorService.searchByName(name);
   }
