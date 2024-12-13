@@ -17,6 +17,9 @@ export class JanitorController {
 
   @Post()
   create(@Body() createJanitorDto: CreateJanitorDto) {
+    if (!createJanitorDto.name) {
+      throw new Error('Name is required');
+    }
     return this.janitorService.create(createJanitorDto);
   }
 
@@ -32,20 +35,16 @@ export class JanitorController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateJanitorDto: UpdateJanitorDto) {
-    
     return this.janitorService.update(+id, updateJanitorDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    
     return this.janitorService.remove(+id);
   }
 
   @Get('/search/:name')
   searchByName(@Param('name') name: string) {
-    
-
     return this.janitorService.searchByName(name);
   }
 }
