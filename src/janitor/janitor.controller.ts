@@ -17,9 +17,7 @@ export class JanitorController {
 
   @Post()
   create(@Body() createJanitorDto: CreateJanitorDto) {
-    if (!createJanitorDto.name) {
-      throw new Error('Name is required');
-    }
+    
     return this.janitorService.create(createJanitorDto);
   }
 
