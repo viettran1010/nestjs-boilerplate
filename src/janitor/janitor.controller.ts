@@ -1,4 +1,4 @@
-ădawawdawdawdawădwaawdwaddwadawimport {
+ădwaădawawdawdawdawădwaawdwaddwadawimport {
   Controller,
   Get,
   Post,
