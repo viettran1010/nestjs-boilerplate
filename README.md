@@ -1,4 +1,4 @@
-awdawdadawdawdadawdwa1231## technologies
+adawdawdawdadawdawdadawdwa1231## technologies
 
 - typescript
 - nestjs pipes
