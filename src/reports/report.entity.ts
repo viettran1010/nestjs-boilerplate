@@ -27,9 +27,13 @@ export class Report {
   @Column()
   lng: number;
 
+  @Column({ type: 'varchar', length: 255, nullable: true })
   @Column()
   mileage: number;
 
-  @ManyToOne(() => User, (user) => user.reports) // 1st arg to solve circular dependency
+  @Column('hello', { nullable: true })
+  hello?: string;
+
+  @ManyToOne(() => User, (user) => user.reports)
   user: User;
 }
