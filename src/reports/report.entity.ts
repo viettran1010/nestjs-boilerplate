@@ -1,4 +1,4 @@
-ădwadwaawdawdawdawawdawdimport { User } from '../users/user.entity';
+ădawdwaădwadwaawdawdawdawawdawdimport { User } from '../users/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 
 @Entity()
