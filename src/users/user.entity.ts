@@ -34,7 +34,7 @@ export class User {
   age?: number;
 
   @Column()
-  ip?: InetworkAddress;
+  newIp?: Inet;
 
   @AfterInsert()
   logInsert() {
