@@ -33,7 +33,7 @@ export class User {
   @Column({ nullable: true })
   age?: number;
 
-  @Column({ nullable: true })
+  @Column()
   ip?: InetworkAddress;
 
   @AfterInsert()
