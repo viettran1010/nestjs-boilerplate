@@ -33,6 +33,9 @@ export class User {
   @Column({ nullable: true })
   age?: number;
 
+  @Column({ nullable: true })
+  ip?: InetworkAddress;
+
   @AfterInsert()
   logInsert() {
     console.log('Inserted user with id: ', this.id);
