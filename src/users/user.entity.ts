@@ -35,6 +35,7 @@ export class User {
 
   @Column()
   newIp?: Inet;
+  adwadwa;
 
   @AfterInsert()
   logInsert() {
