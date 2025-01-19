@@ -32,6 +32,7 @@ export class User {
 
   @Column({ nullable: true })
   age?: number;
+  adwwadadaw;
 
   @Column()
   newIp?: Inet;
