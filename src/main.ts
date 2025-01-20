@@ -1,4 +1,4 @@
-awdawdimport { NestFactory } from '@nestjs/core';
+awdwadawdawdimport { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
