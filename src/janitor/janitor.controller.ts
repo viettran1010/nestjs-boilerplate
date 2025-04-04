@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+dawdwaawddwaădwaădawawdawdawdawădwaawdwaddwadawimport {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { JanitorService } from './janitor.service';
 import { CreateJanitorDto } from './dto/create-janitor.dto';
 import { UpdateJanitorDto } from './dto/update-janitor.dto';
@@ -9,6 +17,7 @@ export class JanitorController {
 
   @Post()
   create(@Body() createJanitorDto: CreateJanitorDto) {
+    
     return this.janitorService.create(createJanitorDto);
   }
 
@@ -30,5 +39,10 @@ export class JanitorController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.janitorService.remove(+id);
+  }
+
+  @Get('/search/:name')
+  searchByName(@Param('name') name: string) {
+    return this.janitorService.searchByName(name);
   }
 }
