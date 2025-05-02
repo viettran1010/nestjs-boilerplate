@@ -1,7 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, HttpException, HttpStatus } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as bcrypt from 'bcrypt';
 import { User } from './user.entity';
+import { CreateUserDto } from './dtos/create-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -9,6 +11,25 @@ export class UsersService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
   ) {}
+
+  async createUser(createUserDto: CreateUserDto) {
+    const { email, password } = createUserDto;
+    const existingUser = await this.usersRepository.findOneBy({ email });
+
+    if (existingUser) {
+      throw new HttpException('Duplicate email', HttpStatus.BAD_REQUEST);
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    const user = this.usersRepository.create({
+      email,
+      password: hashedPassword,
+      admin: false,
+    });
+
+    return await this.usersRepository.save(user);
+  }
 
   async create(email: string, password: string) {
     // to make sure user is valid before saving
@@ -24,9 +45,8 @@ export class UsersService {
     return await this.usersRepository.findOneBy({ id });
   }
 
-  async find(email: string) {
-    console.log('email: ', email);
-    return await this.usersRepository.findBy({ email });
+  async findByEmail(email: string): Promise<User | null> {
+    return await this.usersRepository.findOneBy({ email });
   }
 
   async update(id: number, attrs: Partial<User>) {
