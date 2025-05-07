@@ -10,7 +10,7 @@ import { UsersService } from './users.service';
   imports: [TypeOrmModule.forFeature([User])],
   controllers: [UsersController],
   providers: [UsersService, AuthService],
-  exports: [UsersService],
+  exports: [UsersService], // UsersService is already added to the exports array
 })
 export class UsersModule {
   configure(consumer: MiddlewareConsumer) {
