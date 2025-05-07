@@ -5,5 +5,14 @@ export class UserResponseDto {
   id: number;
 
   @Expose()
-  email: string;
+  name: string;
+
+  @Expose()
+  katakana: string;
+
+  @Expose()
+  phoneNumber: string;
+
+  @Expose()
+  emailAddress: string;
 }
